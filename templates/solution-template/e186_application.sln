@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "e186", "repo\engine\project\e186.vcxproj", "{30023C00-5960-46C2-9812-8BF359162A34}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "e186", "engine\project\e186.vcxproj", "{30023C00-5960-46C2-9812-8BF359162A34}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "application", "repo\application\project\application.vcxproj", "{F51BDAE5-FAC7-4007-A69B-E3908D87A536}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "application", "application\project\application.vcxproj", "{F51BDAE5-FAC7-4007-A69B-E3908D87A536}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
