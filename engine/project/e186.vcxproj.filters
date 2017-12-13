@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{174ccd27-4c17-4485-97ca-855f0cd77852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\framework">
+      <UniqueIdentifier>{1e2b1cd5-5e9a-4bd7-8d08-f7b8c19a2cd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\camera">
+      <UniqueIdentifier>{7e2635a0-e596-4370-9e0e-301ae84116dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exception">
+      <UniqueIdentifier>{d6fbd3f4-46d7-4bbe-b0b8-d8ba6b86f00f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tex">
+      <UniqueIdentifier>{cd4efbb9-6762-49c0-85ec-547e353ff5ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\math">
+      <UniqueIdentifier>{52fdf909-eff2-418e-bdc2-b52bc2563a90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\timer">
+      <UniqueIdentifier>{022a111c-58dc-43a3-b364-98a5a21054d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\shader">
+      <UniqueIdentifier>{4cea82c3-024d-4d75-955a-15dcb0e85dde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\transform">
+      <UniqueIdentifier>{d48e9c2b-0923-4015-9ab6-67a1c9472be6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ui">
+      <UniqueIdentifier>{f5ead826-c0ec-4f91-9def-e73cbe19bc99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\sample_scenes">
+      <UniqueIdentifier>{e5f698dc-1c76-4bdd-bf39-f973e2b07134}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{9cfafc6b-c37d-4061-8ede-a7e713bc3c80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\geodesic">
+      <UniqueIdentifier>{a6eed9b7-e35b-412d-8a70-3a456c574fd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\blinnphong">
+      <UniqueIdentifier>{2bfedab1-feac-4a7a-a746-f300af367b7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\terrain">
+      <UniqueIdentifier>{7040030c-61ef-4d63-89e2-d409eac6c5ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\texture">
+      <UniqueIdentifier>{072cf67b-d1c7-4d89-859a-72fa15cb9270}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\model">
+      <UniqueIdentifier>{0e61d792-7e89-4b68-98ae-b6377564519b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\framework">
+      <UniqueIdentifier>{96cf2a2b-8cad-4bf1-ade2-085b7129c2be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\camera">
+      <UniqueIdentifier>{35d4bd8e-a19f-4a1b-b019-2659787c881a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exception">
+      <UniqueIdentifier>{3e7117dc-68df-41d3-b1e1-fc111677ce2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\math">
+      <UniqueIdentifier>{6084f6ab-f563-4821-a0a4-5acbef4bef94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\transform">
+      <UniqueIdentifier>{983b0640-a02c-4950-9e80-e28b1987bd4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shader">
+      <UniqueIdentifier>{9896401f-8874-4c4a-b152-d4b11cf9b6c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\timer">
+      <UniqueIdentifier>{f41c0ff8-3652-4071-abcd-e26dfaa9602b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tex">
+      <UniqueIdentifier>{85e66758-a340-484c-8b06-ffd854968cb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ui">
+      <UniqueIdentifier>{65224b03-53d7-49d8-9fa2-b2461d837cb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sample_scenes">
+      <UniqueIdentifier>{dcb4042c-91b0-46f9-803d-2bd423ec266f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\material">
+      <UniqueIdentifier>{4f541f0c-5515-4fbb-8c20-f747a5447abe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\material">
+      <UniqueIdentifier>{4f1555ba-8723-4267-88e7-a9bfcad278f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{964a42a5-30a2-4bcd-a739-138409cfdfb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{e365bd87-0656-403b-a0a8-4aab48c97cb2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\e186stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Animator.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\AntTweakBarManager.h">
+      <Filter>Header Files\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Camera.h">
+      <Filter>Header Files\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Context.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\DebugTexDisplayer.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ExceptionWithCallstack.h">
+      <Filter>Header Files\exception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\FrameBufferObject.h">
+      <Filter>Header Files\tex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\IScene.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\log.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\math_utils.h">
+      <Filter>Header Files\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\MaxFpsTimer.h">
+      <Filter>Header Files\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Model.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\QuakeCamera.h">
+      <Filter>Header Files\camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Shader.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\FixedSimulationTimer.h">
+      <Filter>Header Files\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Tex3D.h">
+      <Filter>Header Files\tex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TexData.h">
+      <Filter>Header Files\tex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TexInfo.h">
+      <Filter>Header Files\tex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Tex2D.h">
+      <Filter>Header Files\tex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Transform.h">
+      <Filter>Header Files\transform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\e186targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\e186.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SampleSceneTessIco.h">
+      <Filter>Header Files\sample_scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\SceneSelectorScene.h">
+      <Filter>Header Files\sample_scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VertexAttribLocation.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\VertexAttribData.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\MaterialUniformLocation.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\MaterialData.h">
+      <Filter>Header Files\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\TexLoadingHelper.h">
+      <Filter>Header Files\material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ModelExplorerScene.h">
+      <Filter>Header Files\sample_scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\string_utils.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Stopwatch.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Engine.h">
+      <Filter>Header Files\framework</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\e186stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Animator.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\AntTweakBarManager.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Model.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Context.cpp">
+      <Filter>Source Files\framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DebugTexDisplayer.cpp">
+      <Filter>Source Files\framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\QuakeCamera.cpp">
+      <Filter>Source Files\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Camera.cpp">
+      <Filter>Source Files\camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ExceptionWithCallstack.cpp">
+      <Filter>Source Files\exception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\math_utils.cpp">
+      <Filter>Source Files\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Transform.cpp">
+      <Filter>Source Files\transform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Shader.cpp">
+      <Filter>Source Files\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MaxFpsTimer.cpp">
+      <Filter>Source Files\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FixedSimulationTimer.cpp">
+      <Filter>Source Files\timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\FrameBufferObject.cpp">
+      <Filter>Source Files\tex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Tex2D.cpp">
+      <Filter>Source Files\tex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Tex3D.cpp">
+      <Filter>Source Files\tex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TexData.cpp">
+      <Filter>Source Files\tex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TexInfo.cpp">
+      <Filter>Source Files\tex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\log.cpp">
+      <Filter>Source Files\framework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SampleSceneTessIco.cpp">
+      <Filter>Source Files\sample_scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\src\glad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SceneSelectorScene.cpp">
+      <Filter>Source Files\sample_scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MaterialData.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TexLoadingHelper.cpp">
+      <Filter>Source Files\material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ModelExplorerScene.cpp">
+      <Filter>Source Files\sample_scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\string_utils.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Stopwatch.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine.cpp">
+      <Filter>Source Files\framework</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\shaders\geodesic.tesc">
+      <Filter>Resource Files\shaders\geodesic</Filter>
+    </None>
+    <None Include="..\assets\shaders\geodesic.tese">
+      <Filter>Resource Files\shaders\geodesic</Filter>
+    </None>
+    <None Include="..\assets\shaders\geodesic.vert">
+      <Filter>Resource Files\shaders\geodesic</Filter>
+    </None>
+    <None Include="..\assets\shaders\geodesic.frag">
+      <Filter>Resource Files\shaders\geodesic</Filter>
+    </None>
+    <None Include="..\assets\shaders\geodesic.geom">
+      <Filter>Resource Files\shaders\geodesic</Filter>
+    </None>
+    <None Include="..\assets\shaders\blinnphong.vert">
+      <Filter>Resource Files\shaders\blinnphong</Filter>
+    </None>
+    <None Include="..\assets\shaders\blinnphong.frag">
+      <Filter>Resource Files\shaders\blinnphong</Filter>
+    </None>
+    <None Include="..\assets\shaders\terrain.frag">
+      <Filter>Resource Files\shaders\terrain</Filter>
+    </None>
+    <None Include="..\assets\shaders\terrain.vert">
+      <Filter>Resource Files\shaders\terrain</Filter>
+    </None>
+    <None Include="..\assets\shaders\texture.frag">
+      <Filter>Resource Files\shaders\texture</Filter>
+    </None>
+    <None Include="..\assets\shaders\texture.vert">
+      <Filter>Resource Files\shaders\texture</Filter>
+    </None>
+  </ItemGroup>
+</Project>

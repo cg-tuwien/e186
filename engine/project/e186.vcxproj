@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\Animator.h" />
+    <ClInclude Include="..\include\AntTweakBarManager.h" />
+    <ClInclude Include="..\include\Camera.h" />
+    <ClInclude Include="..\include\Context.h" />
+    <ClInclude Include="..\include\DebugTexDisplayer.h" />
+    <ClInclude Include="..\include\e186.h" />
+    <ClInclude Include="..\include\e186stdafx.h" />
+    <ClInclude Include="..\include\Engine.h" />
+    <ClInclude Include="..\include\ExceptionWithCallstack.h" />
+    <ClInclude Include="..\include\FixedSimulationTimer.h" />
+    <ClInclude Include="..\include\FrameBufferObject.h" />
+    <ClInclude Include="..\include\IScene.h" />
+    <ClInclude Include="..\include\log.h" />
+    <ClInclude Include="..\include\MaterialData.h" />
+    <ClInclude Include="..\include\MaterialUniformLocation.h" />
+    <ClInclude Include="..\include\math_utils.h" />
+    <ClInclude Include="..\include\MaxFpsTimer.h" />
+    <ClInclude Include="..\include\Model.h" />
+    <ClInclude Include="..\include\ModelExplorerScene.h" />
+    <ClInclude Include="..\include\QuakeCamera.h" />
+    <ClInclude Include="..\include\SampleSceneTessIco.h" />
+    <ClInclude Include="..\include\SceneSelectorScene.h" />
+    <ClInclude Include="..\include\Shader.h" />
+    <ClInclude Include="..\include\e186targetver.h" />
+    <ClInclude Include="..\include\Stopwatch.h" />
+    <ClInclude Include="..\include\string_utils.h" />
+    <ClInclude Include="..\include\Tex2D.h" />
+    <ClInclude Include="..\include\Tex3D.h" />
+    <ClInclude Include="..\include\TexData.h" />
+    <ClInclude Include="..\include\TexInfo.h" />
+    <ClInclude Include="..\include\TexLoadingHelper.h" />
+    <ClInclude Include="..\include\Transform.h" />
+    <ClInclude Include="..\include\VertexAttribData.h" />
+    <ClInclude Include="..\include\VertexAttribLocation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\external\src\glad.cpp" />
+    <ClCompile Include="..\src\Animator.cpp" />
+    <ClCompile Include="..\src\AntTweakBarManager.cpp" />
+    <ClCompile Include="..\src\Camera.cpp" />
+    <ClCompile Include="..\src\Context.cpp" />
+    <ClCompile Include="..\src\DebugTexDisplayer.cpp" />
+    <ClCompile Include="..\src\e186stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Engine.cpp" />
+    <ClCompile Include="..\src\ExceptionWithCallstack.cpp" />
+    <ClCompile Include="..\src\FixedSimulationTimer.cpp" />
+    <ClCompile Include="..\src\FrameBufferObject.cpp" />
+    <ClCompile Include="..\src\log.cpp" />
+    <ClCompile Include="..\src\MaterialData.cpp" />
+    <ClCompile Include="..\src\math_utils.cpp" />
+    <ClCompile Include="..\src\MaxFpsTimer.cpp" />
+    <ClCompile Include="..\src\Model.cpp" />
+    <ClCompile Include="..\src\ModelExplorerScene.cpp" />
+    <ClCompile Include="..\src\QuakeCamera.cpp" />
+    <ClCompile Include="..\src\SampleSceneTessIco.cpp" />
+    <ClCompile Include="..\src\SceneSelectorScene.cpp" />
+    <ClCompile Include="..\src\Shader.cpp" />
+    <ClCompile Include="..\src\Stopwatch.cpp" />
+    <ClCompile Include="..\src\string_utils.cpp" />
+    <ClCompile Include="..\src\Tex2D.cpp" />
+    <ClCompile Include="..\src\Tex3D.cpp" />
+    <ClCompile Include="..\src\TexData.cpp" />
+    <ClCompile Include="..\src\TexInfo.cpp" />
+    <ClCompile Include="..\src\TexLoadingHelper.cpp" />
+    <ClCompile Include="..\src\Transform.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\shaders\blinnphong.frag" />
+    <None Include="..\assets\shaders\blinnphong.vert" />
+    <None Include="..\assets\shaders\geodesic.frag" />
+    <None Include="..\assets\shaders\geodesic.geom" />
+    <None Include="..\assets\shaders\geodesic.tesc" />
+    <None Include="..\assets\shaders\geodesic.tese" />
+    <None Include="..\assets\shaders\geodesic.vert" />
+    <None Include="..\assets\shaders\terrain.frag" />
+    <None Include="..\assets\shaders\terrain.vert" />
+    <None Include="..\assets\shaders\texture.frag" />
+    <None Include="..\assets\shaders\texture.vert" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{30023C00-5960-46C2-9812-8BF359162A34}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>e186</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)..\lib\$(Configuration)\</OutDir>
+    <IntDir>intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\lib\$(Configuration)\</OutDir>
+    <IntDir>intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\external\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>e186stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>e186stdafx.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc140-mt.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>assimp-vc140.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\external\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>e186stdafx.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>e186stdafx.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalDependencies>assimp-vc140.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,7 @@
+newmtl Default_rock
+Ka 0 0 0
+Ns 8.16617
+Ks 0.94902 0.576471 0.156863
+Kd 0.655482 0.542562 0.439764
+map_Kd C:/Users/Johannes/Desktop/aaaa/62k/Default_rock.jpg
+map_Bump C:/Users/Johannes/Desktop/aaaa/62k/Default_rock_b.jpg

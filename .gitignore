@@ -1,0 +1,29 @@
+## Ignore Visual Studio temporary files, build results, and stuff
+
+# User-specific files
+*.suo
+*.user
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+intermediate/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+# ...but not inside the "external" directories
+!*/external/**/[Dd]ebug/
+!*/external/**/[Rr]elease/
+!*/external/**/x64/
+!*/external/**/x86/
+!*/external/**/[Bb]in/
+!*/external/**/[Oo]bj/
+!*/external/**/[Ll]og/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Ignore the entire application folder
+/application
