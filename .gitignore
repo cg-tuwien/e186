@@ -24,6 +24,3 @@ x86/
 
 # Visual Studio cache/options directory
 .vs/
-
-# Ignore the entire application folder
-/application
