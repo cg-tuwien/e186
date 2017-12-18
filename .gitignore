@@ -3,8 +3,10 @@
 # User-specific files
 *.suo
 *.user
+# ...but not inside the "templates" directory
+!/templates/**/*.user
 
-# Build results
+# Ignore build results
 [Dd]ebug/
 [Rr]elease/
 intermediate/
