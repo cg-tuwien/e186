@@ -81,9 +81,9 @@
     </PostBuildEvent>
     <CustomBuildStep>
       <Outputs>some-non-existant-file-to-always-run-the-custom-build-step.txt;%(Outputs)</Outputs>
-      <Command>xcopy "..\..\engine\lib\$(Configuration)" "$(TargetDir)" /D /E /I /Y
-for /f %%a in ('dir /b /ad /s "$(SolutionDir)assets*" ^| findstr /v "\bin\\ \assets\\" ') do xcopy "%%a" "$(TargetDir)assets" /D /E /I /Y
-for /f %%a in ('dir /b /ad /s "$(SolutionDir)external*" ^| findstr /v "\external\\" ') do xcopy "%%a\bin\$(Configuration)" "$(TargetDir)" /D /E /I /Y</Command>
+      <Command>xcopy "$(ProjectDir)..\..\engine\lib\$(Configuration)." "$(TargetDir)." /D /E /I /Y
+for /f "delims=" %%a in ('dir /b /ad /s "$(SolutionDir)assets*" ^| findstr /v "\bin\ \assets\ "') do xcopy "%%a" "$(TargetDir)assets" /D /E /I /Y
+for /f "delims=" %%a in ('dir /b /ad /s "$(SolutionDir)external*" ^| findstr /v "\external\ " ') do xcopy "%%a\bin\$(Configuration)" "$(TargetDir)" /D /E /I /Y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -109,16 +109,18 @@ for /f %%a in ('dir /b /ad /s "$(SolutionDir)external*" ^| findstr /v "\external
     </PostBuildEvent>
     <CustomBuildStep>
       <Outputs>some-non-existant-file-to-always-run-the-custom-build-step.txt;%(Outputs)</Outputs>
-      <Command>xcopy "..\..\engine\lib\$(Configuration)" "$(TargetDir)" /D /E /I /Y
-for /f %%a in ('dir /b /ad /s "$(SolutionDir)assets*" ^| findstr /v "\bin\\ \assets\\" ') do xcopy "%%a" "$(TargetDir)assets" /D /E /I /Y
-for /f %%a in ('dir /b /ad /s "$(SolutionDir)external*" ^| findstr /v "\external\\" ') do xcopy "%%a\bin\$(Configuration)" "$(TargetDir)" /D /E /I /Y</Command>
+      <Command>xcopy "$(ProjectDir)..\..\engine\lib\$(Configuration)." "$(TargetDir)." /D /E /I /Y
+for /f "delims=" %%a in ('dir /b /ad /s "$(SolutionDir)assets*" ^| findstr /v "\bin\ \assets\ "') do xcopy "%%a" "$(TargetDir)assets" /D /E /I /Y
+for /f "delims=" %%a in ('dir /b /ad /s "$(SolutionDir)external*" ^| findstr /v "\external\ " ') do xcopy "%%a\bin\$(Configuration)" "$(TargetDir)" /D /E /I /Y</Command>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="HelloBScScene.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HelloBScScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
