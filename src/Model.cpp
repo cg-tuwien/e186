@@ -760,15 +760,15 @@ namespace e186
 			aiMesh* mesh = scene->mMeshes[i];
 			stream << std::endl << std::endl << "MESH name[" << mesh->mName.data << "], primitiveTypes[" << mesh->mPrimitiveTypes << "], #faces[" << mesh->mNumFaces << "], #vertices[" << mesh->mNumVertices << "], materialIndex[" << mesh->mMaterialIndex << "]" << std::endl;
 			stream << "bones count[" << mesh->mNumBones << "] {" << std::endl;
-			for (unsigned int i = 0; i < mesh->mNumBones; i++)
+			for (unsigned int j = 0; j < mesh->mNumBones; j++)
 			{
-				PrintBone(stream, mesh->mBones[i], 1);
+				PrintBone(stream, mesh->mBones[j], 1);
 			}
 			stream << "}" << std::endl;
 			stream << "anim-meshes count[" << mesh->mNumAnimMeshes << "] {" << std::endl;
-			for (unsigned int i = 0; i < mesh->mNumAnimMeshes; i++)
+			for (unsigned int j = 0; j < mesh->mNumAnimMeshes; j++)
 			{
-				PrintAnimMesh(stream, mesh->mAnimMeshes[i], 1);
+				PrintAnimMesh(stream, mesh->mAnimMeshes[j], 1);
 			}
 			stream << "}" << std::endl;
 		}
