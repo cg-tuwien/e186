@@ -18,6 +18,7 @@ namespace e186
 			GLsizei m_width;
 			GLsizei m_height;
 			float m_scale;
+			bool m_scale_relative_to_window_height;
 			GLint m_offset_x;
 			GLint m_offset_y;
 			GLenum m_texture_target;
@@ -27,6 +28,11 @@ namespace e186
 	private:
 		TwBar* m_tweak_bar;
 		std::vector<DbgTexConfig> m_texture_configs;
+		std::unique_ptr<Model> m_quad;
+		Shader m_shader;
+		GLuint m_sampler_loc;
+		GLuint m_color_loc;
+		GLuint m_pvmt_matrix_loc;
 
 		DbgTexConfig* Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name);
 

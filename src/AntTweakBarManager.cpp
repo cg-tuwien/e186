@@ -5,7 +5,7 @@ namespace e186
 	AntTweakBarManager::AntTweakBarManager() : m_enabled(false)
 	{
 	}
-
+	
 	AntTweakBarManager::~AntTweakBarManager()
 	{
 		if (m_enabled)

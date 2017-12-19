@@ -18,8 +18,7 @@ namespace e186
 
 	void SceneSelectorScene::Run()
 	{
-		auto& twbar_mgr = Engine::current->tweak_bar_manager();
-		auto* twbar = twbar_mgr.create_new_tweak_bar("Scene Selector");
+		auto* twbar = Engine::current->tweak_bar_manager().create_new_tweak_bar("Scene Selector");
 		for (const auto& tup : m_scenes)
 		{
 			auto& name = std::get<0>(tup);
@@ -41,10 +40,9 @@ namespace e186
 			glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			twbar_mgr.Render();
 			Engine::current->EndFrame();
 		}
 
-		twbar_mgr.destroy_tweak_bar(twbar);
+		Engine::current->tweak_bar_manager().destroy_tweak_bar(twbar);
 	}
 }

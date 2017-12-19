@@ -13,9 +13,11 @@ namespace e186
 		m_main_wnd_width(0),
 		m_main_wnd_height(0),
 		m_main_wnd_aspectRatio(0),
+		m_render_tweak_bars(false),
 		m_root_scene_generator_func([]() { return nullptr; }),
 		m_next_is_root(false),
-		m_current_is_root(false)
+		m_current_is_root(false),
+		m_ant_tweak_bar_manager()
 	{
 		glfwGetFramebufferSize(m_mainWindow, &m_main_wnd_width, &m_main_wnd_height);
 		m_main_wnd_aspectRatio = static_cast<float>(m_main_wnd_width) / static_cast<float>(m_main_wnd_height);
@@ -332,9 +334,13 @@ namespace e186
 
 	AntTweakBarManager& Engine::tweak_bar_manager()
 	{
-		static AntTweakBarManager twbarMgr;
-		twbarMgr.enable_tweak_bars();
-		return twbarMgr;
+		static auto initialized = [this]()
+		{
+			m_ant_tweak_bar_manager.enable_tweak_bars();
+			m_render_tweak_bars = true;
+			return true;
+		}();
+		return m_ant_tweak_bar_manager;
 	}
 
 	void Engine::BeginFrame()
@@ -356,6 +362,11 @@ namespace e186
 
 	void Engine::EndFrame()
 	{
+		if (m_render_tweak_bars)
+		{
+			tweak_bar_manager().Render();
+		}
+
 		while (!m_pending_actions.empty())
 		{
 			m_pending_actions.front()();
@@ -431,19 +442,29 @@ namespace e186
 		log_debug("--> END OF Application::Run");
 	}
 
+	void Engine::set_render_tweak_bars(bool render_them)
+	{
+		m_render_tweak_bars = render_them;
+	}
+
+	bool Engine::render_tweak_bars() const
+	{
+		return m_render_tweak_bars;
+	}
+
 	void Engine::StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func)
 	{
 		StartWindowedWithRootSceneAndFirstScene(800, 600, std::move(root_scene_gen_func), nullptr);
 	}
 
-	void Engine::StartWithFirstScene(std::unique_ptr<IScene> first_scene)
+	void Engine::StartWithFirstScene(std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
-		StartWindowedWithRootSceneAndFirstScene(800, 600, nullptr, std::move(first_scene));
+		StartWindowedWithRootSceneAndFirstScene(800, 600, nullptr, std::move(first_scene_gen_func));
 	}
 
-	void Engine::StartWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene)
+	void Engine::StartWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
-		StartWindowedWithRootSceneAndFirstScene(800, 600, std::move(root_scene_gen_func), std::move(first_scene));
+		StartWindowedWithRootSceneAndFirstScene(800, 600, std::move(root_scene_gen_func), std::move(first_scene_gen_func));
 	}
 
 	void Engine::StartFullscreenWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func)
@@ -451,12 +472,12 @@ namespace e186
 		StartFullscreenWithRootSceneAndFirstScene(std::move(root_scene_gen_func), nullptr);
 	}
 
-	void Engine::StartFullscreenWithFirstScene(std::unique_ptr<IScene> first_scene)
+	void Engine::StartFullscreenWithFirstScene(std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
-		StartFullscreenWithRootSceneAndFirstScene(nullptr, std::move(first_scene));
+		StartFullscreenWithRootSceneAndFirstScene(nullptr, std::move(first_scene_gen_func));
 	}
 
-	void Engine::StartFullscreenWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene)
+	void Engine::StartFullscreenWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
 		GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
 		if (nullptr == primaryMonitor) {
@@ -470,7 +491,7 @@ namespace e186
 			std::cout << std::endl << "Press return to terminate..." << std::endl;
 			getchar();
 		}
-		StartWithParameters(vidMode->width, vidMode->height, primaryMonitor, std::move(root_scene_gen_func), std::move(first_scene));
+		StartWithParameters(vidMode->width, vidMode->height, primaryMonitor, std::move(root_scene_gen_func), std::move(first_scene_gen_func));
 	}
 
 	void Engine::StartWindowedWithRootScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> root_scene_gen_func)
@@ -478,17 +499,17 @@ namespace e186
 		StartWindowedWithRootSceneAndFirstScene(width, height, std::move(root_scene_gen_func), nullptr);
 	}
 
-	void Engine::StartWindowedWithFirstScene(const int width, const int height, std::unique_ptr<IScene> first_scene)
+	void Engine::StartWindowedWithFirstScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
-		StartWindowedWithRootSceneAndFirstScene(width, height, nullptr, std::move(first_scene));
+		StartWindowedWithRootSceneAndFirstScene(width, height, nullptr, std::move(first_scene_gen_func));
 	}
 
-	void Engine::StartWindowedWithRootSceneAndFirstScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene)
+	void Engine::StartWindowedWithRootSceneAndFirstScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
-		StartWithParameters(width, height, nullptr, std::move(root_scene_gen_func), std::move(first_scene));
+		StartWithParameters(width, height, nullptr, std::move(root_scene_gen_func), std::move(first_scene_gen_func));
 	}
 
-	void Engine::StartWithParameters(const int width, const int height, GLFWmonitor* monitor, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene)
+	void Engine::StartWithParameters(const int width, const int height, GLFWmonitor* monitor, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func)
 	{
 		try
 		{
@@ -517,9 +538,9 @@ namespace e186
 			}
 
 			// Set the first scene, if we have one
-			if (first_scene)
+			if (first_scene_gen_func)
 			{	
-				e186::Engine::current->SetNextScene(std::move(first_scene));
+				e186::Engine::current->SetNextScene(std::move(first_scene_gen_func()));
 			}
 
 			// Let's go! This will load either the first scene or the root scene and run in a loop forever

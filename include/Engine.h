@@ -39,12 +39,15 @@ namespace e186
 		int m_main_wnd_width;
 		int m_main_wnd_height;
 		float m_main_wnd_aspectRatio;
+		bool m_render_tweak_bars;
 
 		std::unique_ptr<IScene> m_current_scene;
 		std::unique_ptr<IScene> m_next_scene;
 		bool m_next_is_root;
 		bool m_current_is_root;
 		std::function<std::unique_ptr<IScene>()> m_root_scene_generator_func;
+
+		AntTweakBarManager m_ant_tweak_bar_manager;
 
 		void SetRootSceneAsNextScene();
 
@@ -152,17 +155,27 @@ namespace e186
 		 */
 		void Run();
 
+		/*!
+		 * Sets a flag which indicates whether or not to render tweak bars
+		 */
+		void set_render_tweak_bars(bool render_them);
+
+		/*!
+		 * Gets a value indicating whether or not to render tweak bars
+		 */
+		bool render_tweak_bars() const;
+
 	public:
 		static void StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func);
-		static void StartWithFirstScene(std::unique_ptr<IScene> first_scene);
-		static void StartWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene);
+		static void StartWithFirstScene(std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
+		static void StartWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
 		static void StartFullscreenWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func);
-		static void StartFullscreenWithFirstScene(std::unique_ptr<IScene> first_scene);
-		static void StartFullscreenWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene);
+		static void StartFullscreenWithFirstScene(std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
+		static void StartFullscreenWithRootSceneAndFirstScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
 		static void StartWindowedWithRootScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> root_scene_gen_func);
-		static void StartWindowedWithFirstScene(const int width, const int height, std::unique_ptr<IScene> first_scene);
-		static void StartWindowedWithRootSceneAndFirstScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene);
-		static void StartWithParameters(const int width, const int height, GLFWmonitor* monitor, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::unique_ptr<IScene> first_scene);
+		static void StartWindowedWithFirstScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
+		static void StartWindowedWithRootSceneAndFirstScene(const int width, const int height, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
+		static void StartWithParameters(const int width, const int height, GLFWmonitor* monitor, std::function<std::unique_ptr<IScene>()> root_scene_gen_func, std::function<std::unique_ptr<IScene>()> first_scene_gen_func);
 	};
 
 }
