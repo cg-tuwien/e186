@@ -215,6 +215,21 @@ namespace e186
 		void PrepareForShader(Shader& shader);
 		MaterialData GetMaterialData(unsigned int meshIndex);
 
+		template<typename Func>
+		std::vector<std::reference_wrapper<Mesh>> SelectMeshes(Func predicate)
+		{ // looki looki: http://en.cppreference.com/w/cpp/utility/functional/reference_wrapper
+			std::vector<std::reference_wrapper<Mesh>> selection;
+			int n = m_meshes.size();
+			for (int i = 0; i < n; ++i)
+			{
+				if (predicate(i, m_meshes[i]))
+				{
+					selection.push_back(m_meshes[i]);
+				}
+			}
+			return selection;
+		}
+
 		Mesh& mesh_at(unsigned int meshIndex);
 
 #ifdef false
