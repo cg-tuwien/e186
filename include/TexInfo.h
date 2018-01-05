@@ -31,7 +31,7 @@ namespace e186
 		GLint m_border;
 
 	public:
-		static const GLint uninitialized = -1;
+		static const GLint kUninitialized = -1;
 
 		TexInfo(GLenum texTarget);
 		TexInfo(GLenum texTarget, GLuint handle, GLint internalFormat, GLint imageFormat, GLenum type, GLint border);

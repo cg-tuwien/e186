@@ -5,8 +5,8 @@ namespace e186
 	TexInfo::TexInfo(GLenum texTarget) :
 		m_texture_target(texTarget),
 		m_gl_handle(0),
-		m_internal_format(TexInfo::uninitialized),
-		m_image_format(TexInfo::uninitialized),
+		m_internal_format(TexInfo::kUninitialized),
+		m_image_format(TexInfo::kUninitialized),
 		m_data_type(0),
 		m_border(0)
 	{

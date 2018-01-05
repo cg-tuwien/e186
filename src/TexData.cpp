@@ -60,7 +60,7 @@ namespace e186
 			destructor(data);
 		}
 
-		if (!is_destructing)
+		if (is_destructing)
 		{
 			m_data_type = 0;
 		}

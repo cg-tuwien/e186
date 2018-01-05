@@ -182,7 +182,9 @@ namespace e186
 		// Flip!
 		for (int i = 0; i < y; ++i)
 		{
-			memcpy(flip + i * x * n * sizeof(float), orig + (y - i - 1) * x * n * sizeof(float), x * n * sizeof(float));
+			memcpy(flip + i * x * n * cSize, //< destination
+				   orig + (y - i - 1) * x * n * cSize, //< source
+				   x * n * cSize); //< size
 		}
 
 		DestroyOffline();
