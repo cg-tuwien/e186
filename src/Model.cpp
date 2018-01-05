@@ -172,6 +172,8 @@ namespace e186
 			return false;
 		}
 
+		m_meshes[index].m_index = index;
+
 		// calculate the size of the per-vertex memory and the strides
 		// positions and normals are always available
 		size_t sizeOneVtx = 0;
@@ -350,44 +352,47 @@ namespace e186
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof(GLuint), &m_meshes[index].m_indices[0], GL_STATIC_DRAW); // GL_STATIC_DRAW ... Buffer data never changes
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		// generate and store the default-VAO, additional VAOs with different vertex-data-configs can be created by the user manually
-		GenerateVAOForMeshWithVertexAttribConfig(index, m_meshes[index].m_vertex_data_layout);
+		m_meshes[index].m_indices_len = static_cast<GLuint>(indicesCount);
 
 		return true;
 	}
 
 
-	bool Model::GenerateVAOsWithVertexAttribConfig(const unsigned int vertexDataConfig)
+	bool Model::GenerateVAOsWithVertexAttribConfig(VertexDataCfgType vertexDataConfig)
 	{
 		bool success = true;
 		auto n = m_meshes.size();
-		for (unsigned int i = 0; i < n; i++)
+		for (MeshIdx i = 0; i < n; i++)
 		{
 			log_info("GenerateVAOForMesh[%d]WithVertexDataConfig[%d]", i, vertexDataConfig);
-			success = success && GenerateVAOForMeshWithVertexAttribConfig(i, vertexDataConfig);
+			success = success && GetOrCreateVAOForMeshForVertexAttribConfig(i, vertexDataConfig) > 0;
 		}
 		return success;
 	}
 
+	bool Model::GenerateVAOsForShader(MeshIdx mesh_index, const Shader& shader)
+	{
+		return GenerateVAOsWithVertexAttribConfig(shader.vertex_attrib_config());
+	}
 
-	bool Model::GenerateVAOForMeshWithVertexAttribConfig(const unsigned int index, const unsigned int vertexDataConfig)
+	VAOType Mesh::GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexDataCfgType vertexDataConfig)
 	{
 		// ensure that this config is not already stored
-		auto it = m_meshes[index].m_vertex_array_objects.find(vertexDataConfig);
-		if (it != m_meshes[index].m_vertex_array_objects.end())
+		auto it = mesh.m_vertex_array_objects.find(vertexDataConfig);
+		if (it != mesh.m_vertex_array_objects.end())
 		{
-			log_info("VAO already exists for mesh[%u] and vertexDataConfig[%u]", index, vertexDataConfig);
-			return false;
+			log_info("VAO already exists for mesh[%u] and vertexDataConfig[%u]", mesh.m_index, vertexDataConfig);
+			return it->second;
 		}
 
 		// generate VAO and bind it
-		GLuint vao(0);
+		GLuint vao{ 0 };
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 
 		// bind the two VBOs
-		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[index].m_vertex_data_vbo_id);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_meshes[index].m_indices_vbo_id);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vertex_data_vbo_id);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices_vbo_id);
 
 		// Position
 		if (!((vertexDataConfig & VertexAttribData_Position) == VertexAttribData_Position))
@@ -397,7 +402,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Position);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, m_meshes[index].m_position_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_position_offset));
+			glVertexAttribPointer(location, mesh.m_position_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_position_offset));
 		}
 
 		// Normal
@@ -405,7 +410,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Normal);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, m_meshes[index].m_normal_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_normal_offset));
+			glVertexAttribPointer(location, mesh.m_normal_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_normal_offset));
 		}
 
 		// TexCoord
@@ -413,7 +418,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::TexCoord);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, m_meshes[index].m_tex_coords_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_tex_coords_offset));
+			glVertexAttribPointer(location, mesh.m_tex_coords_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_tex_coords_offset));
 		}
 
 		// Color
@@ -421,7 +426,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Color);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, m_meshes[index].m_color_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_color_offset));
+			glVertexAttribPointer(location, mesh.m_color_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_color_offset));
 		}
 
 		// Bones
@@ -429,10 +434,10 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::BoneIndices);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, m_meshes[index].m_bone_indices_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_bone_incides_offset));
+			glVertexAttribPointer(location, mesh.m_bone_indices_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_bone_incides_offset));
 			GLuint location2 = static_cast<GLuint>(VertexAttribLocation::BoneWeights);
 			glEnableVertexAttribArray(location2);
-			glVertexAttribPointer(location2, m_meshes[index].m_bone_weights_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_bone_weights_offset));
+			glVertexAttribPointer(location2, mesh.m_bone_weights_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_bone_weights_offset));
 		}
 
 		// Tangent Space
@@ -440,105 +445,119 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Tangents);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, m_meshes[index].m_tangent_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_tangent_offset));
+			glVertexAttribPointer(location, mesh.m_tangent_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_tangent_offset));
 			GLuint location2 = static_cast<GLuint>(VertexAttribLocation::Bitangents);
 			glEnableVertexAttribArray(location2);
-			glVertexAttribPointer(location2, m_meshes[index].m_bitangent_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, m_meshes[index].m_size_one_vertex, reinterpret_cast<GLvoid*>(m_meshes[index].m_bitangent_offset));
+			glVertexAttribPointer(location2, mesh.m_bitangent_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_bitangent_offset));
 		}
 
 		// disable the VAO and store it for the vertex-data setting in the map
 		glBindVertexArray(0);
-		m_meshes[index].m_vertex_array_objects.insert(std::pair<unsigned int, GLuint>(vertexDataConfig, vao));
+		mesh.m_vertex_array_objects.insert(std::pair<unsigned int, GLuint>(vertexDataConfig, vao));
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-		return true;
+		return vao;
 	}
 
-
-	void Model::RenderForVertexAttribConfig(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode) const
+	VAOType Model::GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexDataCfgType vertexDataConfig)
 	{
-		if (BindVAOForMesh(meshIndex, vertexDataConfig))
-		{
-			glDrawElements(mode, indices_length(meshIndex), GL_UNSIGNED_INT, nullptr);
-			UnbindVAO();
-		}
+		return Mesh::GetOrCreateVAOForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
 	}
 
-	void Model::RenderForVertexAttribConfig(const unsigned int vertexDataConfig, GLenum mode) const
+	VAOType Mesh::GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader)
 	{
-		const auto n = num_meshes();
-		for (unsigned int i = 0; i < n; i++)
-		{
-			RenderForVertexAttribConfig(i, vertexDataConfig, mode);
-		}
+		return GetOrCreateVAOForVertexAttribConfig(mesh, shader.vertex_attrib_config());
 	}
 
-	void Model::RenderWithShader(unsigned int meshIndex, const Shader& shader) const
+	VAOType Model::GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader)
 	{
-		GLenum mode = shader.kind_of_primitives();
-		if (GL_PATCHES == mode)
-		{
-			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
-		}
-		RenderForVertexAttribConfig(meshIndex, shader.vertex_attrib_config(), mode);
+		return GetOrCreateVAOForMeshForVertexAttribConfig(mesh_index, shader.vertex_attrib_config());
 	}
 
-	void Model::RenderWithShader(const Shader& shader) const
-	{
-		GLenum mode = shader.kind_of_primitives();
-		if (GL_PATCHES == mode)
-		{
-			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
-		}
-		RenderForVertexAttribConfig(shader.vertex_attrib_config(), mode);
-	}
+	//void Model::RenderForVertexAttribConfig(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode) const
+	//{
+	//	if (BindVAOForMesh(meshIndex, vertexDataConfig))
+	//	{
+	//		glDrawElements(mode, indices_length(meshIndex), GL_UNSIGNED_INT, nullptr);
+	//		UnbindVAO();
+	//	}
+	//}
 
-	void Model::RenderForVertexDataConfigGenerateMissingVAO(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode)
-	{
-		const auto it = m_meshes[meshIndex].m_vertex_array_objects.find(vertexDataConfig);
-		if (m_meshes[meshIndex].m_vertex_array_objects.end() != it)
-		{
-			glBindVertexArray(it->second);
-			glDrawElements(mode, indices_length(meshIndex), GL_UNSIGNED_INT, nullptr);
-			glBindVertexArray(0);
-		}
-		else
-		{
-			GenerateVAOForMeshWithVertexAttribConfig(meshIndex, vertexDataConfig);
-			RenderForVertexAttribConfig(meshIndex, vertexDataConfig);
-		}
-	}
+	//void Model::RenderForVertexAttribConfig(const unsigned int vertexDataConfig, GLenum mode) const
+	//{
+	//	const auto n = num_meshes();
+	//	for (unsigned int i = 0; i < n; i++)
+	//	{
+	//		RenderForVertexAttribConfig(i, vertexDataConfig, mode);
+	//	}
+	//}
 
-	void Model::RenderForVertexDataConfigGenerateMissingVAO(const unsigned int vertexDataConfig, GLenum mode)
-	{
-		const auto n = num_meshes();
-		for (unsigned int i = 0; i < n; i++)
-		{
-			RenderForVertexDataConfigGenerateMissingVAO(i, vertexDataConfig, mode);
-		}
-	}
+	//void Model::RenderWithShader(unsigned int meshIndex, const Shader& shader) const
+	//{
+	//	GLenum mode = shader.kind_of_primitives();
+	//	if (GL_PATCHES == mode)
+	//	{
+	//		glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+	//	}
+	//	RenderForVertexAttribConfig(meshIndex, shader.vertex_attrib_config(), mode);
+	//}
 
-	void Model::RenderWithShaderGenerateMissingVAO(Shader& shader)
-	{
-		GLenum mode = shader.kind_of_primitives();
-		if (GL_PATCHES == mode)
-		{
-			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
-		}
+	//void Model::RenderWithShader(const Shader& shader) const
+	//{
+	//	GLenum mode = shader.kind_of_primitives();
+	//	if (GL_PATCHES == mode)
+	//	{
+	//		glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+	//	}
+	//	RenderForVertexAttribConfig(shader.vertex_attrib_config(), mode);
+	//}
 
-		const auto n = num_meshes();
-		for (unsigned int i = 0; i < n; i++)
-		{
-			if (m_meshes[i].m_material_data)
-			{
-				m_meshes[i].m_material_data->ExecuteUniformSetterForShader(shader);
-			}
+	//void Model::RenderForVertexDataConfigGenerateMissingVAO(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode)
+	//{
+	//	const auto it = m_meshes[meshIndex].m_vertex_array_objects.find(vertexDataConfig);
+	//	if (m_meshes[meshIndex].m_vertex_array_objects.end() != it)
+	//	{
+	//		glBindVertexArray(it->second);
+	//		glDrawElements(mode, indices_length(meshIndex), GL_UNSIGNED_INT, nullptr);
+	//		glBindVertexArray(0);
+	//	}
+	//	else
+	//	{
+	//		GenerateVAOForMeshWithVertexAttribConfig(meshIndex, vertexDataConfig);
+	//		RenderForVertexAttribConfig(meshIndex, vertexDataConfig);
+	//	}
+	//}
 
-			RenderForVertexDataConfigGenerateMissingVAO(i, shader.vertex_attrib_config(), mode);
-		}
-	}
+	//void Model::RenderForVertexDataConfigGenerateMissingVAO(const unsigned int vertexDataConfig, GLenum mode)
+	//{
+	//	const auto n = num_meshes();
+	//	for (unsigned int i = 0; i < n; i++)
+	//	{
+	//		RenderForVertexDataConfigGenerateMissingVAO(i, vertexDataConfig, mode);
+	//	}
+	//}
+
+	//void Model::RenderWithShaderGenerateMissingVAO(Shader& shader)
+	//{
+	//	GLenum mode = shader.kind_of_primitives();
+	//	if (GL_PATCHES == mode)
+	//	{
+	//		glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+	//	}
+
+	//	const auto n = num_meshes();
+	//	for (unsigned int i = 0; i < n; i++)
+	//	{
+	//		if (m_meshes[i].m_material_data)
+	//		{
+	//			m_meshes[i].m_material_data->ExecuteUniformSetterForShader(shader);
+	//		}
+
+	//		RenderForVertexDataConfigGenerateMissingVAO(i, shader.vertex_attrib_config(), mode);
+	//	}
+	//}
 
 
 	void Model::InitTransformationMatrices(const aiNode* pNode, const aiMatrix4x4& accTrans)
@@ -909,18 +928,6 @@ namespace e186
 		}
 	}
 
-	void Model::PrepareForShader(Shader& shader)
-	{
-		const auto n = num_meshes();
-		for (unsigned int i = 0; i < n; i++)
-		{
-			if (m_meshes[i].m_material_data)
-			{
-				m_meshes[i].m_material_data->StoreUniformSetterForShader(shader);
-			}
-		}
-	}
-
 	MaterialData Model::GetMaterialData(unsigned int meshIndex)
 	{
 		assert(m_meshes[meshIndex].m_material_data);
@@ -947,6 +954,26 @@ namespace e186
 		// TODO: not sure if the following 2 commands are necessary
 		//glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind VBO for vertex-data
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind VBO for index-data
+	}
+
+	std::vector<std::tuple<MeshRef, UniformSetter>> Model::CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes)
+	{
+		std::vector<std::tuple<MeshRef, UniformSetter>> uniform_setters;
+		for (Mesh& mesh : meshes)
+		{
+			uniform_setters.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), CreateUniformSetterForShader(shader, *mesh.m_material_data)));
+		}
+		return uniform_setters;
+	}
+
+	std::vector<std::tuple<MeshRef, VAOType>> Model::GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes)
+	{
+		std::vector<std::tuple<MeshRef, VAOType>> vaos;
+		for (Mesh& mesh : meshes)
+		{
+			vaos.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), Mesh::GetOrCreateVAOForShader(mesh, shader)));
+		}
+		return vaos;
 	}
 
 	Mesh& Model::mesh_at(unsigned int meshIndex)

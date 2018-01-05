@@ -87,7 +87,7 @@ namespace e186
 			shader.SetUniform("uDiffuseMaterial", glm::vec3(1.0f, 0.0f, 0.0f));
 			shader.SetUniform("uLightPosition", glm::vec3(0.0f, 100.0f, -50.0f));
 
-			ico->RenderWithShaderGenerateMissingVAO(shader);
+			RenderMesh(shader, ico->mesh_at(0));
 
 			Engine::current->EndFrame();
 		}

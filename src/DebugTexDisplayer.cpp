@@ -94,6 +94,8 @@ namespace e186
 		glUniform1i(m_sampler_loc, 0); // 0 => GL_TEXTURE0
 		glUniform4f(m_color_loc, 1.0f, 1.0f, 1.0f, 1.0f);
 
+		auto& quad_mesh = m_quad->mesh_at(0);
+
 		for (auto& tc : m_texture_configs)
 		{
 			if (!tc.m_enabled)
@@ -122,7 +124,7 @@ namespace e186
 					* glm::translate(glm::vec3(tc.m_offset_x - 1.0f, tc.m_offset_y - 1.0f, 0.0f))
 					* glm::scale(glm::vec3(sc_w + 2.0f, sc_h + 2.0f, 0.0f));
 				glUniformMatrix4fv(m_pvmt_matrix_loc, 1, GL_FALSE, glm::value_ptr(screenMb));
-				m_quad->RenderForVertexAttribConfig(VertexAttribData_Position | VertexAttribData_Tex2D, GL_TRIANGLES);
+				RenderMesh(m_shader, quad_mesh);
 
 				// change back to actual colors
 				glUniform4f(m_shader.GetUniformLocation("color"), 1.0f, 1.0f, 1.0f, 1.0f);
@@ -132,7 +134,7 @@ namespace e186
 				* glm::translate(glm::vec3(tc.m_offset_x, tc.m_offset_y, 0.0f))
 				* glm::scale(glm::vec3(sc_w, sc_h, 0.0f));
 			glUniformMatrix4fv(m_pvmt_matrix_loc, 1, GL_FALSE, glm::value_ptr(screenM));
-			m_quad->RenderForVertexAttribConfig(VertexAttribData_Position | VertexAttribData_Tex2D, GL_TRIANGLES);
+			RenderMesh(m_shader, quad_mesh);
 		}
 
 		glDepthMask(GL_TRUE);

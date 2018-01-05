@@ -83,6 +83,8 @@
   <ItemGroup>
     <None Include="..\assets\shaders\blinnphong.frag" />
     <None Include="..\assets\shaders\blinnphong.vert" />
+    <None Include="..\assets\shaders\blinnphong_nm.frag" />
+    <None Include="..\assets\shaders\blinnphong_nm.vert" />
     <None Include="..\assets\shaders\geodesic.frag" />
     <None Include="..\assets\shaders\geodesic.geom" />
     <None Include="..\assets\shaders\geodesic.tesc" />

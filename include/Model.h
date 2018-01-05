@@ -42,32 +42,12 @@ namespace e186
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
 	
-	struct Mesh
+	class Model;
+	class Mesh
 	{
-		// Constructor - initialize everything
-		Mesh() :
-			m_vertex_data_layout(0),
-			m_vertex_data_vbo_id(0),
-			m_indices_vbo_id(0),
-			m_size_one_vertex(0),
-			m_position_offset(0),
-			m_normal_offset(0),
-			m_tex_coords_offset(0),
-			m_color_offset(0),
-			m_bone_incides_offset(0),
-			m_bone_weights_offset(0),
-			m_tangent_offset(0),
-			m_bitangent_offset(0),
-			m_position_size(0),
-			m_normal_size(0),
-			m_tex_coords_size(0),
-			m_color_size(0),
-			m_bone_indices_size(0),
-			m_bone_weights_size(0),
-			m_tangent_size(0),
-			m_scene_transformation_matrix(glm::mat4(1.0f)),
-			m_bitangent_size(0)
-		{}
+		friend class Model;
+
+		MeshIdx m_index;
 
 		unsigned int m_vertex_data_layout;
 
@@ -75,10 +55,11 @@ namespace e186
 		GLuint m_indices_vbo_id;
 
 		/// stores different VAOs for different VertexData-combinations
-		std::unordered_map<unsigned int, GLuint> m_vertex_array_objects;
+		VAOMap m_vertex_array_objects;
 
 		std::vector<char> m_vertex_data;
 		std::vector<GLuint> m_indices;
+		GLuint m_indices_len;
 
 		size_t m_size_one_vertex;
 
@@ -103,6 +84,45 @@ namespace e186
 		glm::mat4 m_scene_transformation_matrix;
 
 		std::unique_ptr<MaterialData> m_material_data;
+
+	public:
+		// Constructor - initialize everything
+		Mesh() :
+			m_index(-1),
+			m_vertex_data_layout(0),
+			m_vertex_data_vbo_id(0),
+			m_indices_vbo_id(0),
+			m_indices_len(0),
+			m_size_one_vertex(0),
+			m_position_offset(0),
+			m_normal_offset(0),
+			m_tex_coords_offset(0),
+			m_color_offset(0),
+			m_bone_incides_offset(0),
+			m_bone_weights_offset(0),
+			m_tangent_offset(0),
+			m_bitangent_offset(0),
+			m_position_size(0),
+			m_normal_size(0),
+			m_tex_coords_size(0),
+			m_color_size(0),
+			m_bone_indices_size(0),
+			m_bone_weights_size(0),
+			m_tangent_size(0),
+			m_scene_transformation_matrix(glm::mat4(1.0f)),
+			m_bitangent_size(0)
+		{}
+
+		MeshIdx index() const { return m_index; }
+		GLuint indices_length() const { return m_indices_len; } 
+		const glm::mat4& transformation_matrix() const { return m_scene_transformation_matrix; }
+		const std::unique_ptr<MaterialData>& material_data() const { return m_material_data; }
+		std::unique_ptr<MaterialData>& material_data() { return m_material_data; }
+
+		void set_material_data(std::unique_ptr<MaterialData> mat_data) { m_material_data = std::move(mat_data); }
+
+		static VAOType GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader);
+		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexDataCfgType vertexDataConfig);
 	};
 	
 	class Model
@@ -173,15 +193,10 @@ namespace e186
 		bool BindVAOForMesh(const unsigned int meshIndex, const unsigned int vertexDataConfig) const;
 		void UnbindVAO() const;
 
-		bool GenerateVAOsWithVertexAttribConfig(const unsigned int vertexDataConfig);
-		bool GenerateVAOForMeshWithVertexAttribConfig(const unsigned int index, const unsigned int vertexDataConfig);
-		void RenderForVertexAttribConfig(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode) const;
-		void RenderForVertexAttribConfig(const unsigned int vertexDataConfig, GLenum mode) const;
-		void RenderWithShader(unsigned int meshIndex, const Shader& shader) const;
-		void RenderWithShader(const Shader& shader) const;
-		void RenderForVertexDataConfigGenerateMissingVAO(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode);
-		void RenderForVertexDataConfigGenerateMissingVAO(const unsigned int vertexDataConfig, GLenum mode);
-		void RenderWithShaderGenerateMissingVAO(Shader& shader);
+		bool GenerateVAOsWithVertexAttribConfig(VertexDataCfgType vertexDataConfig);
+		bool GenerateVAOsForShader(MeshIdx mesh_index, const Shader& shader);
+		VAOType GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexDataCfgType vertexDataConfig);
+		VAOType GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader);
 
 		const glm::mat4& transformation_matrix() const;
 		const glm::mat4 transformation_matrix(unsigned int meshIndex) const;
@@ -211,24 +226,26 @@ namespace e186
 
 		void GatherMaterialData(const aiScene* scene, const std::string& model_path);
 		static aiMaterial* GetAssimpMaterialPtr(const aiScene* scene, unsigned int meshIndex);
-
-		void PrepareForShader(Shader& shader);
 		MaterialData GetMaterialData(unsigned int meshIndex);
 
 		template<typename Func>
-		std::vector<std::reference_wrapper<Mesh>> SelectMeshes(Func predicate)
-		{ // looki looki: http://en.cppreference.com/w/cpp/utility/functional/reference_wrapper
-			std::vector<std::reference_wrapper<Mesh>> selection;
+		std::vector<MeshRef> SelectMeshes(Func predicate)
+		{
+			std::vector<MeshRef> selection;
 			int n = m_meshes.size();
 			for (int i = 0; i < n; ++i)
 			{
-				if (predicate(i, m_meshes[i]))
+				if (predicate(m_meshes[i]))
 				{
 					selection.push_back(m_meshes[i]);
 				}
 			}
 			return selection;
 		}
+
+		static std::vector<std::tuple<MeshRef, UniformSetter>> CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes);
+
+		static std::vector<std::tuple<MeshRef, VAOType>> GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes);
 
 		Mesh& mesh_at(unsigned int meshIndex);
 

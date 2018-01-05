@@ -119,16 +119,16 @@ namespace e186
 		switch (severity) 
 		{
 			case GL_DEBUG_SEVERITY_HIGH: 
-				log_debug("> Sererity: HIGH");
+				log_debug("> Severity: HIGH");
 				break;
 			case GL_DEBUG_SEVERITY_MEDIUM: 
-				log_debug("> Sererity: MEDIUM");
+				log_debug("> Severity: MEDIUM");
 				break;
 			case GL_DEBUG_SEVERITY_LOW: 
-				log_debug("> Sererity: LOW");
+				log_debug("> Severity: LOW");
 				break;
 			default: 
-				log_debug("> Sererity: Unknown");
+				log_debug("> Severity: Unknown");
 				break;
 		}
 

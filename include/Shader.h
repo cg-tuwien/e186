@@ -2,6 +2,7 @@
 
 namespace e186
 {
+	
 	class Shader
 	{
 		static GLuint Compile(const char* source, GLenum shaderType);
@@ -139,4 +140,9 @@ namespace e186
 		GLenum m_kind_of_primitives;
 	};
 
+	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len);
+	void RenderMesh(const Shader& shader, Mesh& mesh);
+	void RenderMeshes(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos);
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos, const std::vector<std::tuple<MeshRef, UniformSetter>>& uniform_setters);
+	void UnbindVAO();
 }

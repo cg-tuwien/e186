@@ -10,8 +10,12 @@ namespace e186
 		BlendMode_Additive
 	};
 
+	UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
+
 	class MaterialData
 	{
+		friend UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
+
 	public:
 		MaterialData();
 		/*! Initialize from an Assimp-mesh */
@@ -44,16 +48,10 @@ namespace e186
 		const std::shared_ptr<Tex2D>& normals_tex() const { return m_normals_tex; }
 		const std::shared_ptr<Tex2D>& shininess_tex() const { return m_shininess_tex; }
 		const std::shared_ptr<Tex2D>& opacity_tex() const { return m_opacity_tex; }
-		const std::shared_ptr<Tex2D>& displacement_tex() const
-		{
-			return m_displacement_tex;
-		}
+		const std::shared_ptr<Tex2D>& displacement_tex() const { return m_displacement_tex; }
 		const std::shared_ptr<Tex2D>& reflection_tex() const { return m_reflection_tex; }
 		const std::shared_ptr<Tex2D>& lightmap_tex() const { return m_lightmap_tex; }
 
-		static std::function<void(const Shader&, const MaterialData&)> CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
-		void StoreUniformSetterForShader(Shader& shader);
-		void ExecuteUniformSetterForShader(Shader& shader);
 	private:
 		std::string m_name;
 
@@ -82,7 +80,6 @@ namespace e186
 		std::shared_ptr<Tex2D> m_reflection_tex;
 		std::shared_ptr<Tex2D> m_lightmap_tex;
 
-		std::unordered_map<Shader *, std::function<void(const Shader&, const MaterialData&)>> m_shader_uniform_setters;
 		static TexParams ai_mapping_mode_to_tex_params(aiTextureMapMode aimm);
 	};
 

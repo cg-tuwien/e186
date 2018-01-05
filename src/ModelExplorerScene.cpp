@@ -27,13 +27,39 @@ namespace e186
 	void ModelExplorerScene::Run()
 	{
 		// create a shader:
-		Shader shader;
-		shader.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
+		Shader shader_diffuse;
+		shader_diffuse.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
 			.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong.frag", { std::make_tuple(0, "oFragColor") })
 			.Build();
 
-		// prepare model:
-		m_model->PrepareForShader(shader);
+		Shader shader_nrm;
+		shader_nrm.AddVertexShaderSourceFromFile("assets/shaders/blinnphong_nm.vert")
+			.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong_nm.frag", { std::make_tuple(0, "oFragColor") })
+			.Build();
+
+		// select some meshes which we intend to render
+		auto meshes_diffuse = m_model->SelectMeshes([](const Mesh& mesh)
+		{
+			return false == static_cast<bool>(mesh.material_data()->height_tex());
+		});
+		// generate uniform setters for all selected meshes for a specific shader
+		auto uniset_diffuse = Model::CompileUniformSetters(shader_diffuse, meshes_diffuse);
+		// get VAOs of all selected meshes
+		auto vaos_diffuse = Model::GetOrCreateVAOs(shader_diffuse, meshes_diffuse);
+
+		// select some meshes which we intend to render
+		auto meshes_nm = m_model->SelectMeshes([](const Mesh& mesh)
+		{
+			return true == static_cast<bool>(mesh.material_data()->height_tex());
+		});
+		// generate uniform setters for all selected meshes for a specific shader
+		auto uniset_nm = Model::CompileUniformSetters(shader_nrm, meshes_nm);
+		// get VAOs of all selected meshes
+		auto vaos_nm = Model::GetOrCreateVAOs(shader_nrm, meshes_nm);
+
+		auto* fubar = Engine::current->tweak_bar_manager().create_new_tweak_bar("settings");
+		int whot = 0;
+		TwAddVarRW(fubar, "umschalten", TW_TYPE_BOOL32, &whot, "");
 
 		Tex2D tex;
 		tex.FromFile("assets/textures/altitudes.png").Upload(GL_RGB).SetTextureParameters(TexParams_LinearFiltering | TexParams_ClampToEdge);
@@ -81,33 +107,45 @@ namespace e186
 
 			auto nM = glm::mat3(vM);
 
-			shader.Use();
-			shader.SetSampler("uDiffuseTexSampler", tex);
-			shader.SetUniform("normalMatrix", nM);
-			shader.SetUniform("vmtMmatrix", vM * tM);
-			shader.SetUniform("pvmtMatrix", pM * vM * tM);
-			shader.SetUniform("uLightDirection", glm::normalize(nM * glm::vec3(-0.2f, -1.0f, -0.3f)));
-			shader.SetUniform("uAmbientLightColor", glm::vec3(0.1f, 0.1f, 0.1f));
-			shader.SetUniform("uDiffuseColor", glm::vec3(1.0f, 0.0f, 0.0f));
-			shader.SetUniform("uSpecularColor", glm::vec3(0.0f, 1.0f, 0.0f));
-			shader.SetUniform("uAmbientColor", glm::vec3(0.1f, 0.1f, 0.3f));
-			shader.SetUniform("uEmissiveColor", glm::vec3(0.0f, 0.0f, 0.1f));
-			shader.SetUniform("uShininess", 10.0f);
-
-			//m_model->RenderWithShaderGenerateMissingVAO(shader);
-
-			const auto n = m_model->num_meshes();
-			for (unsigned int i = 0; i < n; i++)
+			if (whot)
 			{
-				if (m_model->mesh_at(i).m_material_data)
-				{
-					m_model->mesh_at(i).m_material_data->ExecuteUniformSetterForShader(shader);
-				}
-
-				m_model->RenderForVertexDataConfigGenerateMissingVAO(i, shader.vertex_attrib_config(), shader.kind_of_primitives());
+				shader_diffuse.Use();
+				shader_diffuse.SetSampler("uDiffuseTexSampler", tex);
+				shader_diffuse.SetUniform("normalMatrix", nM);
+				shader_diffuse.SetUniform("vmtMmatrix", vM * tM);
+				shader_diffuse.SetUniform("pvmtMatrix", pM * vM * tM);
+				shader_diffuse.SetUniform("uLightDirection", glm::normalize(nM * glm::vec3(-0.2f, -1.0f, -0.3f)));
+				shader_diffuse.SetUniform("uAmbientLightColor", glm::vec3(0.1f, 0.1f, 0.1f));
+				shader_diffuse.SetUniform("uDiffuseColor", glm::vec3(1.0f, 0.0f, 0.0f));
+				shader_diffuse.SetUniform("uSpecularColor", glm::vec3(0.0f, 1.0f, 0.0f));
+				shader_diffuse.SetUniform("uAmbientColor", glm::vec3(0.1f, 0.1f, 0.3f));
+				shader_diffuse.SetUniform("uEmissiveColor", glm::vec3(0.0f, 0.0f, 0.1f));
+				shader_diffuse.SetUniform("uShininess", 10.0f);
+				RenderMeshesWithAlignedUniformSetters(shader_diffuse, vaos_diffuse, uniset_diffuse);
+				UnbindVAO();
+			}
+			else
+			{
+				shader_nrm.Use();
+				shader_nrm.SetSampler("uDiffuseTexSampler", tex);
+				shader_nrm.SetSampler("uNormalTexSampler", tex);
+				shader_nrm.SetUniform("normalMatrix", nM);
+				shader_nrm.SetUniform("vmtMmatrix", vM * tM);
+				shader_nrm.SetUniform("pvmtMatrix", pM * vM * tM);
+				shader_nrm.SetUniform("uLightDirection", glm::normalize(nM * glm::vec3(-0.2f, -1.0f, -0.3f)));
+				shader_nrm.SetUniform("uAmbientLightColor", glm::vec3(0.1f, 0.1f, 0.1f));
+				shader_nrm.SetUniform("uDiffuseColor", glm::vec3(1.0f, 0.0f, 0.0f));
+				shader_nrm.SetUniform("uSpecularColor", glm::vec3(0.0f, 1.0f, 0.0f));
+				shader_nrm.SetUniform("uAmbientColor", glm::vec3(0.1f, 0.1f, 0.3f));
+				shader_nrm.SetUniform("uEmissiveColor", glm::vec3(0.0f, 0.0f, 0.1f));
+				shader_nrm.SetUniform("uShininess", 10.0f);
+				RenderMeshesWithAlignedUniformSetters(shader_nrm, vaos_nm, uniset_nm);
+				UnbindVAO();
 			}
 
 			Engine::current->EndFrame();
 		}
+
+		Engine::current->tweak_bar_manager().destroy_tweak_bar(fubar);
 	}
 }

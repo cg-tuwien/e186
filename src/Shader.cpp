@@ -551,4 +551,66 @@ namespace e186
 
 		return shaderHandle;
 	}
+
+	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len)
+	{
+		GLenum mode = shader.kind_of_primitives();
+		if (GL_PATCHES == mode)
+		{
+			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+		}
+		glBindVertexArray(vao);
+		glDrawElements(mode, indices_len, GL_UNSIGNED_INT, nullptr);
+	}
+
+	void RenderMesh(const Shader& shader, Mesh& mesh)
+	{
+		RenderVAO(shader, Mesh::GetOrCreateVAOForShader(mesh, shader), mesh.indices_length());
+	}
+
+	void RenderMeshes(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos)
+	{
+		GLenum mode = shader.kind_of_primitives();
+		if (GL_PATCHES == mode)
+		{
+			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+		}
+
+		for (auto& tupl : meshes_and_their_vaos)
+		{
+			Mesh& mesh = std::get<0>(tupl);
+			VAOType vao = std::get<1>(tupl);
+
+			glBindVertexArray(vao);
+			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
+		}
+	}
+
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos, const std::vector<std::tuple<MeshRef, UniformSetter>>& uniform_setters)
+	{
+		GLenum mode = shader.kind_of_primitives();
+		if (GL_PATCHES == mode)
+		{
+			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+		}
+
+		assert(meshes_and_their_vaos.size() == uniform_setters.size());
+		auto n = meshes_and_their_vaos.size();
+		for (auto i = 0; i < n; ++i)
+		{
+			auto& tupl = meshes_and_their_vaos[i];
+			Mesh& mesh = std::get<0>(tupl);
+			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters[i])));
+			VAOType vao = std::get<1>(tupl);
+			std::get<1>(uniform_setters[i])(shader, *mesh.material_data());
+
+			glBindVertexArray(vao);
+			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
+		}
+	}
+
+	void UnbindVAO()
+	{
+		glBindVertexArray(0);
+	}
 }

@@ -191,7 +191,7 @@ namespace e186
 		}
 	}
 
-	std::function<void(const Shader&, const MaterialData&)> MaterialData::CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data)
+	UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data)
 	{
 		shader.Use();
 
@@ -428,20 +428,4 @@ namespace e186
 		};
 	}
 
-
-	void MaterialData::StoreUniformSetterForShader(Shader& shader)
-	{
-		m_shader_uniform_setters[&shader] = CreateUniformSetterForShader(shader, *this);
-	}
-
-	void MaterialData::ExecuteUniformSetterForShader(Shader& shader)
-	{
-		auto loc = m_shader_uniform_setters.find(&shader);
-		if (loc == m_shader_uniform_setters.end())
-		{
-			log_warning("Could not find uniform shader setter");
-			return;
-		}
-		loc->second(shader, *this);
-	}
 }

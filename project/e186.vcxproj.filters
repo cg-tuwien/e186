@@ -334,5 +334,11 @@
     <None Include="..\assets\shaders\texture.vert">
       <Filter>Resource Files\shaders\texture</Filter>
     </None>
+    <None Include="..\assets\shaders\blinnphong_nm.frag">
+      <Filter>Resource Files\shaders\blinnphong</Filter>
+    </None>
+    <None Include="..\assets\shaders\blinnphong_nm.vert">
+      <Filter>Resource Files\shaders\blinnphong</Filter>
+    </None>
   </ItemGroup>
 </Project>

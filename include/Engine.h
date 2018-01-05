@@ -3,6 +3,16 @@
 
 namespace e186
 {
+	using MeshIdx = int;
+	using VAOType = GLuint;
+	using VertexDataCfgType = unsigned int;
+	using VAOMap = std::unordered_map<VertexDataCfgType, VAOType>;
+	class Mesh;
+	using MeshRef = std::reference_wrapper<Mesh>;
+	class MaterialData;
+	class Shader;
+	using UniformSetter = std::function<void(const Shader&, const MaterialData&)>;
+
 	class Engine
 	{
 		static void APIENTRY opengl_debug_message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
