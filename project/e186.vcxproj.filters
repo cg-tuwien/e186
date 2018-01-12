@@ -106,6 +106,15 @@
     <Filter Include="Source Files\utils">
       <UniqueIdentifier>{e365bd87-0656-403b-a0a8-4aab48c97cb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\lightsources">
+      <UniqueIdentifier>{a6e7c55f-432a-4870-924e-d623c0257d1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lightsources">
+      <UniqueIdentifier>{77f57898-e705-43d0-a1b2-552e7e367e00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\gizmo">
+      <UniqueIdentifier>{80619a84-d8ac-472a-91f2-8051cfcda612}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\e186stdafx.h">
@@ -121,9 +130,6 @@
       <Filter>Header Files\camera</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Context.h">
-      <Filter>Header Files\framework</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\DebugTexDisplayer.h">
       <Filter>Header Files\framework</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ExceptionWithCallstack.h">
@@ -210,6 +216,18 @@
     <ClInclude Include="..\include\Engine.h">
       <Filter>Header Files\framework</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\DirectionalLight.h">
+      <Filter>Header Files\lightsources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\PointLight.h">
+      <Filter>Header Files\lightsources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\DebugTexDisplayer.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LightsourceEditor.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
@@ -225,9 +243,6 @@
       <Filter>Source Files\model</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Context.cpp">
-      <Filter>Source Files\framework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\DebugTexDisplayer.cpp">
       <Filter>Source Files\framework</Filter>
     </ClCompile>
     <ClCompile Include="..\src\QuakeCamera.cpp">
@@ -299,6 +314,18 @@
     <ClCompile Include="..\src\Engine.cpp">
       <Filter>Source Files\framework</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\PointLight.cpp">
+      <Filter>Source Files\lightsources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DirectionalLight.cpp">
+      <Filter>Source Files\lightsources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DebugTexDisplayer.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\LightsourceEditor.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\assets\shaders\geodesic.tesc">
@@ -334,11 +361,11 @@
     <None Include="..\assets\shaders\texture.vert">
       <Filter>Resource Files\shaders\texture</Filter>
     </None>
-    <None Include="..\assets\shaders\blinnphong_nm.frag">
-      <Filter>Resource Files\shaders\blinnphong</Filter>
+    <None Include="..\assets\shaders\translucent_gizmo.frag">
+      <Filter>Resource Files\shaders\gizmo</Filter>
     </None>
-    <None Include="..\assets\shaders\blinnphong_nm.vert">
-      <Filter>Resource Files\shaders\blinnphong</Filter>
+    <None Include="..\assets\shaders\translucent_gizmo.vert">
+      <Filter>Resource Files\shaders\gizmo</Filter>
     </None>
   </ItemGroup>
 </Project>

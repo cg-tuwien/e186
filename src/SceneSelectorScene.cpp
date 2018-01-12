@@ -18,7 +18,7 @@ namespace e186
 
 	void SceneSelectorScene::Run()
 	{
-		auto* twbar = Engine::current->tweak_bar_manager().create_new_tweak_bar("Scene Selector");
+		auto twbar = Engine::current->tweak_bar_manager().create_new_tweak_bar("Scene Selector");
 		for (const auto& tup : m_scenes)
 		{
 			auto& name = std::get<0>(tup);
@@ -42,7 +42,5 @@ namespace e186
 
 			Engine::current->EndFrame();
 		}
-
-		Engine::current->tweak_bar_manager().destroy_tweak_bar(twbar);
 	}
 }

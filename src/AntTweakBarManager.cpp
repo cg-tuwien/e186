@@ -2,6 +2,31 @@
 
 namespace e186
 {
+	AntTweakBarHandle::AntTweakBarHandle(TwBar* bar) 
+		: m_bar(bar)
+	{
+		assert(m_bar);
+	}
+
+	AntTweakBarHandle::AntTweakBarHandle(AntTweakBarHandle&& other) noexcept 
+		: m_bar(std::move(other.m_bar))
+	{
+		other.m_bar = nullptr;
+	}
+
+	AntTweakBarHandle& AntTweakBarHandle::operator=(AntTweakBarHandle&& other) noexcept
+	{
+		this->m_bar = other.m_bar;
+		other.m_bar = nullptr;
+		return *this;
+	}
+	
+	AntTweakBarHandle::~AntTweakBarHandle()
+	{
+		TwDeleteBar(m_bar);
+	}
+
+
 	AntTweakBarManager::AntTweakBarManager() : m_enabled(false)
 	{
 	}
@@ -85,14 +110,9 @@ namespace e186
 		}
 	}
 
-	TwBar* AntTweakBarManager::create_new_tweak_bar(const char* name)
+	AntTweakBarHandle AntTweakBarManager::create_new_tweak_bar(const char* name)
 	{
-		return TwNewBar(name);
-	}
-
-	void AntTweakBarManager::destroy_tweak_bar(TwBar* bar)
-	{
-		TwDeleteBar(bar);
+		return AntTweakBarHandle{ TwNewBar(name) };
 	}
 
 	void AntTweakBarManager::Render()

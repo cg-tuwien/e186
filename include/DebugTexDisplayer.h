@@ -26,7 +26,7 @@ namespace e186
 		};
 
 	private:
-		TwBar* m_tweak_bar;
+		AntTweakBarHandle m_tweak_bar;
 		std::vector<DbgTexConfig> m_texture_configs;
 		std::unique_ptr<Model> m_quad;
 		Shader m_shader;

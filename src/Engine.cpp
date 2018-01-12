@@ -23,11 +23,11 @@ namespace e186
 		m_main_wnd_aspectRatio = static_cast<float>(m_main_wnd_width) / static_cast<float>(m_main_wnd_height);
 
 		// Receiving input events
-		glfwSetMouseButtonCallback(m_mainWindow, glfw_mouse_button_callback);
-		glfwSetCursorPosCallback(m_mainWindow, glfw_cursor_pos_callback);
-		glfwSetScrollCallback(m_mainWindow, glfw_scroll_callback);
-		glfwSetKeyCallback(m_mainWindow, glfw_key_callback);
-		glfwSetCharCallback(m_mainWindow, glfw_char_callback);
+		glfwSetMouseButtonCallback(m_mainWindow, Engine::glfw_mouse_button_callback);
+		glfwSetCursorPosCallback(m_mainWindow, Engine::glfw_cursor_pos_callback);
+		glfwSetScrollCallback(m_mainWindow, Engine::glfw_scroll_callback);
+		glfwSetKeyCallback(m_mainWindow, Engine::glfw_key_callback);
+		glfwSetCharCallback(m_mainWindow, Engine::glfw_char_callback);
 
 		// Window size callback
 		glfwSetWindowSizeCallback(m_mainWindow, glfw_windowsize_callback);
@@ -38,12 +38,12 @@ namespace e186
 		// If you are using an extension loader library to access modern OpenGL then this is when to initialize it, as the loader needs a current context to load from.
 		gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 		// Register GL debug callback if we are in DEBUG mode
 		glDebugMessageCallback(Engine::opengl_debug_message_callback, nullptr);
 		// Enable synchronous callback. This ensures that the callback function is called right after an error has occurred. 
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-//#endif
+#endif
 
 		// glfwSwapInterval(1); // = vsync
 	}
@@ -345,7 +345,7 @@ namespace e186
 
 	void Engine::BeginFrame()
 	{
-		while (!m_pending_actions.empty())
+		while (!m_pending_actions.empty()) // TODO: review this during Pr
 		{
 			m_pending_actions.front()();
 			m_pending_actions.pop();

@@ -57,9 +57,9 @@ namespace e186
 		// get VAOs of all selected meshes
 		auto vaos_nm = Model::GetOrCreateVAOs(shader_nrm, meshes_nm);
 
-		auto* fubar = Engine::current->tweak_bar_manager().create_new_tweak_bar("settings");
-		int whot = 0;
-		TwAddVarRW(fubar, "umschalten", TW_TYPE_BOOL32, &whot, "");
+		auto fubar = Engine::current->tweak_bar_manager().create_new_tweak_bar("settings");
+		bool whot = false;
+		TwAddVarRW(fubar, "umschalten", TW_TYPE_BOOLCPP, &whot, "");
 
 		Tex2D tex;
 		tex.FromFile("assets/textures/altitudes.png").Upload(GL_RGB).SetTextureParameters(TexParams_LinearFiltering | TexParams_ClampToEdge);
@@ -145,7 +145,5 @@ namespace e186
 
 			Engine::current->EndFrame();
 		}
-
-		Engine::current->tweak_bar_manager().destroy_tweak_bar(fubar);
 	}
 }

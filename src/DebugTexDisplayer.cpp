@@ -5,11 +5,10 @@
 namespace e186
 {
 
-	DebugTexDisplayer::DebugTexDisplayer() 
+	DebugTexDisplayer::DebugTexDisplayer() :
+		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Textures"))
 	{
 		m_texture_configs.reserve(kVecSize);
-		auto& twBarManager = Engine::current->tweak_bar_manager();
-		m_tweak_bar = twBarManager.create_new_tweak_bar("Textures");
 
 		m_quad = Model::LoadFromFile("assets/models/quad01.obj", glm::mat4(1.0f), MOLF_default);
 		assert(m_quad);
@@ -26,13 +25,12 @@ namespace e186
 
 	DebugTexDisplayer::~DebugTexDisplayer()
 	{
-		auto& twBarManager = Engine::current->tweak_bar_manager();
-		twBarManager.destroy_tweak_bar(m_tweak_bar);
 	}
 
 	DebugTexDisplayer::DbgTexConfig* DebugTexDisplayer::Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name)
 	{
-		if (m_texture_configs.size() >= kVecSize)
+		auto n = m_texture_configs.size();
+		if (n >= kVecSize)
 		{
 			log_error("Max. number of debug textures reached");
 			return nullptr;
@@ -50,15 +48,15 @@ namespace e186
 			texTarget, // GLenum m_texture_target;
 			glHandle   // GLuint m_gl_handle;
 		});
+
 		auto& element = m_texture_configs.back();
-		auto n = m_texture_configs.size();
 		auto num = "Tex #" + std::to_string(n);
 		auto groupAssignment = " group='" + name + "' ";
-		TwAddVarRW(m_tweak_bar, (num + " enbld").c_str(), TW_TYPE_BOOL32, &element.m_enabled, groupAssignment.c_str());
+		TwAddVarRW(m_tweak_bar, (num + " enbld").c_str(), TW_TYPE_BOOLCPP, &element.m_enabled, groupAssignment.c_str());
 		TwAddVarRW(m_tweak_bar, (num + " off-x").c_str(), TW_TYPE_INT32, &element.m_offset_x, groupAssignment.c_str());
 		TwAddVarRW(m_tweak_bar, (num + " off-y").c_str(), TW_TYPE_INT32, &element.m_offset_y, groupAssignment.c_str());
 		TwAddVarRW(m_tweak_bar, (num + " scale").c_str(), TW_TYPE_FLOAT, &element.m_scale, (" min=0.01 max=2.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarRW(m_tweak_bar, (num + " relsc").c_str(), TW_TYPE_BOOL32, &element.m_scale_relative_to_window_height, groupAssignment.c_str());
+		TwAddVarRW(m_tweak_bar, (num + " relsc").c_str(), TW_TYPE_BOOLCPP, &element.m_scale_relative_to_window_height, groupAssignment.c_str());
 		return &element;
 	}
 

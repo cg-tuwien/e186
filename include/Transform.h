@@ -20,8 +20,6 @@ namespace e186
 		static const glm::vec4 kUnitVec4Z;
 
 	protected:
-		std::string m_name;				///< optional name of this current
-
 		unsigned int m_update_id;		///< increased whenever rotation, translation, scale is altered to determine when matrix-update required
 
 		unsigned int m_query_id;		///< update-id of the matrices; the matrices have to be updated if m_query_id != m_update_id
@@ -44,10 +42,12 @@ namespace e186
 
 	public:
 		Transform();
+		Transform(glm::vec3 position);
+		Transform(Transform&& other) noexcept;
+		Transform(const Transform& other) noexcept;
+		Transform& operator=(Transform&& other) noexcept;
+		Transform& operator=(const Transform& other) noexcept;
 		virtual ~Transform();
-
-		void set_name(std::string name);
-		const std::string& name() const;
 
 		/// sets a new position, current position is overwritten
 		void set_position(glm::vec3 position);

@@ -5,11 +5,11 @@
 
 namespace e186
 {
-	const float QuakeCamera::kRotationSpeed = 0.001f;
-	const float QuakeCamera::kMoveSpeed = 100.0f;
-	const float QuakeCamera::kSpeedMultiplier = 5.0f;
-
 	QuakeCamera::QuakeCamera() : 
+		m_rotation_speed(0.001f),
+		m_move_speed(8.0f), // 8 m/s
+		m_fast_multiplier(5.0f), // 40 m/s
+		m_slow_multiplier(0.2f), // 1.6 m/s
 		m_accumulated_mouse_movement(0.0f, 0.0f)
 	{
 		glfwSetInputMode(Engine::current->main_window(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -43,9 +43,13 @@ namespace e186
 		float speedMultiplier = 1.0f;
 		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_SHIFT))
 		{
-			speedMultiplier = kSpeedMultiplier;
+			speedMultiplier = m_fast_multiplier;
 		}
-		Translate(kMoveSpeed * speedMultiplier * static_cast<float>(deltaTime) * rotatedVector);
+		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_CONTROL))
+		{
+			speedMultiplier = m_slow_multiplier;
+		}
+		Translate(m_move_speed * speedMultiplier * static_cast<float>(deltaTime) * rotatedVector);
 		//log_verbose("cam-pos[%.2f, %.2f, %.2f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	}
 
@@ -54,9 +58,13 @@ namespace e186
 		float speedMultiplier = 1.0f;
 		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_SHIFT))
 		{
-			speedMultiplier = kSpeedMultiplier;
+			speedMultiplier = m_fast_multiplier;
 		}
-		Translate(kMoveSpeed * speedMultiplier * static_cast<float>(deltaTime) * homoVectorToAdd);
+		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_CONTROL))
+		{
+			speedMultiplier = m_slow_multiplier;
+		}
+		Translate(m_move_speed * speedMultiplier * static_cast<float>(deltaTime) * homoVectorToAdd);
 		//log_verbose("cam-pos[%.2f, %.2f, %.2f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	}
 
@@ -107,8 +115,8 @@ namespace e186
 		glm::ivec2 mouseMoved = glm::ivec2(width / 2 - mouse_x, height / 2 - mouse_y);
 
 		// accumulate values and create rotation-matrix
-		m_accumulated_mouse_movement.x += kRotationSpeed * static_cast<float>(mouseMoved.x);
-		m_accumulated_mouse_movement.y += kRotationSpeed * static_cast<float>(mouseMoved.y);
+		m_accumulated_mouse_movement.x += m_rotation_speed * static_cast<float>(mouseMoved.x);
+		m_accumulated_mouse_movement.y += m_rotation_speed * static_cast<float>(mouseMoved.y);
 		m_accumulated_mouse_movement.y = glm::clamp(m_accumulated_mouse_movement.y, -FU_HALF_PI_F, FU_HALF_PI_F);
 		glm::mat4 cameraRotation = glm::rotate(m_accumulated_mouse_movement.x, kUnitVec3Y) * glm::rotate(m_accumulated_mouse_movement.y, kUnitVec3X);
 
@@ -124,7 +132,7 @@ namespace e186
 			AddToCameraPositionRelative( kSideVec4, deltaTime);
 		if (glfwGetKey(wnd, 'A'))
 			AddToCameraPositionRelative(-kSideVec4, deltaTime);
-		if (glfwGetKey(wnd, GLFW_KEY_LEFT_CONTROL))
+		if (glfwGetKey(wnd, GLFW_KEY_LEFT_ALT))
 			AddToCameraPositionAbsolute(-kUpVec4, deltaTime);
 		if (glfwGetKey(wnd, GLFW_KEY_SPACE))
 			AddToCameraPositionAbsolute( kUpVec4, deltaTime);

@@ -51,3 +51,5 @@
 #include "Shader.h"
 #include "MaterialData.h"
 #include "Model.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"

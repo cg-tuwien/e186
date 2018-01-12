@@ -16,6 +16,7 @@
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\Context.h" />
     <ClInclude Include="..\include\DebugTexDisplayer.h" />
+    <ClInclude Include="..\include\DirectionalLight.h" />
     <ClInclude Include="..\include\e186.h" />
     <ClInclude Include="..\include\e186stdafx.h" />
     <ClInclude Include="..\include\Engine.h" />
@@ -23,6 +24,7 @@
     <ClInclude Include="..\include\FixedSimulationTimer.h" />
     <ClInclude Include="..\include\FrameBufferObject.h" />
     <ClInclude Include="..\include\IScene.h" />
+    <ClInclude Include="..\include\LightsourceEditor.h" />
     <ClInclude Include="..\include\log.h" />
     <ClInclude Include="..\include\MaterialData.h" />
     <ClInclude Include="..\include\MaterialUniformLocation.h" />
@@ -30,6 +32,7 @@
     <ClInclude Include="..\include\MaxFpsTimer.h" />
     <ClInclude Include="..\include\Model.h" />
     <ClInclude Include="..\include\ModelExplorerScene.h" />
+    <ClInclude Include="..\include\PointLight.h" />
     <ClInclude Include="..\include\QuakeCamera.h" />
     <ClInclude Include="..\include\SampleSceneTessIco.h" />
     <ClInclude Include="..\include\SceneSelectorScene.h" />
@@ -53,6 +56,7 @@
     <ClCompile Include="..\src\Camera.cpp" />
     <ClCompile Include="..\src\Context.cpp" />
     <ClCompile Include="..\src\DebugTexDisplayer.cpp" />
+    <ClCompile Include="..\src\DirectionalLight.cpp" />
     <ClCompile Include="..\src\e186stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -61,12 +65,14 @@
     <ClCompile Include="..\src\ExceptionWithCallstack.cpp" />
     <ClCompile Include="..\src\FixedSimulationTimer.cpp" />
     <ClCompile Include="..\src\FrameBufferObject.cpp" />
+    <ClCompile Include="..\src\LightsourceEditor.cpp" />
     <ClCompile Include="..\src\log.cpp" />
     <ClCompile Include="..\src\MaterialData.cpp" />
     <ClCompile Include="..\src\math_utils.cpp" />
     <ClCompile Include="..\src\MaxFpsTimer.cpp" />
     <ClCompile Include="..\src\Model.cpp" />
     <ClCompile Include="..\src\ModelExplorerScene.cpp" />
+    <ClCompile Include="..\src\PointLight.cpp" />
     <ClCompile Include="..\src\QuakeCamera.cpp" />
     <ClCompile Include="..\src\SampleSceneTessIco.cpp" />
     <ClCompile Include="..\src\SceneSelectorScene.cpp" />
@@ -83,8 +89,6 @@
   <ItemGroup>
     <None Include="..\assets\shaders\blinnphong.frag" />
     <None Include="..\assets\shaders\blinnphong.vert" />
-    <None Include="..\assets\shaders\blinnphong_nm.frag" />
-    <None Include="..\assets\shaders\blinnphong_nm.vert" />
     <None Include="..\assets\shaders\geodesic.frag" />
     <None Include="..\assets\shaders\geodesic.geom" />
     <None Include="..\assets\shaders\geodesic.tesc" />
@@ -94,6 +98,8 @@
     <None Include="..\assets\shaders\terrain.vert" />
     <None Include="..\assets\shaders\texture.frag" />
     <None Include="..\assets\shaders\texture.vert" />
+    <None Include="..\assets\shaders\translucent_gizmo.frag" />
+    <None Include="..\assets\shaders\translucent_gizmo.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

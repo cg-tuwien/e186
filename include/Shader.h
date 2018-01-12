@@ -55,6 +55,16 @@ namespace e186
 			glUseProgram(m_prog_handle);
 		}
 
+		void SetUniform(GLuint location, const glm::vec4& value) const
+		{
+			glUniform4fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));
+		}
+
+		void SetUniform(GLuint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
+		{
+			glUniform4f(location, x, y, z, w);
+		}
+
 		void SetUniform(GLuint location, const glm::vec3& value) const
 		{
 			glUniform3fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));

@@ -243,6 +243,11 @@ namespace e186
 			return selection;
 		}
 
+		std::vector<MeshRef> SelectAllMeshes()
+		{
+			return SelectMeshes([](const Mesh& mesh) { return true; });
+		}
+
 		static std::vector<std::tuple<MeshRef, UniformSetter>> CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes);
 
 		static std::vector<std::tuple<MeshRef, VAOType>> GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes);

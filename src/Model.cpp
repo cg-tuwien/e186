@@ -381,7 +381,6 @@ namespace e186
 		auto it = mesh.m_vertex_array_objects.find(vertexDataConfig);
 		if (it != mesh.m_vertex_array_objects.end())
 		{
-			log_info("VAO already exists for mesh[%u] and vertexDataConfig[%u]", mesh.m_index, vertexDataConfig);
 			return it->second;
 		}
 

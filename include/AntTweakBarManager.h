@@ -2,6 +2,22 @@
 
 namespace e186
 {
+	class AntTweakBarHandle
+	{
+	public:
+		AntTweakBarHandle(TwBar* bar);
+		AntTweakBarHandle(const AntTweakBarHandle&) = delete;
+		AntTweakBarHandle(AntTweakBarHandle&& other) noexcept;
+		AntTweakBarHandle& operator=(const AntTweakBarHandle&) = delete;
+		AntTweakBarHandle& operator=(AntTweakBarHandle&& other) noexcept;
+		~AntTweakBarHandle();
+
+		operator TwBar*() const { return m_bar; }
+		TwBar* get_bar() const { return m_bar; }
+
+	private:
+		TwBar* m_bar;
+	};
 
 	class AntTweakBarManager
 	{
@@ -22,8 +38,7 @@ namespace e186
 		~AntTweakBarManager();
 
 		void enable_tweak_bars();
-		TwBar* create_new_tweak_bar(const char* name);
-		void destroy_tweak_bar(TwBar* bar);
+		AntTweakBarHandle create_new_tweak_bar(const char* name);
 		void Render();
 	};
 

@@ -19,28 +19,87 @@ namespace e186
 	const glm::vec4 Transform::kUnitVec4Z(0, 0, 1, 1);
 
 	Transform::Transform() :
+		m_update_id(0),
+		m_query_id(0),
 		m_rotation(1.0f), // rotation is a matrix
 		m_translation(0.0f),
 		m_scale(1.0f),
 		m_model_matrix(1.0f),
+		m_parent_ptr(nullptr)
+	{
+	}
+
+	Transform::Transform(glm::vec3 position) :
 		m_update_id(0),
 		m_query_id(0),
-		m_parent_ptr(0)
+		m_rotation(1.0f), // rotation is a matrix
+		m_translation(std::move(position)),
+		m_scale(1.0f),
+		m_model_matrix(1.0f),
+		m_parent_ptr(nullptr)
 	{
+	}
+
+	Transform::Transform(Transform&& other) noexcept :
+		m_update_id(other.m_update_id),
+		m_query_id(other.m_query_id),
+		m_rotation(std::move(other.m_rotation)),
+		m_translation(std::move(other.m_translation)),
+		m_scale(std::move(other.m_scale)),
+		m_model_matrix(std::move(other.m_model_matrix)),
+		m_parent_ptr(std::move(other.m_parent_ptr)),
+		m_childs(std::move(other.m_childs))
+	{
+		other.m_update_id = 0;
+		other.m_query_id = 0;
+		other.m_parent_ptr = nullptr;
+		other.m_childs.clear();
+	}
+
+	Transform::Transform(const Transform& other) noexcept :
+		m_update_id(other.m_update_id),
+		m_query_id(other.m_query_id),
+		m_rotation(other.m_rotation),
+		m_translation(other.m_translation),
+		m_scale(other.m_scale),
+		m_model_matrix(other.m_model_matrix),
+		m_parent_ptr(other.m_parent_ptr),
+		m_childs(other.m_childs)
+	{
+	}
+
+	Transform& Transform::operator=(Transform&& other) noexcept
+	{
+		m_update_id = other.m_update_id;
+		m_query_id = other.m_query_id;
+		m_rotation = std::move(other.m_rotation);
+		m_translation = std::move(other.m_translation);
+		m_scale = std::move(other.m_scale);
+		m_model_matrix = std::move(other.m_model_matrix);
+		m_parent_ptr = std::move(other.m_parent_ptr);
+		m_childs = std::move(other.m_childs);
+		other.m_update_id = 0;
+		other.m_query_id = 0;
+		other.m_parent_ptr = nullptr;
+		other.m_childs.clear();
+		return *this;
+	}
+
+	Transform& Transform::operator=(const Transform& other) noexcept
+	{
+		m_update_id = other.m_update_id;
+		m_query_id = other.m_query_id;
+		m_rotation = other.m_rotation;
+		m_translation = other.m_translation;
+		m_scale = other.m_scale;
+		m_model_matrix = other.m_model_matrix;
+		m_parent_ptr = other.m_parent_ptr;
+		m_childs = other.m_childs;
+		return *this;
 	}
 
 	Transform::~Transform()
 	{
-	}
-
-	void Transform::set_name(std::string name)
-	{
-		m_name = std::move(name);
-	}
-
-	const std::string& Transform::name() const
-	{
-		return m_name;
 	}
 
 	void Transform::DataUpdated()

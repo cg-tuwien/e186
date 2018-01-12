@@ -309,7 +309,7 @@ namespace e186
 			attrib_config = attrib_config | VertexAttribData_Bones;
 		}
 
-		if (has_tangents && has_bitangents)
+		if (has_tangents || has_bitangents)
 		{
 			attrib_config = attrib_config | VertexAttribData_TangentSpace;
 		}

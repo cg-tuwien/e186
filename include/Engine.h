@@ -3,15 +3,28 @@
 
 namespace e186
 {
+#pragma region typedefs
 	using MeshIdx = int;
+	
 	using VAOType = GLuint;
+	
 	using VertexDataCfgType = unsigned int;
+	
 	using VAOMap = std::unordered_map<VertexDataCfgType, VAOType>;
+	
 	class Mesh;
 	using MeshRef = std::reference_wrapper<Mesh>;
+	
 	class MaterialData;
 	class Shader;
 	using UniformSetter = std::function<void(const Shader&, const MaterialData&)>;
+	
+	class DirectionalLight;
+	using DirLightRef = std::reference_wrapper<DirectionalLight>;
+	
+	class PointLight;
+	using PointLightRef = std::reference_wrapper<PointLight>;
+#pragma endregion
 
 	class Engine
 	{
