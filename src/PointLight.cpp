@@ -3,38 +3,29 @@
 namespace e186
 {
 
-	PointLight::PointLight(const glm::vec3& color, const glm::vec3& position)
+	PointLight::PointLight(glm::vec3 color, const glm::vec3& position)
 		//: m_transform( position ),
 		: m_position(position),
-		m_diffuse_color{ color },
-		m_specular_color{ color },
-		m_const_attenuation{1.0f},
-		m_linear_attenuation{33.33f},
-		m_quadratic_attenuation{11.11f},
+		m_light_color(std::move(color)),
+		m_attenuation(1.0f, 0.1f, 0.01f),
 		m_enabled{ true }
 	{
 	}
 
-	PointLight::PointLight(glm::vec3 diffuse_color, glm::vec3 specular_color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten)
+	PointLight::PointLight(glm::vec3 color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten)
 		//: m_transform( position ),
 		: m_position(position),
-		m_diffuse_color{ std::move(diffuse_color) },
-		m_specular_color{ std::move(specular_color) },
-		m_const_attenuation{ const_atten },
-		m_linear_attenuation{ lin_atten },
-		m_quadratic_attenuation{ quad_atten },
+		m_light_color(std::move(color)),
+		m_attenuation(const_atten, lin_atten, quad_atten),
 		m_enabled{ true }
 	{
 	}
 
-	PointLight::PointLight(glm::vec3 diffuse_color, glm::vec3 specular_color, Transform m_transform, float const_atten, float lin_atten, float quad_atten)
-		//: m_transform(std::move(m_transform)),
-		: m_position(m_transform.GetPosition()),
-		m_diffuse_color{ std::move(diffuse_color) },
-		m_specular_color{ std::move(specular_color) },
-		m_const_attenuation{ const_atten },
-		m_linear_attenuation{ lin_atten },
-		m_quadratic_attenuation{ quad_atten },
+	PointLight::PointLight(glm::vec3 color, Transform transform, float const_atten, float lin_atten, float quad_atten)
+		//: m_transform( position ),
+		: m_position(transform.GetPosition()),
+		m_light_color(std::move(color)),
+		m_attenuation(const_atten, lin_atten, quad_atten),
 		m_enabled{ true }
 	{
 	}
@@ -48,30 +39,31 @@ namespace e186
 		m_position = std::move(position);
 	}
 
-	void PointLight::set_diffuse_color(glm::vec3 color)
+	void PointLight::set_light_color(glm::vec3 color)
 	{
-		m_diffuse_color = std::move(color);
+		m_light_color = std::move(color);
 	}
 
-	void PointLight::set_specular_color(glm::vec3 color)
+	void PointLight::set_attenuation(glm::vec3 attenuation)
 	{
-		m_specular_color = std::move(color);
+		m_attenuation = std::move(attenuation);
 	}
 
 	void PointLight::set_const_attenuation(float attenuation)
 	{
-		m_const_attenuation = attenuation;
+		m_attenuation = glm::vec3(attenuation, m_attenuation.y, m_attenuation.z);
 	}
 
 	void PointLight::set_linear_attenuation(float attenuation)
 	{
-		m_linear_attenuation = attenuation;
+		m_attenuation = glm::vec3(m_attenuation.x, attenuation, m_attenuation.z);
 	}
 
 	void PointLight::set_quadratic_attenuation(float attenuation)
 	{
-		m_quadratic_attenuation = attenuation;
+		m_attenuation = glm::vec3(m_attenuation.x, m_attenuation.y, attenuation);
 	}
+
 
 	void PointLight::set_enabled(bool is_enabled)
 	{

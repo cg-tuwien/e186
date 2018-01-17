@@ -1,7 +1,26 @@
 #include "LightsourceEditor.h"
+#include <glad/glad.h>
 
 namespace e186
 {
+	PointLightGpuData::PointLightGpuData(glm::vec4 pos, glm::vec4 col, glm::vec4 atten)
+		: m_position(pos),
+		m_light_color(col),
+		m_attenuation(atten)
+	{
+		
+	}
+
+	PointLightGpuData::PointLightGpuData(glm::vec3 pos, glm::vec3 col, glm::vec3 atten)
+		: m_position(pos, 0.0f),
+		m_light_color(col, 0.0f),
+		m_attenuation(atten, 0.0f)
+	{
+
+	}
+
+
+
 	void TW_CALL LightsourceEditor::EnableAllCallback(void *clientData)
 	{
 		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
@@ -9,6 +28,7 @@ namespace e186
 		{
 			ptlt->set_enabled(true);
 		}
+		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::DisableAllCallback(void *clientData)
@@ -18,6 +38,7 @@ namespace e186
 		{
 			ptlt->set_enabled(false);
 		}
+		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::SetPositionCallback(const void *value, void *clientData)
@@ -32,28 +53,16 @@ namespace e186
 		*reinterpret_cast<glm::vec3*>(value) = ptlt->position();
 	}
 
-	void TW_CALL LightsourceEditor::SetDiffuseColorCallback(const void *value, void *clientData)
+	void TW_CALL LightsourceEditor::SetLightColorCallback(const void *value, void *clientData)
 	{
 		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
-		ptlt->set_diffuse_color(*reinterpret_cast<const glm::vec3*>(value));
+		ptlt->set_light_color(*reinterpret_cast<const glm::vec3*>(value));
 	}
 
-	void TW_CALL LightsourceEditor::GetDiffuseColorCallback(void *value, void *clientData)
+	void TW_CALL LightsourceEditor::GetLightColorCallback(void *value, void *clientData)
 	{
 		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
-		*reinterpret_cast<glm::vec3*>(value) = ptlt->diffuse_color();
-	}
-
-	void TW_CALL LightsourceEditor::SetSpecularColorCallback(const void *value, void *clientData)
-	{
-		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
-		ptlt->set_specular_color(*reinterpret_cast<const glm::vec3*>(value));
-	}
-
-	void TW_CALL LightsourceEditor::GetSpecularColorCallback(void *value, void *clientData)
-	{
-		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
-		*reinterpret_cast<glm::vec3*>(value) = ptlt->specular_color();
+		*reinterpret_cast<glm::vec3*>(value) = ptlt->light_color();
 	}
 
 	void TW_CALL LightsourceEditor::SetConstAttenuationCallback(const void *value, void *clientData)
@@ -113,7 +122,9 @@ namespace e186
 		m_outer_transparency(.07f),
 		m_inner_radius(0.1f), // 10cm
 		m_inner_color(1.0f, 1.0f, 0.5f),
-		m_outer_color(1.0f, 1.0f, 0.85f)
+		m_outer_color(1.0f, 1.0f, 0.85f),
+		m_has_changes(true),
+		m_uniform_buffer_handle(0)
 	{
 		m_sphere = Model::LoadFromFile("assets/models/sphere.obj", glm::mat4(1.0f), MOLF_triangulate | MOLF_smoothNormals);
 		m_gizmo_shader.AddVertexShaderSourceFromFile("assets/shaders/translucent_gizmo.vert")
@@ -128,6 +139,11 @@ namespace e186
 		TwAddVarRW(m_tweak_bar, "Inner radius", TW_TYPE_FLOAT, &m_inner_radius, " min=0.0 max=3.0 step=0.1 ");
 		TwAddVarRW(m_tweak_bar, "Color inner", TW_TYPE_COLOR3F, glm::value_ptr(m_inner_color), nullptr);
 		TwAddVarRW(m_tweak_bar, "Color outer", TW_TYPE_COLOR3F, glm::value_ptr(m_outer_color), nullptr);
+
+		// create the uniform buffer right away
+		glGenBuffers(1, &m_uniform_buffer_handle);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_uniform_buffer_handle);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
 	LightsourceEditor::~LightsourceEditor()
@@ -149,10 +165,8 @@ namespace e186
 		auto groupAssignment = " group='" + name + "' ";
 		TwAddVarCB(m_tweak_bar, (name + " enabled").c_str(), TW_TYPE_BOOLCPP, SetEnabledCallback, GetEnabledCallback, point_light, groupAssignment.c_str());
 		TwAddVarCB(m_tweak_bar, (name + " pos").c_str(), TW_TYPE_DIR3F, SetPositionCallback, GetPositionCallback, point_light, groupAssignment.c_str());
-		TwAddVarCB(m_tweak_bar, (name + " diff-col").c_str(), TW_TYPE_COLOR3F, SetDiffuseColorCallback, GetDiffuseColorCallback, point_light, groupAssignment.c_str());
-		TwAddVarCB(m_tweak_bar, (name + " spec-col").c_str(), TW_TYPE_COLOR3F, SetSpecularColorCallback, GetSpecularColorCallback, point_light, groupAssignment.c_str());
+		TwAddVarCB(m_tweak_bar, (name + " light-col").c_str(), TW_TYPE_COLOR3F, SetLightColorCallback, GetLightColorCallback, point_light, groupAssignment.c_str());
 		TwAddVarCB(m_tweak_bar, (name + " const-att").c_str(), TW_TYPE_FLOAT, SetConstAttenuationCallback, GetConstAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarCB(m_tweak_bar, (name + " const-att").c_str(), TW_TYPE_FLOAT, SetLinearAttenuationCallback, GetLinearAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " lin-att").c_str(), TW_TYPE_FLOAT, SetLinearAttenuationCallback, GetLinearAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " quad-att").c_str(), TW_TYPE_FLOAT, SetQuadraticAttenuationCallback, GetQuadraticAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 	}
@@ -205,5 +219,33 @@ namespace e186
 
 		glDisable(GL_BLEND);
 		glDepthMask(GL_TRUE);
+	}
+
+	void LightsourceEditor::Update(bool force_gpu_upload)
+	{
+		if (!m_has_changes && !force_gpu_upload)
+			return;
+
+		std::vector<PointLightGpuData> gpu_data;
+		for (auto& cpu_data : m_point_lights)
+		{
+			if (cpu_data->enabled())
+			{
+				gpu_data.emplace_back(cpu_data->position(), cpu_data->light_color(), cpu_data->attenuation());
+			}
+		}
+
+		auto n = gpu_data.size();
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_uniform_buffer_handle);
+		// fill the buffer, you do this anytime any of the lights change
+		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PointLightGpuData) * n, gpu_data.size() > 0 ? &gpu_data[0] : 0, GL_DYNAMIC_DRAW);
+	}
+
+	void LightsourceEditor::BindUniformBufferToShaderLocations()
+	{
+		// binding to index 0, the glsl code needs to specify this same
+		// index using 'layout(binding=0)'
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_uniform_buffer_handle);
+		// Credits: https://www.gamedev.net/forums/topic/658486-glsl-send-array-receive-struct/ (Happy Coder)
 	}
 }

@@ -2,6 +2,15 @@
 
 namespace e186
 {
+	struct PointLightGpuData
+	{
+		glm::vec4 m_position;
+		glm::vec4 m_light_color;
+		glm::vec4 m_attenuation;
+		PointLightGpuData(glm::vec3 pos, glm::vec3 col, glm::vec3 atten);
+		PointLightGpuData(glm::vec4 pos, glm::vec4 col, glm::vec4 atten);
+	};
+
 	class LightsourceEditor
 	{
 		const static int kMaxPointLights = 1024;
@@ -24,15 +33,21 @@ namespace e186
 
 		void RenderGizmos(Camera& camera);
 
+		/*! On first call, or if anything has changed, uploads the lightsource data to 
+		 *	a Uniform Buffer on the GPU.
+		 *	@param force_gpu_upload Force Uniform Buffer update
+		 */
+		void Update(bool force_gpu_upload);
+
+		void BindUniformBufferToShaderLocations();
+
 	private:
 		static void TW_CALL EnableAllCallback(void *clientData);
 		static void TW_CALL DisableAllCallback(void *clientData);
 		static void TW_CALL SetPositionCallback(const void *value, void *clientData);
 		static void TW_CALL GetPositionCallback(void *value, void *clientData);
-		static void TW_CALL SetDiffuseColorCallback(const void *value, void *clientData);
-		static void TW_CALL GetDiffuseColorCallback(void *value, void *clientData);
-		static void TW_CALL SetSpecularColorCallback(const void *value, void *clientData);
-		static void TW_CALL GetSpecularColorCallback(void *value, void *clientData);
+		static void TW_CALL SetLightColorCallback(const void *value, void *clientData);
+		static void TW_CALL GetLightColorCallback(void *value, void *clientData);
 		static void TW_CALL SetConstAttenuationCallback(const void *value, void *clientData);
 		static void TW_CALL GetConstAttenuationCallback(void *value, void *clientData);
 		static void TW_CALL SetLinearAttenuationCallback(const void *value, void *clientData);
@@ -52,5 +67,7 @@ namespace e186
 		float m_inner_radius;
 		glm::vec3 m_inner_color;
 		glm::vec3 m_outer_color;
+		bool m_has_changes;
+		GLuint m_uniform_buffer_handle;
 	};
 }
