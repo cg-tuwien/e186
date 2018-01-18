@@ -66,7 +66,7 @@ namespace e186
 
 	void PointLight::set_cubic_attenuation(float attenuation)
 	{
-		m_attenuation = glm::vec4(m_attenuation[0], m_attenuation[1], m_attenuation[4], attenuation);
+		m_attenuation = glm::vec4(m_attenuation[0], m_attenuation[1], m_attenuation[2], attenuation);
 	}
 
 	void PointLight::set_enabled(bool is_enabled)

@@ -41,12 +41,18 @@ namespace e186
 
 	private:
 		static void TW_CALL SetLightColorForAllCallback(const void *value, void *clientData);
+		static void TW_CALL GetLightColorForAllCallback(void *value, void *clientData);
 		static void TW_CALL SetConstAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL GetConstAttenuationForAllCallback(void *value, void *clientData);
 		static void TW_CALL SetLinearAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL GetLinearAttenuationForAllCallback(void *value, void *clientData);
 		static void TW_CALL SetQuadraticAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL GetQuadraticAttenuationForAllCallback(void *value, void *clientData);
 		static void TW_CALL SetCubicAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL GetCubicAttenuationForAllCallback(void *value, void *clientData);
 		static void TW_CALL EnableAllCallback(void *clientData);
 		static void TW_CALL DisableAllCallback(void *clientData);
+
 		static void TW_CALL SetPositionCallback(const void *value, void *clientData);
 		static void TW_CALL GetPositionCallback(void *value, void *clientData);
 		static void TW_CALL SetLightColorCallback(const void *value, void *clientData);
