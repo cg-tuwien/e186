@@ -3,7 +3,8 @@
 
 uniform mat4 pvmtMatrix;
 uniform mat4 vmtMmatrix;
-uniform mat3 normalMatrix;
+uniform mat4 vMatrix;
+uniform mat3 vmtNormalMatrix;
 
 layout (location = 0) in vec4 aVertexPosition; 
 layout (location = 1) in vec2 aVertexTexCoord;
@@ -17,7 +18,7 @@ void main()
 {	
 	vTexCoords = aVertexTexCoord;
 	vPositionVS = (vmtMmatrix * aVertexPosition).xyz;
-	vNormalVS = normalMatrix * aVertexNormal;
+	vNormalVS = vmtNormalMatrix * aVertexNormal;
 
 	gl_Position = pvmtMatrix * aVertexPosition;
 }

@@ -75,7 +75,6 @@ namespace e186
 		{
 			ptlt->set_light_color(*reinterpret_cast<const glm::vec3*>(value));
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::SetConstAttenuationForAllCallback(const void *value, void *clientData)
@@ -85,7 +84,6 @@ namespace e186
 		{
 			ptlt->set_const_attenuation(*reinterpret_cast<const float*>(value));
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::SetLinearAttenuationForAllCallback(const void *value, void *clientData)
@@ -95,7 +93,6 @@ namespace e186
 		{
 			ptlt->set_linear_attenuation(*reinterpret_cast<const float*>(value));
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::SetQuadraticAttenuationForAllCallback(const void *value, void *clientData)
@@ -105,7 +102,6 @@ namespace e186
 		{
 			ptlt->set_quadratic_attenuation(*reinterpret_cast<const float*>(value));
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::SetCubicAttenuationForAllCallback(const void *value, void *clientData)
@@ -115,7 +111,6 @@ namespace e186
 		{
 			ptlt->set_cubic_attenuation(*reinterpret_cast<const float*>(value));
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::EnableAllCallback(void *clientData)
@@ -125,7 +120,6 @@ namespace e186
 		{
 			ptlt->set_enabled(true);
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::DisableAllCallback(void *clientData)
@@ -135,7 +129,6 @@ namespace e186
 		{
 			ptlt->set_enabled(false);
 		}
-		thiz->m_has_changes = true;
 	}
 
 	void TW_CALL LightsourceEditor::SetPositionCallback(const void *value, void *clientData)
@@ -227,13 +220,9 @@ namespace e186
 		m_gizmo_shader(),
 		m_point_lights(),
 		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Lightsource Gizmos")),
-		m_inner_transparency(.3f),
-		m_outer_transparency(.07f),
-		m_inner_radius(0.1f), // 10cm
-		m_inner_color(1.0f, 1.0f, 0.5f),
-		m_outer_color(1.0f, 1.0f, 0.85f),
-		m_has_changes(true),
-		m_uniform_buffer_handle(0)
+		m_transparency(.3f),
+		m_gizmo_scale(6.0f),
+		m_gizmo_param(4.0f)
 	{
 		m_sphere = Model::LoadFromFile("assets/models/sphere.obj", glm::mat4(1.0f), MOLF_triangulate | MOLF_smoothNormals);
 		m_gizmo_shader.AddVertexShaderSourceFromFile("assets/shaders/translucent_gizmo.vert")
@@ -248,16 +237,9 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, "Set lin-atten for all", TW_TYPE_FLOAT, SetLinearAttenuationForAllCallback, GetLinearAttenuationForAllCallback, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "Set quad-atten for all", TW_TYPE_FLOAT, SetQuadraticAttenuationForAllCallback, GetQuadraticAttenuationForAllCallback, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "Set cub-atten for all", TW_TYPE_FLOAT, SetCubicAttenuationForAllCallback, GetCubicAttenuationForAllCallback, this, " min=0.0 step=0.01 ");
-		TwAddVarRW(m_tweak_bar, "Transparency inner", TW_TYPE_FLOAT, &m_inner_transparency, " min=0.01 max=1.0 step=0.01 ");
-		TwAddVarRW(m_tweak_bar, "Transparency outer", TW_TYPE_FLOAT, &m_outer_transparency, " min=0.01 max=1.0 step=0.01 ");
-		TwAddVarRW(m_tweak_bar, "Inner radius", TW_TYPE_FLOAT, &m_inner_radius, " min=0.0 max=3.0 step=0.1 ");
-		TwAddVarRW(m_tweak_bar, "Color inner", TW_TYPE_COLOR3F, glm::value_ptr(m_inner_color), nullptr);
-		TwAddVarRW(m_tweak_bar, "Color outer", TW_TYPE_COLOR3F, glm::value_ptr(m_outer_color), nullptr);
-
-		// create the uniform buffer right away
-		glGenBuffers(1, &m_uniform_buffer_handle);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_uniform_buffer_handle);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		TwAddVarRW(m_tweak_bar, "Gizmo Transparency", TW_TYPE_FLOAT, &m_transparency, " min=0.01 max=1.0 step=0.01 ");
+		TwAddVarRW(m_tweak_bar, "Gizmo Scale", TW_TYPE_FLOAT, &m_gizmo_scale, " min=0.0 max=100.0 step=0.1 ");
+		TwAddVarRW(m_tweak_bar, "Gizmo Param", TW_TYPE_FLOAT, &m_gizmo_param, " min=0.0 max=100.0 step=0.1 ");
 	}
 
 	LightsourceEditor::~LightsourceEditor()
@@ -304,9 +286,6 @@ namespace e186
 		auto col_loc = m_gizmo_shader.GetUniformLocation("uColor");
 		auto& sphere_mesh = m_sphere->mesh_at(0);
 
-		glm::vec4 inner_color(m_inner_color.r, m_inner_color.g, m_inner_color.b, m_inner_transparency);
-		glm::vec4 outer_color(m_outer_color.r, m_outer_color.g, m_outer_color.b, m_outer_transparency);
-
 		auto n = m_point_lights.size();
 		for (auto i = 0; i < n; ++i)
 		{
@@ -315,20 +294,14 @@ namespace e186
 			if (!ptlt->enabled())
 				continue;
 
-			auto mM = glm::translate(ptlt->position()); // m_point_lights[i].get().transform().GetModelMatrix();
-			auto tM = glm::scale(glm::vec3(m_inner_radius, m_inner_radius, m_inner_radius));
-			m_gizmo_shader.SetUniform(mat_loc, pM * vM * mM * tM);
-			m_gizmo_shader.SetUniform(col_loc, inner_color);
-			RenderMesh(m_gizmo_shader, sphere_mesh);
+			auto a = ptlt->attenuation();
+			auto d = m_gizmo_param;
+			auto s = m_gizmo_scale / (a[0] + a[1] * d + a[2] * d * d + a[3] * d * d * d);
 
-			auto ca = ptlt->const_attenuation();
-			auto la = ptlt->linear_attenuation();
-			auto qa = ptlt->quadratic_attenuation();
-			// Calculate the distance where the light contribution is as low as 0.025 a.k.a. 1/40
-			auto faded_dist = qa < 0.001f || la < 0.001 ? 1.0f : (-la + sqrt(la * la - 4 * qa * (ca - 40))) / (2 * qa);
-			tM = glm::scale(glm::vec3(faded_dist, faded_dist, faded_dist));
+			auto mM = glm::translate(ptlt->position()); // m_point_lights[i].get().transform().GetModelMatrix();
+			auto tM = glm::scale(glm::vec3(s, s, s));
 			m_gizmo_shader.SetUniform(mat_loc, pM * vM * mM * tM);
-			m_gizmo_shader.SetUniform(col_loc, outer_color);
+			m_gizmo_shader.SetUniform(col_loc, glm::vec4(ptlt->light_color(), m_transparency));
 			RenderMesh(m_gizmo_shader, sphere_mesh);
 		}
 
@@ -336,37 +309,4 @@ namespace e186
 		glDepthMask(GL_TRUE);
 	}
 
-	void LightsourceEditor::Update(bool force_gpu_upload)
-	{
-		if (!m_has_changes && !force_gpu_upload)
-			return;
-
-		std::vector<PointLightGpuData> gpu_data;
-		for (auto& cpu_data : m_point_lights)
-		{
-			if (cpu_data->enabled())
-			{
-				PointLightGpuData plgpu
-				{ 
-					glm::vec4(cpu_data->position(), 0.0f), 
-					glm::vec4(cpu_data->light_color(), 0.0f), 
-					cpu_data->attenuation() 
-				};
-				gpu_data.push_back(std::move(plgpu));
-			}
-		}
-
-		auto n = gpu_data.size();
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_uniform_buffer_handle);
-		// fill the buffer, you do this anytime any of the lights change
-		glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(PointLightGpuData) * n, gpu_data.size() > 0 ? &gpu_data[0] : 0, GL_DYNAMIC_DRAW);
-	}
-
-	void LightsourceEditor::BindUniformBufferToShaderLocations()
-	{
-		// binding to index 0, the glsl code needs to specify this same
-		// index using 'layout(binding=0)'
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_uniform_buffer_handle);
-		// Credits: https://www.gamedev.net/forums/topic/658486-glsl-send-array-receive-struct/ (Happy Coder)
-	}
 }

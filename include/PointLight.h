@@ -7,6 +7,7 @@ namespace e186
 	{
 	public:
 		PointLight(glm::vec3 color, const glm::vec3& position);
+		PointLight(glm::vec3 color, const glm::vec3& position, glm::vec4 attenuation);
 		PointLight(glm::vec3 color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten, float cub_atten);
 		PointLight(glm::vec3 color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten);
 		PointLight(const PointLight& other) noexcept = default;

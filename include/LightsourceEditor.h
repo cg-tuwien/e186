@@ -31,14 +31,6 @@ namespace e186
 
 		void RenderGizmos(Camera& camera);
 
-		/*! On first call, or if anything has changed, uploads the lightsource data to 
-		 *	a Uniform Buffer on the GPU.
-		 *	@param force_gpu_upload Force Uniform Buffer update
-		 */
-		void Update(bool force_gpu_upload);
-
-		void BindUniformBufferToShaderLocations();
-
 	private:
 		static void TW_CALL SetLightColorForAllCallback(const void *value, void *clientData);
 		static void TW_CALL GetLightColorForAllCallback(void *value, void *clientData);
@@ -73,12 +65,8 @@ namespace e186
 		Shader m_gizmo_shader;
 		std::vector<PointLight*> m_point_lights;
 		AntTweakBarHandle m_tweak_bar;
-		float m_inner_transparency;
-		float m_outer_transparency;
-		float m_inner_radius;
-		glm::vec3 m_inner_color;
-		glm::vec3 m_outer_color;
-		bool m_has_changes;
-		GLuint m_uniform_buffer_handle;
+		float m_transparency;
+		float m_gizmo_scale;
+		float m_gizmo_param;
 	};
 }

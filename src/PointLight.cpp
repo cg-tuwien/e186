@@ -21,6 +21,15 @@ namespace e186
 	{
 	}
 
+	PointLight::PointLight(glm::vec3 color, const glm::vec3& position, glm::vec4 attenuation)
+		//: m_transform( position ),
+		: m_position(position),
+		m_light_color(std::move(color)),
+		m_attenuation(std::move(attenuation)),
+		m_enabled{ true }
+	{
+	}
+
 	PointLight::PointLight(glm::vec3 color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten)
 		//: m_transform( position ),
 		: m_position(transform.GetPosition()),
