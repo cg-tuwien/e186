@@ -7,8 +7,6 @@ namespace e186
 		glm::vec4 m_position;
 		glm::vec4 m_light_color;
 		glm::vec4 m_attenuation;
-		PointLightGpuData(glm::vec3 pos, glm::vec3 col, glm::vec3 atten);
-		PointLightGpuData(glm::vec4 pos, glm::vec4 col, glm::vec4 atten);
 	};
 
 	class LightsourceEditor
@@ -42,6 +40,11 @@ namespace e186
 		void BindUniformBufferToShaderLocations();
 
 	private:
+		static void TW_CALL SetLightColorForAllCallback(const void *value, void *clientData);
+		static void TW_CALL SetConstAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL SetLinearAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL SetQuadraticAttenuationForAllCallback(const void *value, void *clientData);
+		static void TW_CALL SetCubicAttenuationForAllCallback(const void *value, void *clientData);
 		static void TW_CALL EnableAllCallback(void *clientData);
 		static void TW_CALL DisableAllCallback(void *clientData);
 		static void TW_CALL SetPositionCallback(const void *value, void *clientData);
@@ -54,6 +57,8 @@ namespace e186
 		static void TW_CALL GetLinearAttenuationCallback(void *value, void *clientData);
 		static void TW_CALL SetQuadraticAttenuationCallback(const void *value, void *clientData);
 		static void TW_CALL GetQuadraticAttenuationCallback(void *value, void *clientData);
+		static void TW_CALL SetCubicAttenuationCallback(const void *value, void *clientData);
+		static void TW_CALL GetCubicAttenuationCallback(void *value, void *clientData);
 		static void TW_CALL SetEnabledCallback(const void *value, void *clientData);
 		static void TW_CALL GetEnabledCallback(void *value, void *clientData);
 

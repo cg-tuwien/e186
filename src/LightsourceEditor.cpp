@@ -3,23 +3,56 @@
 
 namespace e186
 {
-	PointLightGpuData::PointLightGpuData(glm::vec4 pos, glm::vec4 col, glm::vec4 atten)
-		: m_position(pos),
-		m_light_color(col),
-		m_attenuation(atten)
+
+	void TW_CALL LightsourceEditor::SetLightColorForAllCallback(const void *value, void *clientData)
 	{
-		
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		for (auto* ptlt : thiz->m_point_lights)
+		{
+			ptlt->set_light_color(*reinterpret_cast<const glm::vec3*>(value));
+		}
+		thiz->m_has_changes = true;
 	}
 
-	PointLightGpuData::PointLightGpuData(glm::vec3 pos, glm::vec3 col, glm::vec3 atten)
-		: m_position(pos, 0.0f),
-		m_light_color(col, 0.0f),
-		m_attenuation(atten, 0.0f)
+	void TW_CALL LightsourceEditor::SetConstAttenuationForAllCallback(const void *value, void *clientData)
 	{
-
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		for (auto* ptlt : thiz->m_point_lights)
+		{
+			ptlt->set_const_attenuation(*reinterpret_cast<const float*>(value));
+		}
+		thiz->m_has_changes = true;
 	}
 
+	void TW_CALL LightsourceEditor::SetLinearAttenuationForAllCallback(const void *value, void *clientData)
+	{
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		for (auto* ptlt : thiz->m_point_lights)
+		{
+			ptlt->set_linear_attenuation(*reinterpret_cast<const float*>(value));
+		}
+		thiz->m_has_changes = true;
+	}
 
+	void TW_CALL LightsourceEditor::SetQuadraticAttenuationForAllCallback(const void *value, void *clientData)
+	{
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		for (auto* ptlt : thiz->m_point_lights)
+		{
+			ptlt->set_quadratic_attenuation(*reinterpret_cast<const float*>(value));
+		}
+		thiz->m_has_changes = true;
+	}
+
+	void TW_CALL LightsourceEditor::SetCubicAttenuationForAllCallback(const void *value, void *clientData)
+	{
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		for (auto* ptlt : thiz->m_point_lights)
+		{
+			ptlt->set_cubic_attenuation(*reinterpret_cast<const float*>(value));
+		}
+		thiz->m_has_changes = true;
+	}
 
 	void TW_CALL LightsourceEditor::EnableAllCallback(void *clientData)
 	{
@@ -101,6 +134,18 @@ namespace e186
 		*reinterpret_cast<float*>(value) = ptlt->quadratic_attenuation();
 	}
 
+	void TW_CALL LightsourceEditor::SetCubicAttenuationCallback(const void *value, void *clientData)
+	{
+		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
+		ptlt->set_cubic_attenuation(*reinterpret_cast<const float*>(value));
+	}
+
+	void TW_CALL LightsourceEditor::GetCubicAttenuationCallback(void *value, void *clientData)
+	{
+		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
+		*reinterpret_cast<float*>(value) = ptlt->cubic_attenuation();
+	}
+
 	void TW_CALL LightsourceEditor::SetEnabledCallback(const void *value, void *clientData)
 	{
 		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
@@ -134,6 +179,11 @@ namespace e186
 
 		TwAddButton(m_tweak_bar, "Enable all", EnableAllCallback, this, nullptr);
 		TwAddButton(m_tweak_bar, "Disable all", DisableAllCallback, this, nullptr);
+		TwAddVarCB(m_tweak_bar, "Set light color for all", TW_TYPE_COLOR3F, SetLightColorForAllCallback, nullptr, this, nullptr);
+		TwAddVarCB(m_tweak_bar, "Set const-atten for all", TW_TYPE_FLOAT, SetConstAttenuationForAllCallback, nullptr, this, nullptr);
+		TwAddVarCB(m_tweak_bar, "Set lin-atten for all", TW_TYPE_FLOAT, SetLinearAttenuationForAllCallback, nullptr, this, nullptr);
+		TwAddVarCB(m_tweak_bar, "Set quad-atten for all", TW_TYPE_FLOAT, SetQuadraticAttenuationForAllCallback, nullptr, this, nullptr);
+		TwAddVarCB(m_tweak_bar, "Set cub-atten for all", TW_TYPE_FLOAT, SetCubicAttenuationForAllCallback, nullptr, this, nullptr);
 		TwAddVarRW(m_tweak_bar, "Transparency inner", TW_TYPE_FLOAT, &m_inner_transparency, " min=0.01 max=1.0 step=0.01 ");
 		TwAddVarRW(m_tweak_bar, "Transparency outer", TW_TYPE_FLOAT, &m_outer_transparency, " min=0.01 max=1.0 step=0.01 ");
 		TwAddVarRW(m_tweak_bar, "Inner radius", TW_TYPE_FLOAT, &m_inner_radius, " min=0.0 max=3.0 step=0.1 ");
@@ -167,8 +217,9 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, (name + " pos").c_str(), TW_TYPE_DIR3F, SetPositionCallback, GetPositionCallback, point_light, groupAssignment.c_str());
 		TwAddVarCB(m_tweak_bar, (name + " light-col").c_str(), TW_TYPE_COLOR3F, SetLightColorCallback, GetLightColorCallback, point_light, groupAssignment.c_str());
 		TwAddVarCB(m_tweak_bar, (name + " const-att").c_str(), TW_TYPE_FLOAT, SetConstAttenuationCallback, GetConstAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarCB(m_tweak_bar, (name + " lin-att").c_str(), TW_TYPE_FLOAT, SetLinearAttenuationCallback, GetLinearAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarCB(m_tweak_bar, (name + " quad-att").c_str(), TW_TYPE_FLOAT, SetQuadraticAttenuationCallback, GetQuadraticAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
+		TwAddVarCB(m_tweak_bar, (name + " linear-att").c_str(), TW_TYPE_FLOAT, SetLinearAttenuationCallback, GetLinearAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
+		TwAddVarCB(m_tweak_bar, (name + " quadr-att").c_str(), TW_TYPE_FLOAT, SetQuadraticAttenuationCallback, GetQuadraticAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
+		TwAddVarCB(m_tweak_bar, (name + " cubic-att").c_str(), TW_TYPE_FLOAT, SetCubicAttenuationCallback, GetCubicAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 	}
 
 	void LightsourceEditor::Clear()
@@ -231,7 +282,13 @@ namespace e186
 		{
 			if (cpu_data->enabled())
 			{
-				gpu_data.emplace_back(cpu_data->position(), cpu_data->light_color(), cpu_data->attenuation());
+				PointLightGpuData plgpu
+				{ 
+					glm::vec4(cpu_data->position(), 0.0f), 
+					glm::vec4(cpu_data->light_color(), 0.0f), 
+					cpu_data->attenuation() 
+				};
+				gpu_data.push_back(std::move(plgpu));
 			}
 		}
 
