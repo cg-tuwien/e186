@@ -30,7 +30,7 @@ namespace e186
 	{
 		char buf[128];
 		sprintf_s(buf, 128, 
-			"\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n",
+			"\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n",
 			m[0][0], m[0][1], m[0][2],
 			m[1][0], m[1][1], m[1][2],
 			m[2][0], m[2][1], m[2][2]);

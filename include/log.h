@@ -41,7 +41,7 @@ namespace e186
 	#define log_debug(...)      	
 	#endif
 
-	#ifdef _DEBUG && LOG_LEVEL > 3
+	#if defined(_DEBUG) && LOG_LEVEL > 3
 	#define log_debug_verbose(...)		do { printf("DBGVRBSE:"); printf(__VA_ARGS__); printf("\n"); } while(0)
 	#else
 	#define log_debug_verbose(...)      	

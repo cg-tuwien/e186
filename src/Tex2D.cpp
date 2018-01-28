@@ -94,6 +94,7 @@ namespace e186
 	Tex2D& Tex2D::FromFile(const std::string& path, bool isHDR)
 	{
 		int x, y, n;
+		stbi_set_flip_vertically_on_load(true);
 		if (isHDR)
 		{
 			auto data = stbi_loadf(path.c_str(), &x, &y, &n, 0);

@@ -232,8 +232,8 @@ namespace e186
 		std::vector<MeshRef> SelectMeshes(Func predicate)
 		{
 			std::vector<MeshRef> selection;
-			int n = m_meshes.size();
-			for (int i = 0; i < n; ++i)
+			size_t n = m_meshes.size();
+			for (size_t i = 0; i < n; ++i)
 			{
 				if (predicate(m_meshes[i]))
 				{
