@@ -26,6 +26,7 @@ namespace e186
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMajorVersion);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinorVersion);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+			glfwWindowHint(GLFW_SAMPLES, 4); // antialiasing (MSAA)
 #ifdef _DEBUG
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
