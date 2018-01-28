@@ -30,8 +30,8 @@ struct PointLightData
   vec4 atten;
 };
 
-// force this block to be assigned to index 100
-// std140 specifies that the structured data should
+// force this block to be assigned to index 0
+// std430 specifies that the structured data should
 // follow a specific set of packing rules. This will
 // make the packing consistent across OpenGL implementations
 layout(std430, binding = 0) buffer PointLightBlock
@@ -84,7 +84,9 @@ void main()
 	vec3 eye_pos_vs = vec3(0.0, 0.0, 0.0);
 	vec3 to_eye_nrm = normalize(eye_pos_vs - vPositionVS);
 	vec3 normal = normalize(vNormalVS);
-	vec3 diff_tex_color = texture(uDiffuseTexSampler, vTexCoords).xyz;
+	vec4 diff_tex_color = texture(uDiffuseTexSampler, vTexCoords);
+	if (diff_tex_color.a == 0.0)
+		discard;
 	
 	// initialize all the colors
 	vec3 ambient = uAmbientIllumination * uAmbientReflectivity;
@@ -102,7 +104,7 @@ void main()
 		float atten = CalcAttenuation(i, dist, dist_sq, dist * dist_sq);
 		vec3 light_intensity = uPointLights[i].color.rgb / atten;
 		
-		diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm, normal, diff_tex_color);
+		diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm, normal, diff_tex_color.rgb);
 	}
 
 	// add all together
