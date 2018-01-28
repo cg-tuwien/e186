@@ -16,6 +16,7 @@ layout(location = 12) uniform vec3 uAmbientReflectivity;
 layout(location = 13) uniform vec3 uEmissiveLight;
 layout(location = 16) uniform float uShininess;
 layout(location = 20) uniform sampler2D uDiffuseTexSampler;
+layout(location = 27) uniform sampler2D uOpacityTexSampler;
 // ----------------------------------------------
 
 // ################## SSBO DATA #################
@@ -81,12 +82,14 @@ vec3 CalcBlinnPhongDiffAndSpecContribution(vec3 to_light, vec3 to_eye, vec3 norm
 
 void main()
 {
+	float opacity = texture(uOpacityTexSampler, vTexCoords).r;
+	if (opacity == 0.0)
+		discard;
+
 	vec3 eye_pos_vs = vec3(0.0, 0.0, 0.0);
 	vec3 to_eye_nrm = normalize(eye_pos_vs - vPositionVS);
 	vec3 normal = normalize(vNormalVS);
-	vec4 diff_tex_color = texture(uDiffuseTexSampler, vTexCoords);
-	if (diff_tex_color.a == 0.0)
-		discard;
+	vec3 diff_tex_color = texture(uDiffuseTexSampler, vTexCoords).rgb;
 	
 	// initialize all the colors
 	vec3 ambient = uAmbientIllumination * uAmbientReflectivity;
@@ -104,7 +107,7 @@ void main()
 		float atten = CalcAttenuation(i, dist, dist_sq, dist * dist_sq);
 		vec3 light_intensity = uPointLights[i].color.rgb / atten;
 		
-		diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm, normal, diff_tex_color.rgb);
+		diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm, normal, diff_tex_color);
 	}
 
 	// add all together
