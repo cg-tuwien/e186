@@ -59,4 +59,6 @@ namespace e186
 	std::string vector_to_string(const glm::vec4& v);
 
 	const char* fourccToString(unsigned int fourcc);
+
+	std::string GetCurrentCallstack();
 }

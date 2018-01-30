@@ -25,8 +25,10 @@ namespace e186
 			const std::function<void()>& func_ref = std::get<1>(tup);
 
 			TwAddButton(twbar, name.c_str(), [](void *clientData) {
-				std::function<void()>* func = reinterpret_cast<std::function<void()>*>(clientData);
-				(*func)();
+				//Engine::current->m_pending_actions.push([clientData]() {
+					std::function<void()>* func = reinterpret_cast<std::function<void()>*>(clientData);
+					(*func)();
+				//});
 			}, 
 			reinterpret_cast<void*>(const_cast<std::function<void()>*>(&func_ref)), nullptr);
 		}

@@ -55,8 +55,10 @@ namespace e186
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>> m_stored_char_callbacks;
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>*> m_char_callbacks;
 
+	public:
 		std::queue<std::function<void()>> m_pending_actions;
 
+	private:
 		GLFWwindow* m_mainWindow;
 		bool m_running;
 		int m_main_wnd_width;
@@ -109,7 +111,7 @@ namespace e186
 		void UnsubscribeFromCharCallbacks(std::function<void(GLFWwindow*, unsigned int)>& fu);
 
 		AntTweakBarManager& tweak_bar_manager();
-
+		
 		GLFWwindow* main_window() const
 		{
 			return m_mainWindow;
@@ -173,6 +175,10 @@ namespace e186
 		 *	terminate the current scene.
 		 */
 		void SetNextScene(std::unique_ptr<IScene> next_scene);
+
+		/*! Works off all pending actions
+		 */
+		void WorkOffPendingActions();
 
 		/*!	Load and run the next scene
 		 */

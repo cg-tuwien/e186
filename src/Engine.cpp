@@ -132,7 +132,8 @@ namespace e186
 				break;
 		}
 
-		log_debug("> Message:  %s\n", message);
+		log_debug("> Message:  %s", message);
+		log_debug("> Callstack:\n%s\n", GetCurrentCallstack().c_str());
 	}
 
 	void Engine::glfw_windowsize_callback(GLFWwindow* window, int width, int height)
@@ -343,16 +344,8 @@ namespace e186
 		return m_ant_tweak_bar_manager;
 	}
 
-	void Engine::BeginFrame()
+	void Engine::WorkOffPendingActions()
 	{
-		while (!m_pending_actions.empty()) // TODO: review this during Pr
-		{
-			m_pending_actions.front()();
-			m_pending_actions.pop();
-		}
-
-		ProcessEvents();
-
 		while (!m_pending_actions.empty())
 		{
 			m_pending_actions.front()();
@@ -360,17 +353,18 @@ namespace e186
 		}
 	}
 
+	void Engine::BeginFrame()
+	{
+		WorkOffPendingActions();
+		ProcessEvents();
+		WorkOffPendingActions();
+	}
+
 	void Engine::EndFrame()
 	{
 		if (m_render_tweak_bars)
 		{
 			tweak_bar_manager().Render();
-		}
-
-		while (!m_pending_actions.empty())
-		{
-			m_pending_actions.front()();
-			m_pending_actions.pop();
 		}
 
 		SwapBuffers();
@@ -390,11 +384,7 @@ namespace e186
 			}
 		}
 
-		while (!m_pending_actions.empty())
-		{
-			m_pending_actions.front()();
-			m_pending_actions.pop();
-		}
+		WorkOffPendingActions();
 	}
 
 	void Engine::SetRootSceneGenFunc(std::function<std::unique_ptr<IScene>()> root_scene_gen_func)
@@ -427,16 +417,23 @@ namespace e186
 
 		while(m_next_scene)
 		{
+			WorkOffPendingActions();
 			m_current_scene.reset();
+			WorkOffPendingActions();
 			m_current_scene = std::move(m_next_scene);
+			WorkOffPendingActions();
 			m_current_is_root = m_next_is_root;
+			WorkOffPendingActions();
 			assert(!m_next_scene);
+			WorkOffPendingActions();
 			m_current_scene->Run();
+			WorkOffPendingActions();
 
 			if (!m_next_scene && !m_current_is_root)
 			{
 				SetRootSceneAsNextScene();
 			}
+			WorkOffPendingActions();
 		}
 
 		log_debug("--> END OF Application::Run");

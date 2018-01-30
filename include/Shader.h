@@ -144,8 +144,8 @@ namespace e186
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
 		std::unordered_map<std::string, GLuint> m_uniform_locations;
 		GLint m_patch_vertices;
-		static const int MAX_SHADERS = 6;
-		GLuint m_shaderHandles[MAX_SHADERS];
+		static const int kMaxShaders = 6;
+		GLuint m_shaderHandles[kMaxShaders];
 		unsigned int m_vertex_attrib_config;
 		GLenum m_kind_of_primitives;
 	};

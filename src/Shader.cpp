@@ -32,7 +32,7 @@ namespace e186
 		m_vertex_attrib_config(VertexAttribData_Nothing),
 		m_kind_of_primitives(GL_TRIANGLES)
 	{
-		for (int i = 0; i < MAX_SHADERS; ++i)
+		for (int i = 0; i < kMaxShaders; ++i)
 		{
 			m_shaderHandles[i] = 0;
 		}
@@ -55,7 +55,7 @@ namespace e186
 		other.m_prog_handle = 0;
 		other.m_patch_vertices = 0;
 		other.m_vertex_attrib_config = VertexAttribData_Nothing;
-		for (int i = 0; i < MAX_SHADERS; ++i)
+		for (int i = 0; i < kMaxShaders; ++i)
 		{
 			m_shaderHandles[i] = other.m_shaderHandles[i];
 			other.m_shaderHandles[i] = 0;
@@ -76,7 +76,7 @@ namespace e186
 
 		m_kind_of_primitives = other.m_kind_of_primitives;
 
-		for (int i = 0; i < MAX_SHADERS; ++i)
+		for (int i = 0; i < kMaxShaders; ++i)
 		{
 			m_shaderHandles[i] = other.m_shaderHandles[i];
 			other.m_shaderHandles[i] = 0;
@@ -340,7 +340,7 @@ namespace e186
 
 		const auto progHandle = glCreateProgram();
 
-		for (int i = 0; i < MAX_SHADERS; ++i)
+		for (int i = 0; i < kMaxShaders; ++i)
 		{
 			if (0 == m_shaderHandles[i])
 			{

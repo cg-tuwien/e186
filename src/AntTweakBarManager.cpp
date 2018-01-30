@@ -23,7 +23,17 @@ namespace e186
 	
 	AntTweakBarHandle::~AntTweakBarHandle()
 	{
-		TwDeleteBar(m_bar);
+		if (nullptr != m_bar)
+		{
+			if (!TwDeleteBar(m_bar))
+			{
+				auto msg = TwGetLastError();
+				if (nullptr != msg)
+				{
+					log_error(msg);
+				}
+			}
+		}
 	}
 
 
