@@ -81,7 +81,8 @@ namespace e186
 		const auto wnd_width = Engine::current->window_width();
 		const auto wnd_height = Engine::current->window_height();
 		
-		Camera orthoCam; orthoCam.SetOrthogonalProjection(0.0f, wnd_width, 0.0f, wnd_height, 0.0f, 100.0f);
+		Camera orthoCam; 
+		orthoCam.SetOrthogonalProjection(0.0f, static_cast<float>(wnd_width), 0.0f, static_cast<float>(wnd_height), 0.0f, 100.0f);
 		auto pM = orthoCam.projection_matrix();
 
 		glDisable(GL_DEPTH_TEST);

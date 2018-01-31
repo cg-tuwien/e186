@@ -10,7 +10,7 @@ namespace e186
 		static void glfw_error_callback(int error, const char* description);
 
 	public:
-		Context(int glMajorVersion = 4, int glMinorVersion = 5);
+		Context(int glMajorVersion = 4, int glMinorVersion = 3);
 		~Context();
 		
 		static GLFWwindow* create_window(int width, int height, GLFWmonitor* monitor = nullptr, const char* name = "E186 Main Window");

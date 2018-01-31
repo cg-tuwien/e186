@@ -1,4 +1,4 @@
-#version 440 core
+#version 430 core
 #extension GL_ARB_explicit_uniform_location : enable
 
 // ################# UNIFORM DATA ###############
