@@ -416,7 +416,7 @@ namespace e186
 		// Upload white texture only if we have used it!
 		if (white_tex.use_count() > 1)
 		{
-			white_tex->Generate1pxWhite().Upload().SetTextureParameters(TexParams::TexParams_TrilinearFiltering | TexParams_ClampToEdge);
+			white_tex->Generate1pxWhite().Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
 		}
 		
 		return[n = setter_funcs.size(), setters = std::move(setter_funcs)](const Shader& shdr, const MaterialData& mat)
