@@ -248,11 +248,11 @@ namespace e186
 			memcpy(&vertexData[i * sizeOneVtx + normalOffset], &paiMesh->mNormals[i].x, normalSize);
 			if (paiMesh->HasTextureCoords(0))
 			{
-				memcpy(&vertexData[i * sizeOneVtx + texCoordsOffset], &paiMesh->mTextureCoords[0][i].x, texCoordsSize);;
+				memcpy(&vertexData[i * sizeOneVtx + texCoordsOffset], &paiMesh->mTextureCoords[0][i].x, texCoordsSize);
 			}
 			if (paiMesh->HasVertexColors(0))
 			{
-				memcpy(&vertexData[i * sizeOneVtx + colorOffset], &paiMesh->mColors[0][i].r, colorSize);;
+				memcpy(&vertexData[i * sizeOneVtx + colorOffset], &paiMesh->mColors[0][i].r, colorSize);
 			}
 			if (paiMesh->HasTangentsAndBitangents())
 			{
@@ -401,7 +401,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Position);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, mesh.m_position_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_position_offset));
+			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_position_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_position_offset));
 		}
 
 		// Normal
@@ -409,7 +409,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Normal);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, mesh.m_normal_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_normal_offset));
+			glVertexAttribPointer(location, static_cast<GLint>( mesh.m_normal_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_normal_offset));
 		}
 
 		// TexCoord
@@ -417,7 +417,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::TexCoord);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, mesh.m_tex_coords_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_tex_coords_offset));
+			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_tex_coords_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_tex_coords_offset));
 		}
 
 		// Color
@@ -425,7 +425,7 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Color);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, mesh.m_color_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_color_offset));
+			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_color_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_color_offset));
 		}
 
 		// Bones
@@ -433,10 +433,10 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::BoneIndices);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, mesh.m_bone_indices_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_bone_incides_offset));
+			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_bone_indices_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_bone_incides_offset));
 			GLuint location2 = static_cast<GLuint>(VertexAttribLocation::BoneWeights);
 			glEnableVertexAttribArray(location2);
-			glVertexAttribPointer(location2, mesh.m_bone_weights_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_bone_weights_offset));
+			glVertexAttribPointer(location2, static_cast<GLint>(mesh.m_bone_weights_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_bone_weights_offset));
 		}
 
 		// Tangent Space
@@ -444,10 +444,10 @@ namespace e186
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Tangents);
 			glEnableVertexAttribArray(location);
-			glVertexAttribPointer(location, mesh.m_tangent_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_tangent_offset));
+			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_tangent_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_tangent_offset));
 			GLuint location2 = static_cast<GLuint>(VertexAttribLocation::Bitangents);
 			glEnableVertexAttribArray(location2);
-			glVertexAttribPointer(location2, mesh.m_bitangent_size / sizeof(GLfloat), GL_FLOAT, GL_FALSE, mesh.m_size_one_vertex, reinterpret_cast<GLvoid*>(mesh.m_bitangent_offset));
+			glVertexAttribPointer(location2, static_cast<GLint>(mesh.m_bitangent_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_bitangent_offset));
 		}
 
 		// disable the VAO and store it for the vertex-data setting in the map
