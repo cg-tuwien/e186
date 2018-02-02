@@ -9,7 +9,9 @@ namespace e186
 	// 3 ... errors, warnings and infos
 	// 4 ... everything
 
-	#define LOG_LEVEL 3
+	#if !defined(LOG_LEVEL)
+	#define LOG_LEVEL 4
+	#endif
 
 	#if LOG_LEVEL > 0
 	#define log_error(...)		do { printf("ERROR:   "); printf(__VA_ARGS__); printf("\n"); } while(0)

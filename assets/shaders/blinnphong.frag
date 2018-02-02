@@ -16,7 +16,7 @@ layout(location = 12) uniform vec3 uAmbientReflectivity;
 layout(location = 13) uniform vec3 uEmissiveLight;
 layout(location = 16) uniform float uShininess;
 layout(location = 20) uniform sampler2D uDiffuseTexSampler;
-layout(location = 27) uniform sampler2D uOpacityTexSampler;
+//layout(location = 27) uniform sampler2D uOpacityTexSampler;
 // ----------------------------------------------
 
 // ################## SSBO DATA #################
@@ -82,9 +82,9 @@ vec3 CalcBlinnPhongDiffAndSpecContribution(vec3 to_light, vec3 to_eye, vec3 norm
 
 void main()
 {
-	float opacity = texture(uOpacityTexSampler, vTexCoords).r;
-	if (opacity == 0.0)
-		discard;
+	//float opacity = texture(uOpacityTexSampler, vTexCoords).r;
+	//if (opacity == 0.0)
+	//	discard;
 
 	vec3 eye_pos_vs = vec3(0.0, 0.0, 0.0);
 	vec3 to_eye_nrm = normalize(eye_pos_vs - vPositionVS);

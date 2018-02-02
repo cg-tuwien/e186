@@ -52,6 +52,32 @@ namespace e186
 		const std::shared_ptr<Tex2D>& reflection_tex() const { return m_reflection_tex; }
 		const std::shared_ptr<Tex2D>& lightmap_tex() const { return m_lightmap_tex; }
 
+		void set_name(std::string value) { m_name = std::move(value); }
+		void set_diffuse_color(glm::vec3 value) { m_diffuse_color = std::move(value); }
+		void set_specular_color(glm::vec3 value) { m_specular_color = std::move(value); }
+		void set_ambient_color(glm::vec3 value) { m_ambient_color = std::move(value); }
+		void set_emissive_color(glm::vec3 value) { m_emissive_color = std::move(value); }
+		void set_transparent_color(glm::vec3 value) { m_transparent_color = std::move(value); }
+		void set_wireframe_mode(bool enabled) { m_wireframe_mode = enabled; }
+		void set_twosided(bool enabled) { m_twosided = enabled; }
+		void set_blend_mode(BlendMode value) { m_blend_mode = value; }
+		void set_opacity(float value) { m_opacity = value; }
+		void set_shininess(float value) { m_shininess = value; }
+		void set_shininess_strength(float value) { m_shininess_strength = value; }
+		void set_refraction_index(float value) { m_refraction_index = value; }
+		void set_reflectivity(float value) { m_reflectivity = value; }
+		void set_diffuse_tex     (std::shared_ptr<Tex2D> tex) { m_diffuse_tex      = std::move(tex); }
+		void set_specular_tex    (std::shared_ptr<Tex2D> tex) { m_specular_tex     = std::move(tex); }
+		void set_ambient_tex     (std::shared_ptr<Tex2D> tex) { m_ambient_tex      = std::move(tex); }
+		void set_emissive_tex    (std::shared_ptr<Tex2D> tex) { m_emissive_tex     = std::move(tex); }
+		void set_height_tex      (std::shared_ptr<Tex2D> tex) { m_height_tex       = std::move(tex); }
+		void set_normals_tex     (std::shared_ptr<Tex2D> tex) { m_normals_tex      = std::move(tex); }
+		void set_shininess_tex   (std::shared_ptr<Tex2D> tex) { m_shininess_tex    = std::move(tex); }
+		void set_opacity_tex     (std::shared_ptr<Tex2D> tex) { m_opacity_tex      = std::move(tex); }
+		void set_displacement_tex(std::shared_ptr<Tex2D> tex) { m_displacement_tex = std::move(tex); }
+		void set_reflection_tex  (std::shared_ptr<Tex2D> tex) { m_reflection_tex   = std::move(tex); }
+		void set_lightmap_tex    (std::shared_ptr<Tex2D> tex) { m_lightmap_tex     = std::move(tex); }
+
 	private:
 		std::string m_name;
 
