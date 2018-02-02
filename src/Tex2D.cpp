@@ -231,6 +231,39 @@ namespace e186
 		return *this;
 	}
 
+	Tex2D& Tex2D::UploadSRGBIfPossible(GLint internal_format,				///< format to store the image in
+										GLint border,						///< border-size in px
+										GLint level)
+	{
+		if (-1 == internal_format)
+		{
+			GLint srgb_format = m_internal_format;
+			switch (m_internal_format)
+			{
+			case GL_BGR:
+			case GL_RGB:
+				srgb_format = GL_SRGB;
+				break;
+			case GL_RGB8:
+				srgb_format = GL_SRGB8;
+				break;
+			case GL_RGBA:
+			case GL_BGRA:
+				srgb_format = GL_SRGB_ALPHA;
+				break;
+			case GL_RGBA8:
+				srgb_format = GL_SRGB8_ALPHA8;
+				break;
+			}
+			Upload(srgb_format, border, level);
+		}
+		else
+		{
+			Upload(internal_format, border, level);
+		}
+		return *this;
+	}
+
 	Tex2D& Tex2D::DestroyOffline()
 	{
 		TexData::DestroyOffline();

@@ -45,7 +45,7 @@ namespace e186
 		else
 		{
 			auto tex = std::make_shared<Tex2D>();
-			tex->FromFile(complete_path).Upload().SetTextureParameters(texture_parameters).GenerateMipMaps();
+			tex->FromFile(complete_path).UploadSRGBIfPossible().SetTextureParameters(texture_parameters).GenerateMipMaps();
 			m_tex_cache[complete_path] = tex;
 			return tex;
 		}

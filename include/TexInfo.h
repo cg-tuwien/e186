@@ -61,4 +61,6 @@ namespace e186
 
 		void DestroyOnline(bool is_destructing = false);
 	};
+
+	bool IsFormatSRGB(GLint format);
 }

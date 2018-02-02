@@ -70,7 +70,7 @@ namespace e186
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA16F	(GL_RGBA16F,	GL_RGBA,		GL_HALF_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGB32F	(GL_RGB32F,		GL_RGB,			GL_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA32F	(GL_RGBA32F,	GL_RGBA,		GL_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf	(GL_RGBA,		GL_RGBA,		GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf(GL_RGBA,		GL_RGBA,		GL_HALF_FLOAT);
 
 #pragma endregion
 
@@ -166,12 +166,22 @@ namespace e186
 	FrameBufferObject& FrameBufferObject::Bind()
 	{
 		glBindFramebuffer(target(), m_fbo_id);
+
+		if (IsFormatSRGB(0)) // TODO: which one??
+		{
+			glEnable(GL_FRAMEBUFFER_SRGB); // TODO when to??
+		}
+
 		return *this;
 	}
 
 	FrameBufferObject& FrameBufferObject::Unbind()
 	{
 		glBindFramebuffer(target(), 0);
+
+		// Enabling SRGB is the default, since the stuff rendered to the screen should be SRGB
+		glEnable(GL_FRAMEBUFFER_SRGB);
+
 		return *this;
 	}
 

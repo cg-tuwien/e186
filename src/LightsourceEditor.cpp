@@ -221,7 +221,7 @@ namespace e186
 		m_point_lights(),
 		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Lightsource Gizmos")),
 		m_transparency(.3f),
-		m_gizmo_scale(6.0f),
+		m_gizmo_scale(40.0f),
 		m_gizmo_param(4.0f)
 	{
 		m_sphere = Model::LoadFromFile("assets/models/sphere.obj", glm::mat4(1.0f), MOLF_triangulate | MOLF_smoothNormals);
