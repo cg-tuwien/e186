@@ -14,6 +14,7 @@ namespace e186
 		m_main_wnd_height(0),
 		m_main_wnd_aspectRatio(0),
 		m_render_tweak_bars(false),
+		m_renderTime(0),
 		m_root_scene_generator_func([]() { return nullptr; }),
 		m_next_is_root(false),
 		m_current_is_root(false),
@@ -358,10 +359,15 @@ namespace e186
 		WorkOffPendingActions();
 		ProcessEvents();
 		WorkOffPendingActions();
+		glFinish();
+		m_renderTimerStart = static_cast<unsigned int>(glfwGetTime() * 1000.0);
 	}
 
 	void Engine::EndFrame()
 	{
+		glFinish();
+		m_renderTime = static_cast<unsigned int>(glfwGetTime() * 1000.0) - m_renderTimerStart;
+
 		if (m_render_tweak_bars)
 		{
 			tweak_bar_manager().Render();
@@ -447,6 +453,11 @@ namespace e186
 	bool Engine::render_tweak_bars() const
 	{
 		return m_render_tweak_bars;
+	}
+
+	const unsigned int * Engine::renderTime()
+	{
+		return &m_renderTime;
 	}
 
 	void Engine::StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func)
