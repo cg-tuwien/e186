@@ -9,6 +9,8 @@ uniform mat3 vmtNormalMatrix;
 
 uniform vec3 uAmbientIllumination;
 
+uniform vec2 uTexCoordsScale = vec2(1, 1);
+
 // Material data:
 layout(location = 10) uniform vec3 uDiffuseReflectivity;
 layout(location = 11) uniform vec3 uSpecularReflectivity;
@@ -89,7 +91,8 @@ void main()
 	vec3 eye_pos_vs = vec3(0.0, 0.0, 0.0);
 	vec3 to_eye_nrm = normalize(eye_pos_vs - vPositionVS);
 	vec3 normal = normalize(vNormalVS);
-	vec3 diff_tex_color = texture(uDiffuseTexSampler, vTexCoords).rgb;
+	vec2 scaledTexCoords = uTexCoordsScale * vTexCoords;
+	vec3 diff_tex_color = texture(uDiffuseTexSampler, scaledTexCoords).rgb;
 	
 	// initialize all the colors
 	vec3 ambient = uAmbientIllumination * uAmbientReflectivity;

@@ -27,9 +27,9 @@ namespace e186
 		~MaterialData() = default;
 
 		const std::string& name() const { return m_name;  }
-		const glm::vec3& diffuse_color() const { return m_diffuse_color; }
-		const glm::vec3& specular_color() const { return m_specular_color; }
-		const glm::vec3& ambient_color() const { return m_ambient_color; }
+		const glm::vec3& diffuse_reflectivity() const { return m_diffuse_reflectivity; }
+		const glm::vec3& specular_reflectivity() const { return m_specular_reflectivity; }
+		const glm::vec3& ambient_reflectivity() const { return m_ambient_reflectivity; }
 		const glm::vec3& emissive_color() const { return m_emissive_color; }
 		const glm::vec3& transparent_color() const { return m_transparent_color; }
 		bool wireframe_mode() const { return m_wireframe_mode; }
@@ -53,9 +53,9 @@ namespace e186
 		const std::shared_ptr<Tex2D>& lightmap_tex() const { return m_lightmap_tex; }
 
 		void set_name(std::string value) { m_name = std::move(value); }
-		void set_diffuse_color(glm::vec3 value) { m_diffuse_color = std::move(value); }
-		void set_specular_color(glm::vec3 value) { m_specular_color = std::move(value); }
-		void set_ambient_color(glm::vec3 value) { m_ambient_color = std::move(value); }
+		void set_diffuse_reflectivity(glm::vec3 value) { m_diffuse_reflectivity = std::move(value); }
+		void set_specular_reflectivity(glm::vec3 value) { m_specular_reflectivity = std::move(value); }
+		void set_ambient_reflectivity(glm::vec3 value) { m_ambient_reflectivity = std::move(value); }
 		void set_emissive_color(glm::vec3 value) { m_emissive_color = std::move(value); }
 		void set_transparent_color(glm::vec3 value) { m_transparent_color = std::move(value); }
 		void set_wireframe_mode(bool enabled) { m_wireframe_mode = enabled; }
@@ -81,9 +81,9 @@ namespace e186
 	private:
 		std::string m_name;
 
-		glm::vec3 m_diffuse_color;
-		glm::vec3 m_specular_color;
-		glm::vec3 m_ambient_color;
+		glm::vec3 m_diffuse_reflectivity;
+		glm::vec3 m_specular_reflectivity;
+		glm::vec3 m_ambient_reflectivity;
 		glm::vec3 m_emissive_color;
 		glm::vec3 m_transparent_color;
 		bool m_wireframe_mode;

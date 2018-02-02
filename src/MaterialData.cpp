@@ -5,9 +5,9 @@ namespace e186
 {
 	MaterialData::MaterialData() :
 		m_name(""),
-		m_diffuse_color(1.0f, 1.0f, 1.0f),
-		m_specular_color(1.0f, 1.0f, 1.0f),
-		m_ambient_color(1.0f, 1.0f, 1.0f),
+		m_diffuse_reflectivity(1.0f, 1.0f, 1.0f),
+		m_specular_reflectivity(1.0f, 1.0f, 1.0f),
+		m_ambient_reflectivity(1.0f, 1.0f, 1.0f),
 		m_emissive_color(1.0f, 1.0f, 1.0f),
 		m_transparent_color(1.0f, 1.0f, 1.0f),
 		m_wireframe_mode(false),
@@ -53,15 +53,15 @@ namespace e186
 		}
 
 		if (AI_SUCCESS == aimat->Get(AI_MATKEY_COLOR_DIFFUSE, color)) {
-			m_diffuse_color = glm::vec3(color.r, color.g, color.b);
+			m_diffuse_reflectivity = glm::vec3(color.r, color.g, color.b);
 		}
 
 		if (AI_SUCCESS == aimat->Get(AI_MATKEY_COLOR_SPECULAR, color)) {
-			m_specular_color = glm::vec3(color.r, color.g, color.b);
+			m_specular_reflectivity = glm::vec3(color.r, color.g, color.b);
 		}
 
 		if (AI_SUCCESS == aimat->Get(AI_MATKEY_COLOR_AMBIENT, color)) {
-			m_ambient_color = glm::vec3(color.r, color.g, color.b);
+			m_ambient_reflectivity = glm::vec3(color.r, color.g, color.b);
 		}
 
 		if (AI_SUCCESS == aimat->Get(AI_MATKEY_COLOR_EMISSIVE, color)) {
@@ -219,24 +219,24 @@ namespace e186
 				switch (static_cast<MaterialUniformLocation>(location))
 				{
 					case MaterialUniformLocation::DiffuseColor:
-						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], diffuse color uniform is named [%s]", &material_data, shader.handle(), name);
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], diffuse reflectivity uniform is named [%s]", &material_data, shader.handle(), name);
 						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
 						{
-							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::DiffuseColor), mat.diffuse_color());
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::DiffuseColor), mat.diffuse_reflectivity());
 						});
 						break;
 					case MaterialUniformLocation::SpecularColor:
-						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], specular color uniform is named [%s]", &material_data, shader.handle(), name);
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], specular reflectivity uniform is named [%s]", &material_data, shader.handle(), name);
 						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
 						{
-							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::SpecularColor), mat.specular_color());
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::SpecularColor), mat.specular_reflectivity());
 						});
 						break;
 					case MaterialUniformLocation::AmbientColor:
-						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], ambient color uniform is named [%s]", &material_data, shader.handle(), name);
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], ambient reflectivity uniform is named [%s]", &material_data, shader.handle(), name);
 						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
 						{
-							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::AmbientColor), mat.ambient_color());
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::AmbientColor), mat.ambient_reflectivity());
 						});
 						break;
 					case MaterialUniformLocation::EmissiveColor:
