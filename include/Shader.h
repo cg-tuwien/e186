@@ -34,6 +34,7 @@ namespace e186
 		Shader& AddGeometryShaderSourceFromFile(std::string path);
 		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs);
 		Shader& AddComputeShaderSourceFromFile(std::string path);
+		Shader& SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode);
 		Shader& Build();
 		Shader& QueryUniformLocations(const std::vector<std::string>& names);
 		Shader& QueryUniformLocation(const std::string& name);
@@ -100,13 +101,18 @@ namespace e186
 			glUniformMatrix4fv(location, 1, GL_FALSE, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
+		void SetSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint texture_unit = 0) const
+		{
+			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
+			glBindTexture(tex_target, tex_handle);
+			glUniform1i(location, static_cast<GLint>(texture_unit));
+		}
+
 		void SetSampler(GLuint location, const TexInfo& value, GLuint texture_unit = 0) const
 		{
-			check_gl_error("before SetSampler");
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
 			value.Bind();
 			glUniform1i(location, static_cast<GLint>(texture_unit));
-			check_gl_error("after SetSampler");
 		}
 			
 		void SetImageTexture(GLuint location, const TexInfo& value, GLuint unit, GLint level, GLboolean layered, GLint layer, GLenum access)
@@ -143,6 +149,8 @@ namespace e186
 		std::string m_compute_shader_source;
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
 		std::unordered_map<std::string, GLuint> m_uniform_locations;
+		std::vector<const char*> m_transform_feedback_varyings;
+		GLenum m_transform_feedback_buffer_mode;
 		GLint m_patch_vertices;
 		static const int kMaxShaders = 6;
 		GLuint m_shaderHandles[kMaxShaders];
