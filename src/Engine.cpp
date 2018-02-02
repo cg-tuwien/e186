@@ -432,6 +432,7 @@ namespace e186
 			WorkOffPendingActions();
 			assert(!m_next_scene);
 			WorkOffPendingActions();
+			glEnable(GL_FRAMEBUFFER_SRGB);
 			m_current_scene->Run();
 			WorkOffPendingActions();
 

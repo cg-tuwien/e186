@@ -232,4 +232,9 @@ namespace e186
 		glDeleteTextures(1, &m_gl_handle);
 		m_gl_handle = 0;
 	}
+
+	bool IsFormatSRGB(GLint format)
+	{
+		return GL_SRGB == format || GL_SRGB8 == format || GL_SRGB_ALPHA == format || GL_SRGB8_ALPHA8 == format;
+	}
 }

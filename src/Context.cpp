@@ -23,6 +23,8 @@ namespace e186
 		else
 		{	
 			// ======= GLFW: Creating a window and context
+			glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
+			glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glMajorVersion);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glMinorVersion);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
