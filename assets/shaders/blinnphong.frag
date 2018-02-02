@@ -12,13 +12,13 @@ uniform vec3 uAmbientIllumination;
 uniform vec2 uTexCoordsScale = vec2(1, 1);
 
 // Material data:
-layout(location = 10) uniform vec3 uDiffuseReflectivity;
-layout(location = 11) uniform vec3 uSpecularReflectivity;
-layout(location = 12) uniform vec3 uAmbientReflectivity;
-layout(location = 13) uniform vec3 uEmissiveLight;
-layout(location = 16) uniform float uShininess;
-layout(location = 20) uniform sampler2D uDiffuseTexSampler;
-//layout(location = 27) uniform sampler2D uOpacityTexSampler;
+layout(location = 110) uniform vec3 uDiffuseReflectivity;
+layout(location = 111) uniform vec3 uSpecularReflectivity;
+layout(location = 112) uniform vec3 uAmbientReflectivity;
+layout(location = 113) uniform vec3 uEmissiveLight;
+layout(location = 116) uniform float uShininess;
+layout(location = 120) uniform sampler2D uDiffuseTexSampler;
+//layout(location = 127) uniform sampler2D uOpacityTexSampler;
 // ----------------------------------------------
 
 // ################## SSBO DATA #################

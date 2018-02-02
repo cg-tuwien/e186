@@ -5,67 +5,67 @@ namespace e186
 	*/
 	enum class MaterialUniformLocation : unsigned int
 	{
-		/*! Diffuse color at layout (location = 10) */
-		DiffuseColor = 10,
+		/*! Diffuse color at layout (location = 110) */
+		DiffuseColor = 110,
 
-		/*! Specular color at layout (location = 11) */
+		/*! Specular color at layout (location = 111) */
 		SpecularColor,
 
-		/*! Ambient color value at layout (location = 12) */
+		/*! Ambient color value at layout (location = 112) */
 		AmbientColor,
 
-		/*! Emissive color value at layout (location = 13) */
+		/*! Emissive color value at layout (location = 113) */
 		EmissiveColor,
 
-		/*! Transparent color value at layout (location = 14) */
+		/*! Transparent color value at layout (location = 114) */
 		TransparentColor,
 
-		/*! Opacity value at layout (location = 15) */
+		/*! Opacity value at layout (location = 115) */
 		Opacity,
 
-		/*! Transparent color value at layout (location = 16) */
+		/*! Transparent color value at layout (location = 116) */
 		Shininess,
 
-		/*! Transparent color value at layout (location = 17) */
+		/*! Transparent color value at layout (location = 117) */
 		ShininessStrength,
 
-		/*! Transparent color value at layout (location = 18) */
+		/*! Transparent color value at layout (location = 118) */
 		RefractionIndex,
 
-		/*! Transparent color value at layout (location = 19) */
+		/*! Transparent color value at layout (location = 119) */
 		Reflectivity,
 
-		/*! Diffuse texture sampler at layout (location = 20) */
+		/*! Diffuse texture sampler at layout (location = 120) */
 		DiffuseTexture,
 
-		/*! Specular texture sampler at layout (location = 21) */
+		/*! Specular texture sampler at layout (location = 121) */
 		SpecularTexture,
 
-		/*! Ambient texture sampler at layout (location = 22) */
+		/*! Ambient texture sampler at layout (location = 122) */
 		AmbientTexture,
 
-		/*! Emissive texture sampler at layout (location = 23) */
+		/*! Emissive texture sampler at layout (location = 123) */
 		EmissiveTexture,
 
-		/*! Height texture sampler at layout (location = 24) */
+		/*! Height texture sampler at layout (location = 124) */
 		HeightTexture,
 
-		/*! Normals texture sampler at layout (location = 25) */
+		/*! Normals texture sampler at layout (location = 125) */
 		NormalsTexture,
 
-		/*! Shininess texture sampler at layout (location = 26) */
+		/*! Shininess texture sampler at layout (location = 126) */
 		ShininessTexture,
 
-		/*! Opacity texture sampler at layout (location = 27) */
+		/*! Opacity texture sampler at layout (location = 127) */
 		OpacityTexture,
 
-		/*! Displacement texture sampler at layout (location = 28) */
+		/*! Displacement texture sampler at layout (location = 128) */
 		DisplacementTexture,
 
-		/*! Reflection texture sampler at layout (location = 29) */
+		/*! Reflection texture sampler at layout (location = 129) */
 		ReflectionTexture,
 
-		/*! Lightmap texture sampler at layout (location = 30) */
+		/*! Lightmap texture sampler at layout (location = 130) */
 		LightmapTexture
 	};
 
