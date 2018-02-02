@@ -4,11 +4,32 @@ namespace e186
 {
 	SceneSelectorScene::SceneSelectorScene()
 	{
+		m_key_handler = [this](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			if (action != GLFW_PRESS)
+				return;
+
+			if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9)
+			{
+				int idx = key - GLFW_KEY_1;
+				if (key == GLFW_KEY_0)
+				{
+					idx += 10;
+				}
+				if (idx < m_scenes.size())
+				{
+					const std::function<void()>& func_ref = std::get<1>(m_scenes[idx]);
+					func_ref();
+				}
+			}
+		};
+		Engine::current->SubscribeToKeyCallbacks(m_key_handler);
 	}
 
 
 	SceneSelectorScene::~SceneSelectorScene()
 	{
+		Engine::current->UnsubscribeFromKeyCallbacks(m_key_handler);
 	}
 
 	void SceneSelectorScene::Terminate()

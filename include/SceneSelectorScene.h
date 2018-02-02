@@ -28,5 +28,6 @@ namespace e186
 	private:
 		bool m_termination_requested;
 		std::vector<std::tuple<std::string, std::function<void()>>> m_scenes;
+		std::function<void(GLFWwindow*, int, int, int, int)> m_key_handler;
 	};
 }
