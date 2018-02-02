@@ -65,6 +65,7 @@ namespace e186
 		int m_main_wnd_height;
 		float m_main_wnd_aspectRatio;
 		bool m_render_tweak_bars;
+		unsigned int m_renderTime, m_renderTimerStart;
 
 		std::unique_ptr<IScene> m_current_scene;
 		std::unique_ptr<IScene> m_next_scene;
@@ -193,6 +194,8 @@ namespace e186
 		 * Gets a value indicating whether or not to render tweak bars
 		 */
 		bool render_tweak_bars() const;
+
+		const unsigned int* renderTime();
 
 	public:
 		static void StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func);

@@ -24,6 +24,7 @@ namespace e186
 		Tex2D& FromFile(const std::string& path, bool isHDR = false);
 		Tex2D& Flip();
 		Tex2D& Upload(GLint internal_format = -1, GLint border = 0, GLint level = 0);
+		Tex2D& UploadSRGBIfPossible(GLint internal_format = -1, GLint border = 0, GLint level = 0);
 		Tex2D& DestroyOffline();
 		Tex2D& DestroyOnline();
 

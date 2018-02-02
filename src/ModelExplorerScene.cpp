@@ -62,7 +62,7 @@ namespace e186
 		TwAddVarRW(fubar, "umschalten", TW_TYPE_BOOLCPP, &whot, "");
 
 		Tex2D tex;
-		tex.FromFile("assets/textures/altitudes.png").Upload(GL_RGB).SetTextureParameters(TexParams_LinearFiltering | TexParams_ClampToEdge);
+		tex.FromFile("assets/textures/altitudes.png").UploadSRGBIfPossible().SetTextureParameters(TexParams_LinearFiltering | TexParams_ClampToEdge);
 		check_gl_error("LoadedTextures::altitudes()");
 
 		// create a camera for view and projection matrices:

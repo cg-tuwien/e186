@@ -135,6 +135,13 @@ namespace e186
 		return AddComputeShaderSource(LoadFromFile(path));
 	}
 
+	Shader& Shader::SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode)
+	{
+		m_transform_feedback_varyings = std::move(varyings);
+		m_transform_feedback_buffer_mode = buffer_mode;
+		return *this;
+	}
+
 	Shader& Shader::AddVertexShaderSource(std::string shaderSource)
 	{
 		m_vertex_shader_source = std::move(shaderSource);
@@ -374,6 +381,11 @@ namespace e186
 		glBindAttribLocation(progHandle, index, name);
 		check_gl_error((std::string("fu.shader.Build at attribute location for ") + name).c_str());
 		}*/
+
+		if (m_transform_feedback_varyings.size() > 0)
+		{
+			glTransformFeedbackVaryings(progHandle, static_cast<GLsizei>(m_transform_feedback_varyings.size()), &m_transform_feedback_varyings[0], m_transform_feedback_buffer_mode);
+		}
 
 		glLinkProgram(progHandle);
 		CheckErrorAndPrintInfoLog("Shader::Build after glLinkProgram", "Could not link program");
