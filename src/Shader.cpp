@@ -384,7 +384,7 @@ namespace e186
 
 		if (m_transform_feedback_varyings.size() > 0)
 		{
-			glTransformFeedbackVaryings(progHandle, m_transform_feedback_varyings.size(), &m_transform_feedback_varyings[0], m_transform_feedback_buffer_mode);
+			glTransformFeedbackVaryings(progHandle, static_cast<GLsizei>(m_transform_feedback_varyings.size()), &m_transform_feedback_varyings[0], m_transform_feedback_buffer_mode);
 		}
 
 		glLinkProgram(progHandle);

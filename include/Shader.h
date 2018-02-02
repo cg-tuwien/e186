@@ -81,6 +81,11 @@ namespace e186
 			glUniform1f(location, value);
 		}
 
+		void SetUniform(GLuint location, GLint value) const
+		{
+			glUniform1i(location, value);
+		}
+
 		void SetUniform(GLuint location, const glm::vec2& value) const
 		{
 			glUniform2fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));
