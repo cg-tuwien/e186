@@ -435,7 +435,7 @@ namespace e186
 		auto loc = glGetUniformLocation(m_prog_handle, name.c_str());
 		if (-1 == loc)
 		{
-			log_debug("Uniform %s not found.\n", name);
+			log_debug("Uniform %s not found.", name.c_str());
 			//throw ExceptionWithCallstack("Uniform '" + name + "' not found.");
 		}
 		m_uniform_locations[name] = loc;
