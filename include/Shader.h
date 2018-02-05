@@ -129,7 +129,9 @@ namespace e186
 		template <typename... Args>
 		void SetUniform(const std::string uniform_name, Args&&... args)
 		{
-			SetUniform(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
+			GLuint location = GetUniformLocation(uniform_name);
+			if (location != -1)
+				SetUniform(location, std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>

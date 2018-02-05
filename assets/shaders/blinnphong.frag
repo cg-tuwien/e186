@@ -28,7 +28,7 @@ layout(location = 120) uniform sampler2D uDiffuseTexSampler;
 // and OpenGL
 struct PointLightData
 {
-  vec4 position;
+  vec4 positionVS;
   vec4 color;
   vec4 atten;
 };
@@ -101,7 +101,7 @@ void main()
 
 	for (int i = 0; i < uPointLights.length(); ++i)
 	{
-		vec3 light_pos_vs = (vMatrix * vec4(uPointLights[i].position.xyz, 1)).xyz;
+		vec3 light_pos_vs = uPointLights[i].positionVS.xyz;
 		vec3 to_light = light_pos_vs - vPositionVS;
 		float dist_sq = dot(to_light, to_light);
 		float dist = sqrt(dist_sq);

@@ -4,7 +4,7 @@ namespace e186
 {
 	struct PointLightGpuData
 	{
-		glm::vec4 m_position;
+		glm::vec4 m_position_vs;
 		glm::vec4 m_light_color;
 		glm::vec4 m_attenuation;
 	};
