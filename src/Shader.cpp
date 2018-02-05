@@ -409,7 +409,7 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::QueryUniformLocations(const std::vector<std::string>& names)
+	Shader& Shader::QueryOptionalUniformLocations(const std::vector<std::string>& names)
 	{
 		if (0 == m_prog_handle)
 		{
@@ -419,12 +419,37 @@ namespace e186
 		glUseProgram(m_prog_handle);
 		for (auto const& name : names)
 		{
-			m_uniform_locations[name] = glGetUniformLocation(m_prog_handle, name.c_str());
+			const auto loc = glGetUniformLocation(m_prog_handle, name.c_str());
+			m_uniform_locations[name] = loc;
+		}
+		return *this;
+	}
+
+	Shader& Shader::QueryUniformLocations(const std::vector<std::string>& names)
+	{
+		for (auto const& name : names)
+		{
+			if (-1 == m_uniform_locations[name])
+			{
+				log_warning("Uniform location of '%s' not found.", name.c_str());
+			}
 		}
 		return *this;
 	}
 		
-	Shader& Shader::QueryUniformLocation(const std::string& name)
+	Shader& Shader::QueryMandatoryUniformLocations(const std::vector<std::string>& names)
+	{
+		for (auto const& name : names)
+		{
+			if (-1 == m_uniform_locations[name])
+			{
+				throw ExceptionWithCallstack("Uniform location of '" + name + "' not found.");
+			}
+		}
+		return *this;
+	}
+
+	Shader& Shader::QueryOptionalUniformLocation(const std::string& name)
 	{
 		if (0 == m_prog_handle)
 		{
@@ -433,12 +458,27 @@ namespace e186
 
 		glUseProgram(m_prog_handle);
 		auto loc = glGetUniformLocation(m_prog_handle, name.c_str());
-		if (-1 == loc)
-		{
-			log_debug("Uniform %s not found.", name.c_str());
-			//throw ExceptionWithCallstack("Uniform '" + name + "' not found.");
-		}
 		m_uniform_locations[name] = loc;
+		return *this;
+	}
+
+	Shader& Shader::QueryUniformLocation(const std::string& name)
+	{
+		QueryOptionalUniformLocation(name);
+		if (-1 == m_uniform_locations[name])
+		{
+			log_warning("Uniform location of '%s' not found.", name.c_str());
+		}
+		return *this;
+	}
+
+	Shader& Shader::QueryMandatoryUniformLocation(const std::string& name)
+	{
+		QueryOptionalUniformLocation(name);
+		if (-1 == m_uniform_locations[name])
+		{
+			throw ExceptionWithCallstack("Uniform location of '" + name + "' not found.");
+		}
 		return *this;
 	}
 
@@ -450,7 +490,7 @@ namespace e186
 		}
 
 		GLsizei count = 0;
-		GLuint attachedShaders[8]; // fragment, vertex, geometry, hull, domain => max. 5 aligned to 8
+		GLuint attachedShaders[8]; // fragment, vertex, geometry, hull, domai || compute => max. 5 aligned to 8
 		glGetAttachedShaders(m_prog_handle, 8, &count, attachedShaders);
 
 		// also delete the attached shaders
@@ -470,9 +510,20 @@ namespace e186
 		return m_uniform_locations.find(name) != m_uniform_locations.end();
 	}
 
+	GLuint Shader::GetOptionalUniformLocation(const std::string& name)
+	{
+		const auto loc = m_uniform_locations.find(name);
+		if (loc == m_uniform_locations.end())
+		{
+			QueryOptionalUniformLocation(name);
+			return m_uniform_locations.at(name);
+		}
+		return loc->second;
+	}
+
 	GLuint Shader::GetUniformLocation(const std::string& name)
 	{
-		auto loc = m_uniform_locations.find(name);
+		const auto loc = m_uniform_locations.find(name);
 		if (loc == m_uniform_locations.end())
 		{
 			QueryUniformLocation(name);
@@ -481,6 +532,17 @@ namespace e186
 		return loc->second;
 	}
 
+	GLuint Shader::GetMandatoryUniformLocation(const std::string& name)
+	{
+		const auto loc = m_uniform_locations.find(name);
+		if (loc == m_uniform_locations.end())
+		{
+			QueryMandatoryUniformLocation(name);
+			return m_uniform_locations.at(name);
+		}
+		return loc->second;
+	}
+	
 	Shader::operator GLuint() const
 	{
 		return m_prog_handle;

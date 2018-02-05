@@ -36,11 +36,17 @@ namespace e186
 		Shader& AddComputeShaderSourceFromFile(std::string path);
 		Shader& SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode);
 		Shader& Build();
+		Shader& QueryOptionalUniformLocations(const std::vector<std::string>& names);
 		Shader& QueryUniformLocations(const std::vector<std::string>& names);
+		Shader& QueryMandatoryUniformLocations(const std::vector<std::string>& names);
+		Shader& QueryOptionalUniformLocation(const std::string& name);
 		Shader& QueryUniformLocation(const std::string& name);
+		Shader& QueryMandatoryUniformLocation(const std::string& name);
 		Shader& Destroy();
 		bool HasUniform(const std::string& name) const;
+		GLuint GetOptionalUniformLocation(const std::string& name);
 		GLuint GetUniformLocation(const std::string& name);
+		GLuint GetMandatoryUniformLocation(const std::string& name);
 		explicit operator GLuint() const;
 		GLuint handle() const;
 
@@ -126,12 +132,34 @@ namespace e186
 			glUniform1i(location, static_cast<GLint>(unit));
 		}
 			
+
+		template <typename... Args>
+		void SetOptionalUniform(const std::string uniform_name, Args&&... args)
+		{
+			const auto loc = GetOptionalUniformLocation(uniform_name);
+			if (-1 != loc) 
+				SetUniform(loc, std::forward<Args>(args)...);
+		}
+
 		template <typename... Args>
 		void SetUniform(const std::string uniform_name, Args&&... args)
 		{
-			GLuint location = GetUniformLocation(uniform_name);
-			if (location != -1)
-				SetUniform(location, std::forward<Args>(args)...);
+			SetUniform(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetMandatoryUniform(const std::string uniform_name, Args&&... args)
+		{
+			SetUniform(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+
+		template <typename... Args>
+		void SetOptionalSampler(const std::string uniform_name, Args&&... args)
+		{
+			const auto loc = GetOptionalUniformLocation(uniform_name);
+			if (-1 != loc)
+				SetSampler(loc, std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
@@ -141,9 +169,30 @@ namespace e186
 		}
 
 		template <typename... Args>
+		void SetMandatorySampler(const std::string uniform_name, Args&&... args)
+		{
+			SetSampler(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+
+		template <typename... Args>
+		void SetOptionalImageTexture(const std::string uniform_name, Args&&... args)
+		{
+			const auto loc = GetOptionalUniformLocation(uniform_name);
+			if (-1 != loc)
+				SetImageTexture(loc, std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
 		void SetImageTexture(const std::string uniform_name, Args&&... args)
 		{
 			SetImageTexture(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetMandatoryImageTexture(const std::string uniform_name, Args&&... args)
+		{
+			SetImageTexture(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 	private:
