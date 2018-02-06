@@ -48,6 +48,7 @@
 #include "log.h"
 #include "VertexAttribData.h"
 #include "VertexAttribLocation.h"
+#include "AutoMatrix.h"
 #include "Shader.h"
 #include "MaterialData.h"
 #include "Model.h"

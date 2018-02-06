@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\Animator.h" />
     <ClInclude Include="..\include\AntTweakBarManager.h" />
+    <ClInclude Include="..\include\AutoMatrix.h" />
     <ClInclude Include="..\include\Camera.h" />
     <ClInclude Include="..\include\Context.h" />
     <ClInclude Include="..\include\DebugTexDisplayer.h" />

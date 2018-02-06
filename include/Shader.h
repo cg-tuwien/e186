@@ -1,4 +1,7 @@
 #pragma once
+#include <unordered_set>
+#include <set>
+#include <array>
 
 namespace e186
 {
@@ -14,6 +17,10 @@ namespace e186
 
 		static std::string LoadFromFile(const std::string& path);
 
+		void DetermineWhichAutoMatsToCalc();
+		void PrepareAutoMatActionConfigs();
+		void CreateAutoMatCalcers();
+
 	public:
 		Shader();
 		Shader(const Shader& other) = delete;
@@ -21,6 +28,9 @@ namespace e186
 		Shader& operator=(const Shader& other) = delete;
 		Shader& operator=(Shader&& other) noexcept;
 		~Shader();
+
+		explicit operator GLuint() const;
+		GLuint handle() const;
 
 		Shader& AddVertexShaderSource(std::string shaderSource);
 		Shader& AddTesselationControlShaderSource(std::string shaderSource);
@@ -42,20 +52,19 @@ namespace e186
 		Shader& QueryOptionalUniformLocation(const std::string& name);
 		Shader& QueryUniformLocation(const std::string& name);
 		Shader& QueryMandatoryUniformLocation(const std::string& name);
+		Shader& DeclareAutoMatrix(std::string name, unsigned int properties);
 		Shader& Destroy();
 		bool HasUniform(const std::string& name) const;
 		GLuint GetOptionalUniformLocation(const std::string& name);
 		GLuint GetUniformLocation(const std::string& name);
 		GLuint GetMandatoryUniformLocation(const std::string& name);
-		explicit operator GLuint() const;
-		GLuint handle() const;
-
 		bool HasTesselationShaders() const;
 		GLint patch_vertices() const;
 		bool HasGeometryShader() const;
 		unsigned int vertex_attrib_config() const;
 		GLenum kind_of_primitives() const;
 		void set_kind_of_primitives(GLenum mode);
+		void SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
 
 		void Use() const 
 		{
@@ -209,9 +218,15 @@ namespace e186
 		GLenum m_transform_feedback_buffer_mode;
 		GLint m_patch_vertices;
 		static const int kMaxShaders = 6;
-		GLuint m_shaderHandles[kMaxShaders];
+		std::array<GLuint, kMaxShaders> m_shaderHandles;
 		unsigned int m_vertex_attrib_config;
 		GLenum m_kind_of_primitives;
+		std::vector<std::tuple<std::string, unsigned int>> m_auto_matrices;
+		std::vector<std::tuple<GLuint, unsigned int>> m_auto_mats_action_config;
+		std::vector<std::tuple<GLuint, unsigned int>> m_auto_mats_action_config_nrm;
+		std::array<bool, 16> m_auto_mat_do_calc;
+		std::array<glm::mat4, 16> m_auto_mat_action_cache;
+		std::vector<std::function<void()>> m_auto_mat_calcers;
 	};
 
 	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len);

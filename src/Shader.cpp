@@ -28,14 +28,55 @@ namespace e186
 		m_compute_shader_source(),
 		m_fragment_outputs(),
 		m_uniform_locations(),
+		m_transform_feedback_varyings(),
+		m_transform_feedback_buffer_mode(0),
 		m_patch_vertices(0),
+		m_shaderHandles { 0, 0, 0, 0, 0, 0, },
 		m_vertex_attrib_config(VertexAttribData_Nothing),
-		m_kind_of_primitives(GL_TRIANGLES)
-	{
-		for (int i = 0; i < kMaxShaders; ++i)
+		m_kind_of_primitives(GL_TRIANGLES),
+		m_auto_matrices(),
+		m_auto_mats_action_config(),
+		m_auto_mats_action_config_nrm(),
+		m_auto_mat_do_calc
 		{
-			m_shaderHandles[i] = 0;
-		}
+			false,  // 00 AutoMatrix_Nothing
+			false,  // 01 AutoMatrix_TransformMatrix	
+			false, 	// 02 AutoMatrix_ModelMatrix		
+			false, 	// 03 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix
+			false, 	// 04 AutoMatrix_ViewMatrix		
+			false, 	// 05 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix
+			false, 	// 06 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+			false, 	// 07 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+			false, 	// 08 AutoMatrix_ProjectionMatrix
+			false, 	// 09 AutoMatrix_TransformMatrix | AutoMatrix_ProjectionMatrix
+			false, 	// 10 AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+			false, 	// 11 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+			false, 	// 12 AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			false, 	// 13 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			false, 	// 14 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			false   // 15 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		},
+		m_auto_mat_action_cache 
+		{
+			glm::mat4(1.0), // 00 AutoMatrix_Nothing
+			glm::mat4(1.0), // 01 AutoMatrix_TransformMatrix	
+			glm::mat4(1.0),	// 02 AutoMatrix_ModelMatrix		
+			glm::mat4(1.0),	// 03 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix
+			glm::mat4(1.0),	// 04 AutoMatrix_ViewMatrix		
+			glm::mat4(1.0),	// 05 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix
+			glm::mat4(1.0),	// 06 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+			glm::mat4(1.0),	// 07 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+			glm::mat4(1.0),	// 08 AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0),	// 09 AutoMatrix_TransformMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0),	// 10 AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0),	// 11 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0),	// 12 AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0),	// 13 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0),	// 14 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0)	// 15 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		},
+		m_auto_mat_calcers()
+	{
 	}
 
 	Shader::Shader(Shader&& other) noexcept
@@ -48,18 +89,23 @@ namespace e186
 		m_compute_shader_source(std::move(other.m_compute_shader_source)),
 		m_fragment_outputs(std::move(other.m_fragment_outputs)),
 		m_uniform_locations(std::move(other.m_uniform_locations)),
+		m_transform_feedback_varyings(std::move(other.m_transform_feedback_varyings)),
+		m_transform_feedback_buffer_mode(std::move(other.m_transform_feedback_buffer_mode)),
 		m_patch_vertices(other.m_patch_vertices),
+		m_shaderHandles(std::move(other.m_shaderHandles)),
 		m_vertex_attrib_config(other.m_vertex_attrib_config),
-		m_kind_of_primitives(other.m_kind_of_primitives)
+		m_kind_of_primitives(other.m_kind_of_primitives),
+		m_auto_matrices(std::move(other.m_auto_matrices)),
+		m_auto_mats_action_config(std::move(other.m_auto_mats_action_config)),
+		m_auto_mats_action_config_nrm(std::move(other.m_auto_mats_action_config_nrm)),
+		m_auto_mat_do_calc(std::move(other.m_auto_mat_do_calc)),
+		m_auto_mat_action_cache(std::move(other.m_auto_mat_action_cache)),
+		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers))
 	{
 		other.m_prog_handle = 0;
 		other.m_patch_vertices = 0;
 		other.m_vertex_attrib_config = VertexAttribData_Nothing;
-		for (int i = 0; i < kMaxShaders; ++i)
-		{
-			m_shaderHandles[i] = other.m_shaderHandles[i];
-			other.m_shaderHandles[i] = 0;
-		}
+		other.m_transform_feedback_buffer_mode = 0;
 		log_debug("Move constructing Shader with m_prog_handle[%u]", m_prog_handle);
 	}
 
@@ -74,13 +120,10 @@ namespace e186
 		m_vertex_attrib_config = other.m_vertex_attrib_config;
 		other.m_vertex_attrib_config = VertexAttribData_Nothing;
 
-		m_kind_of_primitives = other.m_kind_of_primitives;
+		m_transform_feedback_buffer_mode = other.m_transform_feedback_buffer_mode;
+		other.m_transform_feedback_buffer_mode = 0;
 
-		for (int i = 0; i < kMaxShaders; ++i)
-		{
-			m_shaderHandles[i] = other.m_shaderHandles[i];
-			other.m_shaderHandles[i] = 0;
-		}
+		m_kind_of_primitives = other.m_kind_of_primitives;
 
 		m_vertex_shader_source = std::move(other.m_vertex_shader_source);
 		m_tess_control_shader_source = std::move(other.m_tess_control_shader_source);
@@ -89,7 +132,15 @@ namespace e186
 		m_fragment_shader_source = std::move(other.m_fragment_shader_source);
 		m_compute_shader_source = std::move(other.m_compute_shader_source);
 		m_fragment_outputs = std::move(other.m_fragment_outputs);
-		m_uniform_locations = std::move(other.m_uniform_locations);
+		m_uniform_locations = std::move(other.m_uniform_locations); 
+		m_transform_feedback_varyings = std::move(other.m_transform_feedback_varyings);
+		m_shaderHandles = std::move(other.m_shaderHandles);
+		m_auto_matrices = std::move(other.m_auto_matrices);
+		m_auto_mats_action_config = std::move(other.m_auto_mats_action_config);
+		m_auto_mats_action_config_nrm = std::move(other.m_auto_mats_action_config_nrm);
+		m_auto_mat_do_calc = std::move(other.m_auto_mat_do_calc);
+		m_auto_mat_action_cache = std::move(other.m_auto_mat_action_cache);
+		m_auto_mat_calcers = std::move(other.m_auto_mat_calcers);
 
 		log_debug("Move assigning Shader with m_prog_handle[%u]", m_prog_handle);
 		return *this;
@@ -104,6 +155,214 @@ namespace e186
 		}
 		Destroy();
 	}
+
+
+
+
+	void Shader::DetermineWhichAutoMatsToCalc()
+	{
+		for (const auto& tpl : m_auto_matrices)
+		{
+			auto matidx = std::get<1>(tpl) & 0xF;
+			m_auto_mat_do_calc[matidx] = true;
+		}
+	}
+
+	void Shader::CreateAutoMatCalcers()
+	{
+		if (m_auto_matrices.size() == 0)
+		{
+			return;
+		}
+
+		// 00 AutoMatrix_Nothing
+		// 01 AutoMatrix_TransformMatrix	
+		// 02 AutoMatrix_ModelMatrix		
+		// 04 AutoMatrix_ViewMatrix		
+		// 08 AutoMatrix_ProjectionMatrix
+
+		// 03 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix
+		if (m_auto_mat_do_calc[3]) {
+			m_auto_mat_calcers.push_back([this]() {
+				m_auto_mat_action_cache[3] = m_auto_mat_action_cache[2] * m_auto_mat_action_cache[1];
+			});
+		}
+		// 05 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix
+		if (m_auto_mat_do_calc[5]) {
+			m_auto_mat_calcers.push_back([this]() {
+				m_auto_mat_action_cache[5] = m_auto_mat_action_cache[4] * m_auto_mat_action_cache[1];
+			});
+		}
+		// 06 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+		if (m_auto_mat_do_calc[6]) {
+			m_auto_mat_calcers.push_back([this]() {
+				m_auto_mat_action_cache[6] = m_auto_mat_action_cache[4] * m_auto_mat_action_cache[2];
+			});
+		}
+		// 09 AutoMatrix_TransformMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[9]) {
+			m_auto_mat_calcers.push_back([this]() {
+				m_auto_mat_action_cache[9] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[1];
+			});
+		}
+		// 10 AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[10]) {
+			m_auto_mat_calcers.push_back([this]() {
+				m_auto_mat_action_cache[10] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[2];
+			});
+		}
+		// 12 AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[12]) {
+			m_auto_mat_calcers.push_back([this]() {
+				m_auto_mat_action_cache[12] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[4];
+			});
+		}
+
+		// 07 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+		if (m_auto_mat_do_calc[7]) {
+			if (m_auto_mat_do_calc[3]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[7] = m_auto_mat_action_cache[4] * m_auto_mat_action_cache[3];
+				});
+			}
+			else if (m_auto_mat_do_calc[6]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[7] = m_auto_mat_action_cache[6] * m_auto_mat_action_cache[1];
+				});
+			}
+			else {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[7] = m_auto_mat_action_cache[4] * m_auto_mat_action_cache[2] * m_auto_mat_action_cache[1];
+				});
+			}
+		}
+		// 11 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[11]) {
+			if (m_auto_mat_do_calc[3]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[11] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[3];
+				});
+			}
+			else if (m_auto_mat_do_calc[10]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[11] = m_auto_mat_action_cache[10] * m_auto_mat_action_cache[1];
+				});
+			}
+			else {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[11] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[2] * m_auto_mat_action_cache[1];
+				});
+			}
+		}
+		// 13 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[13]) {
+			if (m_auto_mat_do_calc[5]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[13] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[5];
+				});
+			}
+			else if (m_auto_mat_do_calc[12]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[13] = m_auto_mat_action_cache[12] * m_auto_mat_action_cache[1];
+				});
+			}
+			else {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[13] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[4] * m_auto_mat_action_cache[1];
+				});
+			}
+		}
+		// 14 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[14]) {
+			if (m_auto_mat_do_calc[6]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[14] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[6];
+				});
+			}
+			else if (m_auto_mat_do_calc[12]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[14] = m_auto_mat_action_cache[12] * m_auto_mat_action_cache[2];
+				});
+			}
+			else {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[14] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[4] * m_auto_mat_action_cache[2];
+				});
+			}
+		}
+
+		// 15 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		if (m_auto_mat_do_calc[15]) {
+			if (m_auto_mat_do_calc[7]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[7];
+				});
+			}
+			else if (m_auto_mat_do_calc[14]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[14] * m_auto_mat_action_cache[1];
+				});
+			}
+			else if (m_auto_mat_do_calc[3] && m_auto_mat_do_calc[12]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[12] * m_auto_mat_action_cache[3];
+				});
+			}
+			else if (m_auto_mat_do_calc[3]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[4] * m_auto_mat_action_cache[3];
+				});
+			}
+			else if (m_auto_mat_do_calc[12]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[12] * m_auto_mat_action_cache[2] * m_auto_mat_action_cache[1];
+				});
+			}
+			else if (m_auto_mat_do_calc[6]) {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[6] * m_auto_mat_action_cache[1];
+				});
+			}
+			else {
+				m_auto_mat_calcers.push_back([this]() {
+					m_auto_mat_action_cache[15] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[4] * m_auto_mat_action_cache[2] * m_auto_mat_action_cache[1];
+				});
+			}
+		}
+	}
+
+	void Shader::PrepareAutoMatActionConfigs()
+	{
+		for (const auto& tpl : m_auto_matrices)
+		{
+			const auto& name = std::get<0>(tpl);
+			auto params = std::get<1>(tpl);
+			auto matidx = params & 0xF;
+			auto is_normal_matrix = (params & AutoMatrix_IsNormalMatrix) != 0;
+			auto is_optional = (params & AutoMatrix_IsOptional) != 0;
+			auto is_mandatory = (params & AutoMatrix_IsMandatory) != 0;
+
+			GLuint loc;
+			if (is_mandatory)
+				loc = GetMandatoryUniformLocation(name);
+			else if (is_optional)
+				loc = GetOptionalUniformLocation(name);
+			else
+				loc = GetUniformLocation(name);
+
+			if (is_normal_matrix)
+			{
+				m_auto_mats_action_config_nrm.push_back(std::make_tuple(loc, static_cast<AutoMatrix>(matidx)));
+			}
+			else
+			{
+				m_auto_mats_action_config.push_back(std::make_tuple(loc, static_cast<AutoMatrix>(matidx)));
+			}
+		}
+	}
+
+
+
 
 	Shader& Shader::AddVertexShaderSourceFromFile(std::string path)
 	{
@@ -336,6 +595,29 @@ namespace e186
 		}
 	}
 
+	void Shader::SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
+	{
+		// update the four base matrices in cache
+		m_auto_mat_action_cache[AutoMatrix_TransformMatrix] = transformationMatrix;
+		m_auto_mat_action_cache[AutoMatrix_ModelMatrix] = modelMatrix;
+		m_auto_mat_action_cache[AutoMatrix_ViewMatrix] = viewMatrix;
+		m_auto_mat_action_cache[AutoMatrix_ProjectionMatrix] = projectionMatrix;
+		// update the rest of the matrices
+		for (const auto& fu : m_auto_mat_calcers)
+		{
+			fu();
+		}
+		// upload matrices to shader
+		for (const auto& tpl : m_auto_mats_action_config_nrm)
+		{
+			SetUniform(std::get<0>(tpl), glm::mat3(glm::inverseTranspose(m_auto_mat_action_cache[std::get<1>(tpl)])));
+		}
+		for (const auto& tpl : m_auto_mats_action_config)
+		{
+			SetUniform(std::get<0>(tpl), m_auto_mat_action_cache[std::get<1>(tpl)]);
+		}
+	}
+
 	Shader& Shader::Build()
 	{
 		m_shaderHandles[0] = m_vertex_shader_source.empty()       ? 0 : Compile(m_vertex_shader_source.c_str(),       GL_VERTEX_SHADER);
@@ -406,6 +688,11 @@ namespace e186
 		DetermineVertexAttribConfig();
 		DetermineTessData();
 		DeterminePrimitivesMode();
+
+		DetermineWhichAutoMatsToCalc();
+		PrepareAutoMatActionConfigs();
+		CreateAutoMatCalcers();
+
 		return *this;
 	}
 
@@ -479,6 +766,17 @@ namespace e186
 		{
 			throw ExceptionWithCallstack("Uniform location of '" + name + "' not found.");
 		}
+		return *this;
+	}
+
+	Shader& Shader::DeclareAutoMatrix(std::string name, unsigned int properties)
+	{
+		for (const auto& tpl : m_auto_matrices)
+		{
+			if (std::get<0>(tpl) == name)
+				throw ExceptionWithCallstack("AutoMatrix declaration for '" + name + "' already exists.");
+		}
+		m_auto_matrices.push_back(std::make_tuple(std::move(name), properties));
 		return *this;
 	}
 
