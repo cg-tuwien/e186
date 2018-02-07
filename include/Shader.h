@@ -5,7 +5,9 @@
 
 namespace e186
 {
-	
+	struct MeshUniformSettersForShader;
+	struct MeshVaosForAttribConfig;
+
 	class Shader
 	{
 		static GLuint Compile(const char* source, GLenum shaderType);
@@ -61,7 +63,7 @@ namespace e186
 		bool HasTesselationShaders() const;
 		GLint patch_vertices() const;
 		bool HasGeometryShader() const;
-		unsigned int vertex_attrib_config() const;
+		VertexAttribData vertex_attrib_config() const;
 		GLenum kind_of_primitives() const;
 		void set_kind_of_primitives(GLenum mode);
 		void SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
@@ -219,7 +221,7 @@ namespace e186
 		GLint m_patch_vertices;
 		static const int kMaxShaders = 6;
 		std::array<GLuint, kMaxShaders> m_shaderHandles;
-		unsigned int m_vertex_attrib_config;
+		VertexAttribData m_vertex_attrib_config;
 		GLenum m_kind_of_primitives;
 		std::vector<std::tuple<std::string, AutoMatrix>> m_auto_matrices;
 		std::vector<std::tuple<GLuint, AutoMatrix>> m_auto_mats_action_config;
@@ -231,7 +233,7 @@ namespace e186
 
 	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len);
 	void RenderMesh(const Shader& shader, Mesh& mesh);
-	void RenderMeshes(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos);
-	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos, const std::vector<std::tuple<MeshRef, UniformSetter>>& uniform_setters);
+	void RenderMeshes(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos);
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters);
 	void UnbindVAO();
 }

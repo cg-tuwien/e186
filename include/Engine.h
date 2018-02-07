@@ -8,9 +8,7 @@ namespace e186
 	
 	using VAOType = GLuint;
 	
-	using VertexDataCfgType = unsigned int;
-	
-	using VAOMap = std::unordered_map<VertexDataCfgType, VAOType>;
+	using VAOMap = std::unordered_map<VertexAttribData, VAOType>;
 	
 	class Mesh;
 	using MeshRef = std::reference_wrapper<Mesh>;

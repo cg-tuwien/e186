@@ -36,7 +36,7 @@ namespace e186
 
 		// load the model:
 		auto ico = Model::LoadFromFile("assets/models/icosahedron.obj", glm::mat4(1.0f));
-		ico->GenerateVAOsWithVertexAttribConfig(VertexAttribData_Position);
+		ico->GenerateVAOsWithVertexAttribConfig(VertexAttribData::Position);
 
 		// create a camera for view and projection matrices:
 		QuakeCamera cam;

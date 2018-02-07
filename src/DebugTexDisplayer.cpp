@@ -12,7 +12,7 @@ namespace e186
 
 		m_quad = Model::LoadFromFile("assets/models/quad01.obj", glm::mat4(1.0f), MOLF_default);
 		assert(m_quad);
-		m_quad->GenerateVAOsWithVertexAttribConfig(VertexAttribData_Position | VertexAttribData_Tex2D);
+		m_quad->GenerateVAOsWithVertexAttribConfig(VertexAttribData::Position | VertexAttribData::Tex2D);
 
 		m_shader.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
 				.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag", { std::make_tuple(0, "fragColor") })

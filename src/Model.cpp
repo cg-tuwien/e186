@@ -198,7 +198,7 @@ namespace e186
 
 		sizeOneVtx = positionSize + normalSize; // positions and normals
 		positionOffset = 0;
-		m_meshes[index].m_vertex_data_layout = VertexAttribData_Position | VertexAttribData_Normal;
+		m_meshes[index].m_vertex_data_layout = VertexAttribData::Position | VertexAttribData::Normal;
 		normalOffset = positionSize;
 		bitangentOffset = tangentOffset = boneWeightsOffset = boneIndicesOffset = colorOffset = texCoordsOffset = (positionSize + normalSize);
 		if (paiMesh->HasTextureCoords(0))
@@ -209,7 +209,7 @@ namespace e186
 			boneWeightsOffset += texCoordsSize;
 			tangentOffset += texCoordsSize;
 			bitangentOffset += texCoordsSize;
-			m_meshes[index].m_vertex_data_layout |= VertexAttribData_Tex2D;
+			m_meshes[index].m_vertex_data_layout |= VertexAttribData::Tex2D;
 		}
 		if (paiMesh->HasVertexColors(0))
 		{
@@ -218,7 +218,7 @@ namespace e186
 			boneWeightsOffset += colorSize;
 			tangentOffset += colorSize;
 			bitangentOffset += colorSize;
-			m_meshes[index].m_vertex_data_layout |= VertexAttribData_Color;
+			m_meshes[index].m_vertex_data_layout |= VertexAttribData::Color;
 		}
 		if (paiMesh->HasBones())
 		{
@@ -226,14 +226,14 @@ namespace e186
 			boneWeightsOffset += boneIndicesSize;
 			tangentOffset += (boneIndicesSize + boneWeightsSize);
 			bitangentOffset += (boneIndicesSize + boneWeightsSize);
-			m_meshes[index].m_vertex_data_layout |= VertexAttribData_Bones;
+			m_meshes[index].m_vertex_data_layout |= VertexAttribData::Bones;
 			assert(sizeOneVtx == boneWeightsOffset + boneWeightsSize);
 		}
 		if (paiMesh->HasTangentsAndBitangents())
 		{
 			sizeOneVtx += tangentSize + bitangentSize;
 			bitangentOffset += tangentSize;
-			m_meshes[index].m_vertex_data_layout |= VertexAttribData_TangentSpace;
+			m_meshes[index].m_vertex_data_layout |= VertexAttribData::Tangents | VertexAttribData::Bitangents;
 			assert(sizeOneVtx == bitangentOffset + bitangentSize);
 		}
 
@@ -358,7 +358,7 @@ namespace e186
 	}
 
 
-	bool Model::GenerateVAOsWithVertexAttribConfig(VertexDataCfgType vertexDataConfig)
+	bool Model::GenerateVAOsWithVertexAttribConfig(VertexAttribData vertexDataConfig)
 	{
 		bool success = true;
 		auto n = m_meshes.size();
@@ -375,7 +375,7 @@ namespace e186
 		return GenerateVAOsWithVertexAttribConfig(shader.vertex_attrib_config());
 	}
 
-	VAOType Mesh::GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexDataCfgType vertexDataConfig)
+	VAOType Mesh::GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig)
 	{
 		// ensure that this config is not already stored
 		auto it = mesh.m_vertex_array_objects.find(vertexDataConfig);
@@ -394,7 +394,7 @@ namespace e186
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices_vbo_id);
 
 		// Position
-		if (!((vertexDataConfig & VertexAttribData_Position) == VertexAttribData_Position))
+		if (!((vertexDataConfig & VertexAttribData::Position) == VertexAttribData::Position))
 		{
 			log_warning("VertexData_Position not specified for VAO generation - enabling it anyways!");
 		}
@@ -405,7 +405,7 @@ namespace e186
 		}
 
 		// Normal
-		if ((vertexDataConfig & VertexAttribData_Normal) == VertexAttribData_Normal)
+		if ((vertexDataConfig & VertexAttribData::Normal) == VertexAttribData::Normal)
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Normal);
 			glEnableVertexAttribArray(location);
@@ -413,7 +413,7 @@ namespace e186
 		}
 
 		// TexCoord
-		if ((vertexDataConfig & VertexAttribData_Tex2D) == VertexAttribData_Tex2D)
+		if ((vertexDataConfig & VertexAttribData::Tex2D) == VertexAttribData::Tex2D)
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::TexCoord);
 			glEnableVertexAttribArray(location);
@@ -421,7 +421,7 @@ namespace e186
 		}
 
 		// Color
-		if ((vertexDataConfig & VertexAttribData_Color) == VertexAttribData_Color)
+		if ((vertexDataConfig & VertexAttribData::Color) == VertexAttribData::Color)
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Color);
 			glEnableVertexAttribArray(location);
@@ -429,7 +429,7 @@ namespace e186
 		}
 
 		// Bones
-		if ((vertexDataConfig & VertexAttribData_Bones) == VertexAttribData_Bones)
+		if ((vertexDataConfig & VertexAttribData::Bones) == VertexAttribData::Bones)
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::BoneIndices);
 			glEnableVertexAttribArray(location);
@@ -439,20 +439,25 @@ namespace e186
 			glVertexAttribPointer(location2, static_cast<GLint>(mesh.m_bone_weights_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_bone_weights_offset));
 		}
 
-		// Tangent Space
-		if ((vertexDataConfig & VertexAttribData_TangentSpace) == VertexAttribData_TangentSpace)
+		// Tangent Space: Tangents
+		if ((vertexDataConfig & VertexAttribData::Tangents) == VertexAttribData::Tangents)
 		{
 			GLuint location = static_cast<GLuint>(VertexAttribLocation::Tangents);
 			glEnableVertexAttribArray(location);
 			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_tangent_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_tangent_offset));
-			GLuint location2 = static_cast<GLuint>(VertexAttribLocation::Bitangents);
-			glEnableVertexAttribArray(location2);
-			glVertexAttribPointer(location2, static_cast<GLint>(mesh.m_bitangent_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_bitangent_offset));
+		}
+
+		// Tangent Space: Tangents
+		if ((vertexDataConfig & VertexAttribData::Bitangents) == VertexAttribData::Bitangents)
+		{
+			GLuint location = static_cast<GLuint>(VertexAttribLocation::Bitangents);
+			glEnableVertexAttribArray(location);
+			glVertexAttribPointer(location, static_cast<GLint>(mesh.m_bitangent_size / sizeof(GLfloat)), GL_FLOAT, GL_FALSE, static_cast<GLsizei>(mesh.m_size_one_vertex), reinterpret_cast<GLvoid*>(mesh.m_bitangent_offset));
 		}
 
 		// disable the VAO and store it for the vertex-data setting in the map
 		glBindVertexArray(0);
-		mesh.m_vertex_array_objects.insert(std::pair<unsigned int, GLuint>(vertexDataConfig, vao));
+		mesh.m_vertex_array_objects.insert(std::pair<VertexAttribData, GLuint>(vertexDataConfig, vao));
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -460,7 +465,7 @@ namespace e186
 		return vao;
 	}
 
-	VAOType Model::GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexDataCfgType vertexDataConfig)
+	VAOType Model::GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig)
 	{
 		return Mesh::GetOrCreateVAOForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
 	}
@@ -933,7 +938,7 @@ namespace e186
 		return *m_meshes[meshIndex].m_material_data.get();
 	}
 
-	bool Model::BindVAOForMesh(const unsigned int meshIndex, const unsigned int vertexDataConfig) const
+	bool Model::BindVAOForMesh(const unsigned int meshIndex, const VertexAttribData vertexDataConfig) const
 	{
 		auto it = m_meshes[meshIndex].m_vertex_array_objects.find(vertexDataConfig);
 		if (m_meshes[meshIndex].m_vertex_array_objects.end() != it)
@@ -955,24 +960,30 @@ namespace e186
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind VBO for index-data
 	}
 
-	std::vector<std::tuple<MeshRef, UniformSetter>> Model::CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes)
+	MeshUniformSettersForShader Model::CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes)
 	{
-		std::vector<std::tuple<MeshRef, UniformSetter>> uniform_setters;
+		MeshUniformSettersForShader retval;
+		retval.m_shader_handle = shader.handle();
+
 		for (Mesh& mesh : meshes)
 		{
-			uniform_setters.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), CreateUniformSetterForShader(shader, *mesh.m_material_data)));
+			retval.m_mesh_uniform_setters.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), CreateUniformSetterForShader(shader, *mesh.m_material_data)));
 		}
-		return uniform_setters;
+
+		return retval;
 	}
 
-	std::vector<std::tuple<MeshRef, VAOType>> Model::GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes)
+	MeshVaosForAttribConfig Model::GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes)
 	{
-		std::vector<std::tuple<MeshRef, VAOType>> vaos;
+		MeshVaosForAttribConfig retval;
+		retval.m_vertex_attrib_config = shader.vertex_attrib_config();
+		
 		for (Mesh& mesh : meshes)
 		{
-			vaos.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), Mesh::GetOrCreateVAOForShader(mesh, shader)));
+			retval.m_mesh_vaos.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), Mesh::GetOrCreateVAOForShader(mesh, shader)));
 		}
-		return vaos;
+		
+		return retval;
 	}
 
 	Mesh& Model::mesh_at(unsigned int meshIndex)

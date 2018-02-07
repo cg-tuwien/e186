@@ -32,7 +32,7 @@ namespace e186
 		m_transform_feedback_buffer_mode(0),
 		m_patch_vertices(0),
 		m_shaderHandles { 0, 0, 0, 0, 0, 0, },
-		m_vertex_attrib_config(VertexAttribData_Nothing),
+		m_vertex_attrib_config(VertexAttribData::Nothing),
 		m_kind_of_primitives(GL_TRIANGLES),
 		m_auto_matrices(),
 		m_auto_mats_action_config(),
@@ -104,7 +104,7 @@ namespace e186
 	{
 		other.m_prog_handle = 0;
 		other.m_patch_vertices = 0;
-		other.m_vertex_attrib_config = VertexAttribData_Nothing;
+		other.m_vertex_attrib_config = VertexAttribData::Nothing;
 		other.m_transform_feedback_buffer_mode = 0;
 		log_debug("Move constructing Shader with m_prog_handle[%u]", m_prog_handle);
 	}
@@ -118,7 +118,7 @@ namespace e186
 		other.m_patch_vertices = 0;
 
 		m_vertex_attrib_config = other.m_vertex_attrib_config;
-		other.m_vertex_attrib_config = VertexAttribData_Nothing;
+		other.m_vertex_attrib_config = VertexAttribData::Nothing;
 
 		m_transform_feedback_buffer_mode = other.m_transform_feedback_buffer_mode;
 		other.m_transform_feedback_buffer_mode = 0;
@@ -448,7 +448,7 @@ namespace e186
 		return m_patch_vertices;
 	}
 
-	unsigned int Shader::vertex_attrib_config() const
+	VertexAttribData Shader::vertex_attrib_config() const
 	{
 		return m_vertex_attrib_config;
 	}
@@ -484,12 +484,10 @@ namespace e186
 		GLint size_of_the_attribute_variable = 0;
 		GLenum type_of_the_attribute_variable = 0;
 
-		unsigned int attrib_config = VertexAttribData_Nothing;
+		auto attrib_config = VertexAttribData::Nothing;
 
 		bool has_bone_weights = false;
 		bool has_bone_indices = false;
-		bool has_tangents = false;
-		bool has_bitangents = false;
 
 		GLint count;
 		glGetProgramiv(handle(), GL_ACTIVE_ATTRIBUTES, &count);
@@ -503,27 +501,27 @@ namespace e186
 				switch (static_cast<VertexAttribLocation>(location))
 				{
 				case VertexAttribLocation::Position:
-					attrib_config = attrib_config | VertexAttribData_Position;
+					attrib_config = attrib_config | VertexAttribData::Position;
 					log_debug_verbose("For shader with handle[%u], positions attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::TexCoord:
-					attrib_config = attrib_config | VertexAttribData_Tex2D;
+					attrib_config = attrib_config | VertexAttribData::Tex2D;
 					log_debug_verbose("For shader with handle[%u], tex-coords attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Normal:
-					attrib_config = attrib_config | VertexAttribData_Normal;
+					attrib_config = attrib_config | VertexAttribData::Normal;
 					log_debug_verbose("For shader with handle[%u], normals attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Color:
-					attrib_config = attrib_config | VertexAttribData_Color;
+					attrib_config = attrib_config | VertexAttribData::Color;
 					log_debug_verbose("For shader with handle[%u], colors attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::TexCoord2:
-					attrib_config = attrib_config | VertexAttribData_Tex2D_2;
+					attrib_config = attrib_config | VertexAttribData::Tex2D_2;
 					log_debug_verbose("For shader with handle[%u], tex-coords2 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::TexCoord3:
-					attrib_config = attrib_config | VertexAttribData_Tex2D_3;
+					attrib_config = attrib_config | VertexAttribData::Tex2D_3;
 					log_debug_verbose("For shader with handle[%u], tex-coords3 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::BoneWeights:
@@ -535,35 +533,35 @@ namespace e186
 					log_debug_verbose("For shader with handle[%u], bone-indices attribute is named [%s]\n  => has both bone attributes", handle(), name);
 					break;
 				case VertexAttribLocation::Tangents:
-					has_tangents = true;
+					attrib_config = attrib_config | VertexAttribData::Tangents;
 					log_debug_verbose("For shader with handle[%u], tangents attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Bitangents:
-					has_bitangents = true;
-					log_debug_verbose("For shader with handle[%u], bitangents attribute is named [%s]\n  => has both tangent space attributes", handle(), name);
+					attrib_config = attrib_config | VertexAttribData::Bitangents;
+					log_debug_verbose("For shader with handle[%u], bitangents attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Param0:
-					attrib_config = attrib_config | VertexAttribData_Param0;
+					attrib_config = attrib_config | VertexAttribData::Param0;
 					log_debug_verbose("For shader with handle[%u], param0 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Param1:
-					attrib_config = attrib_config | VertexAttribData_Param1;
+					attrib_config = attrib_config | VertexAttribData::Param1;
 					log_debug_verbose("For shader with handle[%u], param1 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Param2:
-					attrib_config = attrib_config | VertexAttribData_Param2;
+					attrib_config = attrib_config | VertexAttribData::Param2;
 					log_debug_verbose("For shader with handle[%u], param2 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Param3:
-					attrib_config = attrib_config | VertexAttribData_Param3;
+					attrib_config = attrib_config | VertexAttribData::Param3;
 					log_debug_verbose("For shader with handle[%u], param3 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Param4:
-					attrib_config = attrib_config | VertexAttribData_Param4;
+					attrib_config = attrib_config | VertexAttribData::Param4;
 					log_debug_verbose("For shader with handle[%u], param4 attribute is named [%s]", handle(), name);
 					break;
 				case VertexAttribLocation::Param5:
-					attrib_config = attrib_config | VertexAttribData_Param5;
+					attrib_config = attrib_config | VertexAttribData::Param5;
 					log_debug_verbose("For shader with handle[%u], param5 attribute is named [%s]", handle(), name);
 					break;
 				}
@@ -572,12 +570,7 @@ namespace e186
 
 		if (has_bone_weights && has_bone_indices)
 		{
-			attrib_config = attrib_config | VertexAttribData_Bones;
-		}
-
-		if (has_tangents || has_bitangents)
-		{
-			attrib_config = attrib_config | VertexAttribData_TangentSpace;
+			attrib_config = attrib_config | VertexAttribData::Bones;
 		}
 
 		m_vertex_attrib_config = attrib_config;
@@ -941,15 +934,18 @@ namespace e186
 		RenderVAO(shader, Mesh::GetOrCreateVAOForShader(mesh, shader), mesh.indices_length());
 	}
 
-	void RenderMeshes(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos)
+	void RenderMeshes(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos)
 	{
+		// If the following assert fails, you are probably trying to render using the wrong shader!
+		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
+
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)
 		{
 			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
 		}
 
-		for (auto& tupl : meshes_and_their_vaos)
+		for (auto& tupl : meshes_and_their_vaos.m_mesh_vaos)
 		{
 			Mesh& mesh = std::get<0>(tupl);
 			VAOType vao = std::get<1>(tupl);
@@ -959,23 +955,27 @@ namespace e186
 		}
 	}
 
-	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const std::vector<std::tuple<MeshRef, VAOType>>& meshes_and_their_vaos, const std::vector<std::tuple<MeshRef, UniformSetter>>& uniform_setters)
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters)
 	{
+		// If one of the following asserts fails, you are probably trying to render using the wrong shader!
+		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
+		assert(shader.handle() == uniform_setters.m_shader_handle);
+
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)
 		{
 			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
 		}
 
-		assert(meshes_and_their_vaos.size() == uniform_setters.size());
-		auto n = meshes_and_their_vaos.size();
+		assert(meshes_and_their_vaos.m_mesh_vaos.size() == uniform_setters.m_mesh_uniform_setters.size());
+		auto n = meshes_and_their_vaos.m_mesh_vaos.size();
 		for (auto i = 0; i < n; ++i)
 		{
-			auto& tupl = meshes_and_their_vaos[i];
+			auto& tupl = meshes_and_their_vaos.m_mesh_vaos[i];
 			Mesh& mesh = std::get<0>(tupl);
-			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters[i])));
+			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters.m_mesh_uniform_setters[i])));
 			VAOType vao = std::get<1>(tupl);
-			std::get<1>(uniform_setters[i])(shader, *mesh.material_data());
+			std::get<1>(uniform_setters.m_mesh_uniform_setters[i])(shader, *mesh.material_data());
 
 			glBindVertexArray(vao);
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);

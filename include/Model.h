@@ -41,7 +41,19 @@ namespace e186
 		// the default flags
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
+
+	struct MeshUniformSettersForShader
+	{
+		GLuint m_shader_handle;
+		std::vector<std::tuple<MeshRef, UniformSetter>> m_mesh_uniform_setters;
+	};
 	
+	struct MeshVaosForAttribConfig
+	{
+		VertexAttribData m_vertex_attrib_config;
+		std::vector<std::tuple<MeshRef, VAOType>> m_mesh_vaos;
+	};
+
 	class Model;
 	class Mesh
 	{
@@ -49,7 +61,7 @@ namespace e186
 
 		MeshIdx m_index;
 
-		unsigned int m_vertex_data_layout;
+		VertexAttribData m_vertex_data_layout;
 
 		GLuint m_vertex_data_vbo_id;
 		GLuint m_indices_vbo_id;
@@ -89,7 +101,7 @@ namespace e186
 		// Constructor - initialize everything
 		Mesh() :
 			m_index(-1),
-			m_vertex_data_layout(0),
+			m_vertex_data_layout(VertexAttribData::Nothing),
 			m_vertex_data_vbo_id(0),
 			m_indices_vbo_id(0),
 			m_indices_len(0),
@@ -122,7 +134,7 @@ namespace e186
 		void set_material_data(std::unique_ptr<MaterialData> mat_data) { m_material_data = std::move(mat_data); }
 
 		static VAOType GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader);
-		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexDataCfgType vertexDataConfig);
+		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);
 	};
 	
 	class Model
@@ -190,12 +202,12 @@ namespace e186
 		static std::string GetTextureNameFromMaterials(const aiScene* scene, unsigned int meshIndex, aiTextureType type);
 
 	public:
-		bool BindVAOForMesh(const unsigned int meshIndex, const unsigned int vertexDataConfig) const;
+		bool BindVAOForMesh(const unsigned int meshIndex, const VertexAttribData vertexDataConfig) const;
 		void UnbindVAO() const;
 
-		bool GenerateVAOsWithVertexAttribConfig(VertexDataCfgType vertexDataConfig);
+		bool GenerateVAOsWithVertexAttribConfig(VertexAttribData vertexDataConfig);
 		bool GenerateVAOsForShader(MeshIdx mesh_index, const Shader& shader);
-		VAOType GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexDataCfgType vertexDataConfig);
+		VAOType GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig);
 		VAOType GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader);
 
 		const glm::mat4& transformation_matrix() const;
@@ -248,9 +260,9 @@ namespace e186
 			return SelectMeshes([](const Mesh& mesh) { return true; });
 		}
 
-		static std::vector<std::tuple<MeshRef, UniformSetter>> CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshUniformSettersForShader CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes);
 
-		static std::vector<std::tuple<MeshRef, VAOType>> GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshVaosForAttribConfig GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes);
 
 		Mesh& mesh_at(unsigned int meshIndex);
 
