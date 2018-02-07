@@ -52,7 +52,7 @@ namespace e186
 		Shader& QueryOptionalUniformLocation(const std::string& name);
 		Shader& QueryUniformLocation(const std::string& name);
 		Shader& QueryMandatoryUniformLocation(const std::string& name);
-		Shader& DeclareAutoMatrix(std::string name, unsigned int properties);
+		Shader& DeclareAutoMatrix(std::string name, AutoMatrix properties);
 		Shader& Destroy();
 		bool HasUniform(const std::string& name) const;
 		GLuint GetOptionalUniformLocation(const std::string& name);
@@ -221,9 +221,9 @@ namespace e186
 		std::array<GLuint, kMaxShaders> m_shaderHandles;
 		unsigned int m_vertex_attrib_config;
 		GLenum m_kind_of_primitives;
-		std::vector<std::tuple<std::string, unsigned int>> m_auto_matrices;
-		std::vector<std::tuple<GLuint, unsigned int>> m_auto_mats_action_config;
-		std::vector<std::tuple<GLuint, unsigned int>> m_auto_mats_action_config_nrm;
+		std::vector<std::tuple<std::string, AutoMatrix>> m_auto_matrices;
+		std::vector<std::tuple<GLuint, AutoMatrix>> m_auto_mats_action_config;
+		std::vector<std::tuple<GLuint, AutoMatrix>> m_auto_mats_action_config_nrm;
 		std::array<bool, 16> m_auto_mat_do_calc;
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;

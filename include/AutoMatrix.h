@@ -1,15 +1,27 @@
 #pragma once
 namespace e186
 {
-	enum AutoMatrix : unsigned int
+	enum struct AutoMatrix : uint32_t
 	{
-		AutoMatrix_Nothing				= 0x0000,
-		AutoMatrix_TransformMatrix		= 0x0001,
-		AutoMatrix_ModelMatrix			= 0x0002,
-		AutoMatrix_ViewMatrix			= 0x0004,
-		AutoMatrix_ProjectionMatrix		= 0x0008,
-		AutoMatrix_IsNormalMatrix		= 0x0010,
-		AutoMatrix_IsOptional			= 0x0020,
-		AutoMatrix_IsMandatory			= 0x0040,
+		Nothing				= 0x0000,
+		TransformMatrix		= 0x0001,
+		ModelMatrix			= 0x0002,
+		ViewMatrix			= 0x0004,
+		ProjectionMatrix	= 0x0008,
+		IsNormalMatrix		= 0x0010,
+		IsOptional			= 0x0020,
+		IsMandatory			= 0x0040,
 	};
+
+	inline AutoMatrix operator| (AutoMatrix a, AutoMatrix b)
+	{
+		typedef std::underlying_type<AutoMatrix>::type EnumType;
+		return static_cast<AutoMatrix>(static_cast<EnumType>(a) | static_cast<EnumType>(b));
+	}
+
+	inline AutoMatrix operator& (AutoMatrix a, AutoMatrix b)
+	{
+		typedef std::underlying_type<AutoMatrix>::type EnumType;
+		return static_cast<AutoMatrix>(static_cast<EnumType>(a) & static_cast<EnumType>(b));
+	}
 }

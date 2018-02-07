@@ -39,41 +39,41 @@ namespace e186
 		m_auto_mats_action_config_nrm(),
 		m_auto_mat_do_calc
 		{
-			false,  // 00 AutoMatrix_Nothing
-			false,  // 01 AutoMatrix_TransformMatrix	
-			false, 	// 02 AutoMatrix_ModelMatrix		
-			false, 	// 03 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix
-			false, 	// 04 AutoMatrix_ViewMatrix		
-			false, 	// 05 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix
-			false, 	// 06 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
-			false, 	// 07 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
-			false, 	// 08 AutoMatrix_ProjectionMatrix
-			false, 	// 09 AutoMatrix_TransformMatrix | AutoMatrix_ProjectionMatrix
-			false, 	// 10 AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
-			false, 	// 11 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
-			false, 	// 12 AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
-			false, 	// 13 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
-			false, 	// 14 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
-			false   // 15 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			false,  // 00 AutoMatrix::Nothing
+			false,  // 01 AutoMatrix::TransformMatrix	
+			false, 	// 02 AutoMatrix::ModelMatrix		
+			false, 	// 03 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix
+			false, 	// 04 AutoMatrix::ViewMatrix		
+			false, 	// 05 AutoMatrix::TransformMatrix | AutoMatrix::ViewMatrix
+			false, 	// 06 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix
+			false, 	// 07 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix
+			false, 	// 08 AutoMatrix::ProjectionMatrix
+			false, 	// 09 AutoMatrix::TransformMatrix | AutoMatrix::ProjectionMatrix
+			false, 	// 10 AutoMatrix::ModelMatrix | AutoMatrix::ProjectionMatrix
+			false, 	// 11 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ProjectionMatrix
+			false, 	// 12 AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
+			false, 	// 13 AutoMatrix::TransformMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
+			false, 	// 14 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
+			false   // 15 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		},
 		m_auto_mat_action_cache 
 		{
-			glm::mat4(1.0), // 00 AutoMatrix_Nothing
-			glm::mat4(1.0), // 01 AutoMatrix_TransformMatrix	
-			glm::mat4(1.0),	// 02 AutoMatrix_ModelMatrix		
-			glm::mat4(1.0),	// 03 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix
-			glm::mat4(1.0),	// 04 AutoMatrix_ViewMatrix		
-			glm::mat4(1.0),	// 05 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix
-			glm::mat4(1.0),	// 06 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
-			glm::mat4(1.0),	// 07 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
-			glm::mat4(1.0),	// 08 AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0),	// 09 AutoMatrix_TransformMatrix | AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0),	// 10 AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0),	// 11 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0),	// 12 AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0),	// 13 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0),	// 14 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
-			glm::mat4(1.0)	// 15 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+			glm::mat4(1.0), // 00 AutoMatrix::Nothing
+			glm::mat4(1.0), // 01 AutoMatrix::TransformMatrix	
+			glm::mat4(1.0),	// 02 AutoMatrix::ModelMatrix		
+			glm::mat4(1.0),	// 03 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix
+			glm::mat4(1.0),	// 04 AutoMatrix::ViewMatrix		
+			glm::mat4(1.0),	// 05 AutoMatrix::TransformMatrix | AutoMatrix::ViewMatrix
+			glm::mat4(1.0),	// 06 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix
+			glm::mat4(1.0),	// 07 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix
+			glm::mat4(1.0),	// 08 AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0),	// 09 AutoMatrix::TransformMatrix | AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0),	// 10 AutoMatrix::ModelMatrix | AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0),	// 11 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0),	// 12 AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0),	// 13 AutoMatrix::TransformMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0),	// 14 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
+			glm::mat4(1.0)	// 15 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		},
 		m_auto_mat_calcers()
 	{
@@ -163,7 +163,7 @@ namespace e186
 	{
 		for (const auto& tpl : m_auto_matrices)
 		{
-			auto matidx = std::get<1>(tpl) & 0xF;
+			auto matidx = static_cast<uint8_t>(std::get<1>(tpl)) & 0xF;
 			m_auto_mat_do_calc[matidx] = true;
 		}
 	}
@@ -175,50 +175,50 @@ namespace e186
 			return;
 		}
 
-		// 00 AutoMatrix_Nothing
-		// 01 AutoMatrix_TransformMatrix	
-		// 02 AutoMatrix_ModelMatrix		
-		// 04 AutoMatrix_ViewMatrix		
-		// 08 AutoMatrix_ProjectionMatrix
+		// 00 AutoMatrix::Nothing
+		// 01 AutoMatrix::TransformMatrix	
+		// 02 AutoMatrix::ModelMatrix		
+		// 04 AutoMatrix::ViewMatrix		
+		// 08 AutoMatrix::ProjectionMatrix
 
-		// 03 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix
+		// 03 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix
 		if (m_auto_mat_do_calc[3]) {
 			m_auto_mat_calcers.push_back([this]() {
 				m_auto_mat_action_cache[3] = m_auto_mat_action_cache[2] * m_auto_mat_action_cache[1];
 			});
 		}
-		// 05 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix
+		// 05 AutoMatrix::TransformMatrix | AutoMatrix::ViewMatrix
 		if (m_auto_mat_do_calc[5]) {
 			m_auto_mat_calcers.push_back([this]() {
 				m_auto_mat_action_cache[5] = m_auto_mat_action_cache[4] * m_auto_mat_action_cache[1];
 			});
 		}
-		// 06 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+		// 06 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix
 		if (m_auto_mat_do_calc[6]) {
 			m_auto_mat_calcers.push_back([this]() {
 				m_auto_mat_action_cache[6] = m_auto_mat_action_cache[4] * m_auto_mat_action_cache[2];
 			});
 		}
-		// 09 AutoMatrix_TransformMatrix | AutoMatrix_ProjectionMatrix
+		// 09 AutoMatrix::TransformMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[9]) {
 			m_auto_mat_calcers.push_back([this]() {
 				m_auto_mat_action_cache[9] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[1];
 			});
 		}
-		// 10 AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+		// 10 AutoMatrix::ModelMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[10]) {
 			m_auto_mat_calcers.push_back([this]() {
 				m_auto_mat_action_cache[10] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[2];
 			});
 		}
-		// 12 AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		// 12 AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[12]) {
 			m_auto_mat_calcers.push_back([this]() {
 				m_auto_mat_action_cache[12] = m_auto_mat_action_cache[8] * m_auto_mat_action_cache[4];
 			});
 		}
 
-		// 07 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix
+		// 07 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix
 		if (m_auto_mat_do_calc[7]) {
 			if (m_auto_mat_do_calc[3]) {
 				m_auto_mat_calcers.push_back([this]() {
@@ -236,7 +236,7 @@ namespace e186
 				});
 			}
 		}
-		// 11 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ProjectionMatrix
+		// 11 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[11]) {
 			if (m_auto_mat_do_calc[3]) {
 				m_auto_mat_calcers.push_back([this]() {
@@ -254,7 +254,7 @@ namespace e186
 				});
 			}
 		}
-		// 13 AutoMatrix_TransformMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		// 13 AutoMatrix::TransformMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[13]) {
 			if (m_auto_mat_do_calc[5]) {
 				m_auto_mat_calcers.push_back([this]() {
@@ -272,7 +272,7 @@ namespace e186
 				});
 			}
 		}
-		// 14 AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		// 14 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[14]) {
 			if (m_auto_mat_do_calc[6]) {
 				m_auto_mat_calcers.push_back([this]() {
@@ -291,7 +291,7 @@ namespace e186
 			}
 		}
 
-		// 15 AutoMatrix_TransformMatrix | AutoMatrix_ModelMatrix | AutoMatrix_ViewMatrix | AutoMatrix_ProjectionMatrix
+		// 15 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		if (m_auto_mat_do_calc[15]) {
 			if (m_auto_mat_do_calc[7]) {
 				m_auto_mat_calcers.push_back([this]() {
@@ -337,10 +337,10 @@ namespace e186
 		{
 			const auto& name = std::get<0>(tpl);
 			auto params = std::get<1>(tpl);
-			auto matidx = params & 0xF;
-			auto is_normal_matrix = (params & AutoMatrix_IsNormalMatrix) != 0;
-			auto is_optional = (params & AutoMatrix_IsOptional) != 0;
-			auto is_mandatory = (params & AutoMatrix_IsMandatory) != 0;
+			auto matidx = static_cast<uint8_t>(params) & 0xF;
+			auto is_normal_matrix = (params & AutoMatrix::IsNormalMatrix) != AutoMatrix::Nothing;
+			auto is_optional = (params & AutoMatrix::IsOptional) != AutoMatrix::Nothing;
+			auto is_mandatory = (params & AutoMatrix::IsMandatory) != AutoMatrix::Nothing;
 
 			GLuint loc;
 			if (is_mandatory)
@@ -598,10 +598,10 @@ namespace e186
 	void Shader::SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix)
 	{
 		// update the four base matrices in cache
-		m_auto_mat_action_cache[AutoMatrix_TransformMatrix] = transformationMatrix;
-		m_auto_mat_action_cache[AutoMatrix_ModelMatrix] = modelMatrix;
-		m_auto_mat_action_cache[AutoMatrix_ViewMatrix] = viewMatrix;
-		m_auto_mat_action_cache[AutoMatrix_ProjectionMatrix] = projectionMatrix;
+		m_auto_mat_action_cache[static_cast<uint8_t>(AutoMatrix::TransformMatrix)] = transformationMatrix;
+		m_auto_mat_action_cache[static_cast<uint8_t>(AutoMatrix::ModelMatrix)] = modelMatrix;
+		m_auto_mat_action_cache[static_cast<uint8_t>(AutoMatrix::ViewMatrix)] = viewMatrix;
+		m_auto_mat_action_cache[static_cast<uint8_t>(AutoMatrix::ProjectionMatrix)] = projectionMatrix;
 		// update the rest of the matrices
 		for (const auto& fu : m_auto_mat_calcers)
 		{
@@ -610,11 +610,11 @@ namespace e186
 		// upload matrices to shader
 		for (const auto& tpl : m_auto_mats_action_config_nrm)
 		{
-			SetUniform(std::get<0>(tpl), glm::mat3(glm::inverseTranspose(m_auto_mat_action_cache[std::get<1>(tpl)])));
+			SetUniform(std::get<0>(tpl), glm::mat3(glm::inverseTranspose(m_auto_mat_action_cache[static_cast<uint8_t>(std::get<1>(tpl))])));
 		}
 		for (const auto& tpl : m_auto_mats_action_config)
 		{
-			SetUniform(std::get<0>(tpl), m_auto_mat_action_cache[std::get<1>(tpl)]);
+			SetUniform(std::get<0>(tpl), m_auto_mat_action_cache[static_cast<uint8_t>(std::get<1>(tpl))]);
 		}
 	}
 
@@ -769,7 +769,7 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::DeclareAutoMatrix(std::string name, unsigned int properties)
+	Shader& Shader::DeclareAutoMatrix(std::string name, AutoMatrix properties)
 	{
 		for (const auto& tpl : m_auto_matrices)
 		{
