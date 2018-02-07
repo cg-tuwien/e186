@@ -32,6 +32,9 @@ namespace e186
 		void RenderGizmos(Camera& camera);
 
 	private:
+		static void TW_CALL SetUniformPositionOffsetCallback(const void *value, void *clientData);
+		static void TW_CALL GetUniformPositionOffsetCallback(void *value, void *clientData);
+
 		static void TW_CALL SetLightColorForAllCallback(const void *value, void *clientData);
 		static void TW_CALL GetLightColorForAllCallback(void *value, void *clientData);
 		static void TW_CALL SetConstAttenuationForAllCallback(const void *value, void *clientData);
@@ -64,9 +67,12 @@ namespace e186
 		std::unique_ptr<Model> m_sphere;
 		Shader m_gizmo_shader;
 		std::vector<PointLight*> m_point_lights;
+		std::vector<glm::vec3> m_point_lights_orig_pos;
+		std::vector<std::tuple<LightsourceEditor*, size_t>> m_point_lights_tw_index_helper;
 		AntTweakBarHandle m_tweak_bar;
 		float m_transparency;
 		float m_gizmo_scale;
 		float m_gizmo_param;
+		glm::vec3 m_uniform_position_offset;
 	};
 }

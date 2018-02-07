@@ -68,6 +68,24 @@ namespace e186
 		}
 	}
 
+	void TW_CALL LightsourceEditor::GetUniformPositionOffsetCallback(void *value, void *clientData)
+	{
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		*reinterpret_cast<glm::vec3*>(value) = thiz->m_uniform_position_offset;
+	}
+
+	void TW_CALL LightsourceEditor::SetUniformPositionOffsetCallback(const void *value, void *clientData)
+	{
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
+		thiz->m_uniform_position_offset = *reinterpret_cast<const glm::vec3*>(value);
+		// Update all lights' positions
+		auto n = thiz->m_point_lights.size();
+		for (auto i = 0; i < n; ++i)
+		{
+			thiz->m_point_lights[i]->set_position(thiz->m_point_lights_orig_pos[i] + thiz->m_uniform_position_offset);
+		}
+	}
+
 	void TW_CALL LightsourceEditor::SetLightColorForAllCallback(const void *value, void *clientData)
 	{
 		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
@@ -133,14 +151,19 @@ namespace e186
 
 	void TW_CALL LightsourceEditor::SetPositionCallback(const void *value, void *clientData)
 	{
-		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
-		ptlt->set_position(*reinterpret_cast<const glm::vec3*>(value));
+		auto* tpl = reinterpret_cast<std::tuple<LightsourceEditor*, size_t>*>(clientData);
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(std::get<0>(*tpl));
+		auto index = std::get<1>(*tpl);
+		thiz->m_point_lights[index]->set_position(*reinterpret_cast<const glm::vec3*>(value));
+		thiz->m_point_lights_orig_pos[index] = thiz->m_point_lights[index]->position();
 	}
 
 	void TW_CALL LightsourceEditor::GetPositionCallback(void *value, void *clientData)
 	{
-		auto* ptlt = reinterpret_cast<PointLight*>(clientData);
-		*reinterpret_cast<glm::vec3*>(value) = ptlt->position();
+		auto* tpl = reinterpret_cast<std::tuple<LightsourceEditor*, size_t>*>(clientData);
+		auto* thiz = reinterpret_cast<LightsourceEditor*>(std::get<0>(*tpl));
+		auto index = std::get<1>(*tpl);
+		*reinterpret_cast<glm::vec3*>(value) = thiz->m_point_lights[index]->position();
 	}
 
 	void TW_CALL LightsourceEditor::SetLightColorCallback(const void *value, void *clientData)
@@ -219,19 +242,25 @@ namespace e186
 	LightsourceEditor::LightsourceEditor() :
 		m_gizmo_shader(),
 		m_point_lights(),
+		m_point_lights_orig_pos(),
+		m_point_lights_tw_index_helper(),
 		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Lightsource Gizmos")),
 		m_transparency(.3f),
 		m_gizmo_scale(40.0f),
-		m_gizmo_param(4.0f)
+		m_gizmo_param(4.0f),
+		m_uniform_position_offset(0.0f, 0.0f, 0.0f)
 	{
 		m_sphere = Model::LoadFromFile("assets/models/sphere.obj", glm::mat4(1.0f), MOLF_triangulate | MOLF_smoothNormals);
 		m_gizmo_shader.AddVertexShaderSourceFromFile("assets/shaders/translucent_gizmo.vert")
 			.AddFragmentShaderSourceFromFile("assets/shaders/translucent_gizmo.frag", { std::make_tuple(0, "oFragColor") })
 			.Build();
 		m_point_lights.reserve(kMaxPointLights);
+		m_point_lights_orig_pos.reserve(kMaxPointLights);
+		m_point_lights_tw_index_helper.reserve(kMaxPointLights);
 
 		TwAddButton(m_tweak_bar, "Enable all", EnableAllCallback, this, nullptr);
 		TwAddButton(m_tweak_bar, "Disable all", DisableAllCallback, this, nullptr);
+		TwAddVarCB(m_tweak_bar, "Offset", TW_TYPE_DIR3F, SetUniformPositionOffsetCallback, GetUniformPositionOffsetCallback, this, nullptr);
 		TwAddVarCB(m_tweak_bar, "Set light color for all", TW_TYPE_COLOR3F, SetLightColorForAllCallback, GetLightColorForAllCallback, this, nullptr);
 		TwAddVarCB(m_tweak_bar, "Set const-atten for all", TW_TYPE_FLOAT, SetConstAttenuationForAllCallback, GetConstAttenuationForAllCallback, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "Set lin-atten for all", TW_TYPE_FLOAT, SetLinearAttenuationForAllCallback, GetLinearAttenuationForAllCallback, this, " min=0.0 step=0.01 ");
@@ -255,12 +284,19 @@ namespace e186
 			return;
 		}
 
+		auto insert_index = n;
 		m_point_lights.push_back(point_light);
+		m_point_lights_orig_pos.push_back(point_light->position());
+		m_point_lights[insert_index]->set_position(m_point_lights_orig_pos[insert_index] + m_uniform_position_offset);
+		m_point_lights_tw_index_helper.push_back(std::make_tuple(this, insert_index));
+		assert(m_point_lights.size() == m_point_lights_orig_pos.size());
+		assert(m_point_lights.size() == m_point_lights_tw_index_helper.size());
+		assert(m_point_lights.size() == insert_index + 1);
 
 		auto name = "PL #" + std::to_string(n);
 		auto groupAssignment = " group='" + name + "' ";
 		TwAddVarCB(m_tweak_bar, (name + " enabled").c_str(), TW_TYPE_BOOLCPP, SetEnabledCallback, GetEnabledCallback, point_light, groupAssignment.c_str());
-		TwAddVarCB(m_tweak_bar, (name + " pos").c_str(), TW_TYPE_DIR3F, SetPositionCallback, GetPositionCallback, point_light, groupAssignment.c_str());
+		TwAddVarCB(m_tweak_bar, (name + " pos").c_str(), TW_TYPE_DIR3F, SetPositionCallback, GetPositionCallback, &m_point_lights_tw_index_helper[insert_index], groupAssignment.c_str());
 		TwAddVarCB(m_tweak_bar, (name + " light-col").c_str(), TW_TYPE_COLOR3F, SetLightColorCallback, GetLightColorCallback, point_light, groupAssignment.c_str());
 		TwAddVarCB(m_tweak_bar, (name + " const-att").c_str(), TW_TYPE_FLOAT, SetConstAttenuationCallback, GetConstAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " linear-att").c_str(), TW_TYPE_FLOAT, SetLinearAttenuationCallback, GetLinearAttenuationCallback, point_light, (" min=0.0 step=0.01 " + groupAssignment).c_str());
