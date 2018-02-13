@@ -17,6 +17,7 @@ namespace e186
 		LightsourceEditor();
 		~LightsourceEditor();
 
+		void Set(DirectionalLight* directional_light);
 		void Add(PointLight* point_light);
 		void Clear();
 
@@ -48,6 +49,13 @@ namespace e186
 		static void TW_CALL EnableAllCallback(void *clientData);
 		static void TW_CALL DisableAllCallback(void *clientData);
 
+		static void TW_CALL SetDLDirectionCallback(const void *value, void *clientData);
+		static void TW_CALL GetDLDirectionCallback(void *value, void *clientData);
+		static void TW_CALL SetDLLightColorCallback(const void *value, void *clientData);
+		static void TW_CALL GetDLLightColorCallback(void *value, void *clientData);
+		static void TW_CALL SetDLEnabledCallback(const void *value, void *clientData);
+		static void TW_CALL GetDLEnabledCallback(void *value, void *clientData);
+
 		static void TW_CALL SetPositionCallback(const void *value, void *clientData);
 		static void TW_CALL GetPositionCallback(void *value, void *clientData);
 		static void TW_CALL SetLightColorCallback(const void *value, void *clientData);
@@ -66,6 +74,7 @@ namespace e186
 	private:
 		std::unique_ptr<Model> m_sphere;
 		Shader m_gizmo_shader;
+		DirectionalLight* m_directional_light;
 		std::vector<PointLight*> m_point_lights;
 		std::vector<glm::vec3> m_point_lights_orig_pos;
 		std::vector<std::tuple<LightsourceEditor*, size_t>> m_point_lights_tw_index_helper;

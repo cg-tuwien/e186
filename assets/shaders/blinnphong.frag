@@ -7,6 +7,10 @@ uniform mat4 vmtMmatrix;
 uniform mat4 vMatrix;
 uniform mat3 vmtNormalMatrix;
 
+// directional light
+uniform vec3 uDirLight_direction = vec3(0, 0, 0); ///< light-direction in view-space, must be normalized
+uniform vec3 uDirLight_color = vec3(1, -1, 1);
+
 uniform vec3 uAmbientIllumination;
 
 uniform vec2 uTexCoordsScale = vec2(1, 1);
@@ -98,6 +102,10 @@ void main()
 	vec3 ambient = uAmbientIllumination * uAmbientReflectivity;
 	vec3 emissive = uEmissiveLight;
 	vec3 diffuse_and_specular  = vec3(0,0,0);
+
+    // directional light
+    if (uDirLight_direction.x != 0 || uDirLight_direction.y != 0 || uDirLight_direction.z != 0)
+        diffuse_and_specular = uDirLight_color * CalcBlinnPhongDiffAndSpecContribution(-uDirLight_direction, to_eye_nrm, normal, diff_tex_color);
 
 	for (int i = 0; i < uPointLights.length(); ++i)
 	{

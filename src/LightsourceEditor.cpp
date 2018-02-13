@@ -149,6 +149,44 @@ namespace e186
 		}
 	}
 
+
+	void TW_CALL LightsourceEditor::SetDLDirectionCallback(const void * value, void * clientData)
+	{
+		auto* dlt = reinterpret_cast<DirectionalLight*>(clientData);
+		dlt->set_light_direction(*reinterpret_cast<const glm::vec3*>(value));
+	}
+
+	void TW_CALL LightsourceEditor::GetDLDirectionCallback(void * value, void * clientData)
+	{
+		auto* dlt = reinterpret_cast<DirectionalLight*>(clientData);
+		*reinterpret_cast<glm::vec3*>(value) = dlt->light_direction();
+	}
+
+	void TW_CALL LightsourceEditor::SetDLLightColorCallback(const void *value, void *clientData)
+	{
+		auto* dlt = reinterpret_cast<DirectionalLight*>(clientData);
+		dlt->set_light_color(*reinterpret_cast<const glm::vec3*>(value));
+	}
+
+	void TW_CALL LightsourceEditor::GetDLLightColorCallback(void *value, void *clientData)
+	{
+		auto* dlt = reinterpret_cast<DirectionalLight*>(clientData);
+		*reinterpret_cast<glm::vec3*>(value) = dlt->light_color();
+	}
+
+	void TW_CALL LightsourceEditor::SetDLEnabledCallback(const void *value, void *clientData)
+	{
+		auto* dlt = reinterpret_cast<DirectionalLight*>(clientData);
+		dlt->set_enabled(*reinterpret_cast<const bool*>(value));
+	}
+
+	void TW_CALL LightsourceEditor::GetDLEnabledCallback(void *value, void *clientData)
+	{
+		auto* dlt = reinterpret_cast<DirectionalLight*>(clientData);
+		*reinterpret_cast<bool*>(value) = dlt->enabled();
+	}
+
+
 	void TW_CALL LightsourceEditor::SetPositionCallback(const void *value, void *clientData)
 	{
 		auto* tpl = reinterpret_cast<std::tuple<LightsourceEditor*, size_t>*>(clientData);
@@ -273,6 +311,15 @@ namespace e186
 
 	LightsourceEditor::~LightsourceEditor()
 	{
+	}
+
+	void LightsourceEditor::Set(DirectionalLight* directional_light)
+	{
+		m_directional_light = directional_light;
+		auto groupAssignment = " group='DL' ";
+		TwAddVarCB(m_tweak_bar, "enabled", TW_TYPE_BOOLCPP, SetDLEnabledCallback, GetDLEnabledCallback, directional_light, groupAssignment);
+		TwAddVarCB(m_tweak_bar, "direction", TW_TYPE_DIR3F, SetDLDirectionCallback, GetDLDirectionCallback, directional_light, groupAssignment);
+		TwAddVarCB(m_tweak_bar, "light-col", TW_TYPE_COLOR3F, SetDLLightColorCallback, GetDLLightColorCallback, directional_light, groupAssignment);
 	}
 
 	void LightsourceEditor::Add(PointLight* point_light)

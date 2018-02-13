@@ -5,19 +5,18 @@ namespace e186
 
 	DirectionalLight::DirectionalLight(const glm::vec3& color, const glm::vec3& direction)
 		: m_light_direction(glm::normalize(direction)),
-		m_diffuse_color(color),
-		m_specular_color(color)
+		m_light_color(color),
+		m_enabled(true)
 	{
 		
 	}
 
-	DirectionalLight::DirectionalLight(glm::vec3 diffuse_color, glm::vec3 specular_color, const glm::vec3& direction)
+	/*DirectionalLight::DirectionalLight(glm::vec3 light_color, const glm::vec3& direction)
 		: m_light_direction(glm::normalize(direction)),
-		m_diffuse_color(std::move(diffuse_color)),
-		m_specular_color(std::move(specular_color))
+		m_light_color(std::move(light_color))
 	{
 
-	}
+	}*/
 
 	DirectionalLight::~DirectionalLight()
 	{
@@ -36,14 +35,14 @@ namespace e186
 		m_light_direction = transform.GetFrontVector();
 	}
 
-	void DirectionalLight::set_diffuse_color(glm::vec3 color)
+	void DirectionalLight::set_light_color(glm::vec3 color)
 	{
-		m_diffuse_color = std::move(color);
+		m_light_color = std::move(color);
 	}
 
-	void DirectionalLight::set_specular_color(glm::vec3 color)
+	void DirectionalLight::set_enabled(bool is_enabled)
 	{
-		m_specular_color = std::move(color);
+		m_enabled = is_enabled;
 	}
 
 

@@ -6,7 +6,7 @@ namespace e186
 	{
 	public:
 		DirectionalLight(const glm::vec3& color, const glm::vec3& direction);
-		DirectionalLight(glm::vec3 diffuse_color, glm::vec3 specular_color, const glm::vec3& direction);
+		//DirectionalLight(glm::vec3 light_color, const glm::vec3& direction);
 		DirectionalLight(const DirectionalLight& other) noexcept = default;
 		DirectionalLight(DirectionalLight&& other) noexcept = default;
 		DirectionalLight& operator=(const DirectionalLight& other) noexcept = default;
@@ -14,18 +14,18 @@ namespace e186
 		~DirectionalLight();
 
 		const glm::vec3& light_direction() const { return m_light_direction; }
-		const glm::vec3& diffuse_color() const { return m_diffuse_color; }
-		const glm::vec3& specular_color() const { return m_specular_color; }
+		const glm::vec3& light_color() const { return m_light_color; }
+		bool enabled() const { return m_enabled; }
 
 		void set_light_direction(const glm::vec3& direction);
 		void set_light_direction(Transform& transform);
-		void set_diffuse_color(glm::vec3 color);
-		void set_specular_color(glm::vec3 color);
+		void set_light_color(glm::vec3 color);
+		void set_enabled(bool is_enabled);
 
 	private:
 		glm::vec3 m_light_direction;
-		glm::vec3 m_diffuse_color;
-		glm::vec3 m_specular_color;
+		glm::vec3 m_light_color;
+		bool m_enabled;
 	};
 
 }
