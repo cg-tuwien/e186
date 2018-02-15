@@ -2,11 +2,16 @@
 
 namespace e186
 {
+	struct DirectionalLightGpuData
+	{
+		glm::vec4 m_light_dir_vs;
+		glm::vec4 m_light_color;
+	};
+
 	class DirectionalLight
 	{
 	public:
 		DirectionalLight(const glm::vec3& color, const glm::vec3& direction);
-		//DirectionalLight(glm::vec3 light_color, const glm::vec3& direction);
 		DirectionalLight(const DirectionalLight& other) noexcept = default;
 		DirectionalLight(DirectionalLight&& other) noexcept = default;
 		DirectionalLight& operator=(const DirectionalLight& other) noexcept = default;
@@ -21,6 +26,9 @@ namespace e186
 		void set_light_direction(Transform& transform);
 		void set_light_color(glm::vec3 color);
 		void set_enabled(bool is_enabled);
+
+		DirectionalLightGpuData GetGpuData(const glm::mat3& view_space_nrm_trans_mat) const;
+		void FillGpuDataIntoTarget(DirectionalLightGpuData& target, const glm::mat3& view_space_nrm_trans_mat) const;
 
 	private:
 		glm::vec3 m_light_direction;

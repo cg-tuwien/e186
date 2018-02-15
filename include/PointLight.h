@@ -2,14 +2,20 @@
 
 namespace e186
 {
+	struct PointLightGpuData
+	{
+		glm::vec4 m_position_vs;
+		glm::vec4 m_light_color;
+		glm::vec4 m_attenuation;
+	};
 
 	class PointLight
 	{
 	public:
-		PointLight(glm::vec3 color, const glm::vec3& position);
-		PointLight(glm::vec3 color, const glm::vec3& position, glm::vec4 attenuation);
-		PointLight(glm::vec3 color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten, float cub_atten);
-		PointLight(glm::vec3 color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten);
+		PointLight(const glm::vec3& color, const glm::vec3& position);
+		PointLight(const glm::vec3& color, const glm::vec3& position, const glm::vec4& attenuation);
+		PointLight(const glm::vec3& color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten, float cub_atten);
+		PointLight(const glm::vec3& color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten);
 		PointLight(const PointLight& other) noexcept = default;
 		PointLight(PointLight&& other) noexcept = default;
 		PointLight& operator=(const PointLight& other) noexcept = default;
@@ -34,6 +40,9 @@ namespace e186
 		void set_quadratic_attenuation(float attenuation);
 		void set_cubic_attenuation(float attenuation);
 		void set_enabled(bool is_enabled);
+
+		PointLightGpuData GetGpuData(const glm::mat4& view_space_trans_mat) const;
+		void FillGpuDataIntoTarget(PointLightGpuData& target, const glm::mat4& view_space_trans_mat) const;
 
 	private:
 		//Transform m_transform;

@@ -3,37 +3,37 @@
 namespace e186
 {
 
-	PointLight::PointLight(glm::vec3 color, const glm::vec3& position)
+	PointLight::PointLight(const glm::vec3& color, const glm::vec3& position)
 		//: m_transform( position ),
 		: m_position(position),
-		m_light_color(std::move(color)),
+		m_light_color(color),
 		m_attenuation(1.0f, 0.1f, 0.01f, 0.001f),
 		m_enabled{ true }
 	{
 	}
 
-	PointLight::PointLight(glm::vec3 color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten, float cub_atten)
+	PointLight::PointLight(const glm::vec3& color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten, float cub_atten)
 		//: m_transform( position ),
 		: m_position(position),
-		m_light_color(std::move(color)),
+		m_light_color(color),
 		m_attenuation(const_atten, lin_atten, quad_atten, cub_atten),
 		m_enabled{ true }
 	{
 	}
 
-	PointLight::PointLight(glm::vec3 color, const glm::vec3& position, glm::vec4 attenuation)
+	PointLight::PointLight(const glm::vec3& color, const glm::vec3& position, const glm::vec4& attenuation)
 		//: m_transform( position ),
 		: m_position(position),
-		m_light_color(std::move(color)),
+		m_light_color(color),
 		m_attenuation(std::move(attenuation)),
 		m_enabled{ true }
 	{
 	}
 
-	PointLight::PointLight(glm::vec3 color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten)
+	PointLight::PointLight(const glm::vec3& color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten)
 		//: m_transform( position ),
 		: m_position(transform.GetPosition()),
-		m_light_color(std::move(color)),
+		m_light_color(color),
 		m_attenuation(const_atten, lin_atten, quad_atten, cub_atten),
 		m_enabled{ true }
 	{
@@ -81,5 +81,28 @@ namespace e186
 	void PointLight::set_enabled(bool is_enabled)
 	{
 		m_enabled = is_enabled;
+	}
+
+	PointLightGpuData PointLight::GetGpuData(const glm::mat4& view_space_trans_mat) const
+	{
+		PointLightGpuData gdata;
+		FillGpuDataIntoTarget(gdata, view_space_trans_mat);
+		return gdata;
+	}
+
+	void PointLight::FillGpuDataIntoTarget(PointLightGpuData& target, const glm::mat4& view_space_trans_mat) const
+	{
+		if (m_enabled)
+		{
+			target.m_position_vs = view_space_trans_mat * glm::vec4(m_position, 0.0f);
+			target.m_light_color = glm::vec4(m_light_color, 1.0f);
+			target.m_attenuation = m_attenuation;
+		}
+		else
+		{
+			target.m_position_vs = glm::vec4(0.0f);
+			target.m_light_color = glm::vec4(0.0f);
+			target.m_attenuation = glm::vec4(0.0f);
+		}
 	}
 }
