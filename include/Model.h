@@ -46,13 +46,20 @@ namespace e186
 	{
 		GLuint m_shader_handle;
 		std::vector<std::tuple<MeshRef, UniformSetter>> m_mesh_uniform_setters;
+		MeshUniformSettersForShader() : m_shader_handle{0}, m_mesh_uniform_setters{} {}
 	};
 	
 	struct MeshVaosForAttribConfig
 	{
 		VertexAttribData m_vertex_attrib_config;
 		std::vector<std::tuple<MeshRef, VAOType>> m_mesh_vaos;
+		MeshVaosForAttribConfig() : m_vertex_attrib_config{VertexAttribData::Nothing}, m_mesh_vaos{} {}
 	};
+
+	void Append(MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append);
+	void Append(MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append);
+	MeshUniformSettersForShader Concatenate(const MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append);
+	MeshVaosForAttribConfig Concatenate(const MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append);
 
 	class Model;
 	class Mesh

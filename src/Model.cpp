@@ -986,6 +986,38 @@ namespace e186
 		return retval;
 	}
 
+	void Append(MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append)
+	{
+		assert(unisetters.m_shader_handle == 0 || unisetters.m_shader_handle == unisetters_to_append.m_shader_handle);
+		unisetters.m_shader_handle = unisetters_to_append.m_shader_handle;
+		unisetters.m_mesh_uniform_setters.insert(std::end(unisetters.m_mesh_uniform_setters), std::begin(unisetters_to_append.m_mesh_uniform_setters), std::end(unisetters_to_append.m_mesh_uniform_setters));
+	}
+
+	void Append(MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append)
+	{
+		assert(vaos.m_vertex_attrib_config == VertexAttribData::Nothing || vaos.m_vertex_attrib_config == vaos_to_append.m_vertex_attrib_config);
+		vaos.m_vertex_attrib_config = vaos_to_append.m_vertex_attrib_config;
+		vaos.m_mesh_vaos.insert(std::end(vaos.m_mesh_vaos), std::begin(vaos_to_append.m_mesh_vaos), std::end(vaos_to_append.m_mesh_vaos));
+	}
+
+	MeshUniformSettersForShader Concatenate(const MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append)
+	{
+		MeshUniformSettersForShader combined;
+		Append(combined, unisetters);
+		Append(combined, unisetters_to_append);
+		return combined;
+	}
+
+	MeshVaosForAttribConfig Concatenate(const MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append)
+	{
+		MeshVaosForAttribConfig combined;
+		Append(combined, vaos);
+		Append(combined, vaos_to_append);
+		return combined;
+	}
+
+
+
 	Mesh& Model::mesh_at(unsigned int meshIndex)
 	{
 		return m_meshes[meshIndex];
