@@ -27,8 +27,8 @@ namespace e186
 		void set_light_color(glm::vec3 color);
 		void set_enabled(bool is_enabled);
 
-		DirectionalLightGpuData GetGpuData(const glm::mat3& view_space_nrm_trans_mat) const;
-		void FillGpuDataIntoTarget(DirectionalLightGpuData& target, const glm::mat3& view_space_nrm_trans_mat) const;
+		DirectionalLightGpuData GetGpuData(const glm::mat3& nrm_mat) const;
+		void FillGpuDataIntoTarget(DirectionalLightGpuData& target, const glm::mat3& nrm_mat) const;
 
 	private:
 		glm::vec3 m_light_direction;

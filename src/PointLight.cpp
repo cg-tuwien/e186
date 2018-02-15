@@ -94,7 +94,7 @@ namespace e186
 	{
 		if (m_enabled)
 		{
-			target.m_position_vs = view_space_trans_mat * glm::vec4(m_position, 0.0f);
+			target.m_position_vs = view_space_trans_mat * glm::vec4(m_position, 1.0f);
 			target.m_light_color = glm::vec4(m_light_color, 1.0f);
 			target.m_attenuation = m_attenuation;
 		}

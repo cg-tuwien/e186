@@ -142,7 +142,25 @@ namespace e186
 			glBindImageTexture(unit, value.handle(), level, layered, layer, access, value.internal_format());
 			glUniform1i(location, static_cast<GLint>(unit));
 		}
-			
+
+		void SetLight(GLuint color_loc, const AmbientLightGpuData& data)
+		{
+			SetUniform(color_loc, data.m_light_color);
+		}
+
+		void SetLight(GLuint position_loc, GLuint color_loc, GLuint attenuation_loc, const PointLightGpuData& data)
+		{
+			SetUniform(position_loc, data.m_position_vs);
+			SetUniform(color_loc, data.m_light_color);
+			SetUniform(attenuation_loc, data.m_attenuation);
+		}
+
+		void SetLight(GLuint direction_loc, GLuint color_loc, const DirectionalLightGpuData& data)
+		{
+			SetUniform(direction_loc, data.m_light_dir_vs);
+			SetUniform(color_loc, data.m_light_color);
+		}
+
 
 		template <typename... Args>
 		void SetOptionalUniform(const std::string uniform_name, Args&&... args)
@@ -205,6 +223,68 @@ namespace e186
 		{
 			SetImageTexture(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
+
+
+		void SetOptionalLight(const std::string uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
+		{
+			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
+			if (-1 != color_loc) 
+				SetLight(color_loc, data);
+		}
+		void SetLight(const std::string uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
+		{
+			const auto color_loc = GetUniformLocation(uniform_name + color_member);
+			SetLight(color_loc, data);
+		}
+		void SetMandatoryLight(const std::string uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
+		{
+			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
+			SetLight(color_loc, data);
+		}
+		
+		void SetOptionalLight(const std::string uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
+		{
+			const auto dir_loc = GetOptionalUniformLocation(uniform_name + direction_member);
+			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
+			if (-1 != color_loc && -1 != dir_loc) 
+				SetLight(dir_loc, color_loc, data);
+		}
+		void SetLight(const std::string uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
+		{
+			const auto dir_loc = GetUniformLocation(uniform_name + direction_member);
+			const auto color_loc = GetUniformLocation(uniform_name + color_member);
+			SetLight(dir_loc, color_loc, data);
+		}
+		void SetMandatoryLight(const std::string uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
+		{
+			const auto dir_loc = GetMandatoryUniformLocation(uniform_name + direction_member);
+			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
+			SetLight(dir_loc, color_loc, data);
+		}
+
+		void SetOptionalLight(const std::string uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
+		{
+			const auto pos_loc = GetOptionalUniformLocation(uniform_name + position_member);
+			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
+			const auto atten_loc = GetOptionalUniformLocation(uniform_name + attenuation_member);
+			if (-1 != pos_loc && -1 != color_loc && -1 != atten_loc)
+				SetLight(pos_loc, color_loc, atten_loc, data);
+		}
+		void SetLight(const std::string uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
+		{
+			const auto pos_loc = GetUniformLocation(uniform_name + position_member);
+			const auto color_loc = GetUniformLocation(uniform_name + color_member);
+			const auto atten_loc = GetUniformLocation(uniform_name + attenuation_member);
+			SetLight(pos_loc, color_loc, atten_loc, data);
+		}
+		void SetMandatoryLight(const std::string uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
+		{
+			const auto pos_loc = GetMandatoryUniformLocation(uniform_name + position_member);
+			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
+			const auto atten_loc = GetMandatoryUniformLocation(uniform_name + attenuation_member);
+			SetLight(pos_loc, color_loc, atten_loc, data);
+		}
+
 
 	private:
 		GLuint m_prog_handle;

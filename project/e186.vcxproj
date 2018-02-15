@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\AmbientLight.h" />
     <ClInclude Include="..\include\Animator.h" />
     <ClInclude Include="..\include\AntTweakBarManager.h" />
     <ClInclude Include="..\include\AutoMatrix.h" />
@@ -52,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\external\src\glad.cpp" />
+    <ClCompile Include="..\src\AmbientLight.cpp" />
     <ClCompile Include="..\src\Animator.cpp" />
     <ClCompile Include="..\src\AntTweakBarManager.cpp" />
     <ClCompile Include="..\src\Camera.cpp" />

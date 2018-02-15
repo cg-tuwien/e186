@@ -56,4 +56,5 @@ namespace e186
 			target.m_light_color = glm::vec4(0.0f);
 		}
 	}
+
 }

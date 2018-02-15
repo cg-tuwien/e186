@@ -231,6 +231,9 @@
     <ClInclude Include="..\include\AutoMatrix.h">
       <Filter>Header Files\shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\AmbientLight.h">
+      <Filter>Header Files\lightsources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
@@ -328,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="..\src\LightsourceEditor.cpp">
       <Filter>Source Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\AmbientLight.cpp">
+      <Filter>Source Files\lightsources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

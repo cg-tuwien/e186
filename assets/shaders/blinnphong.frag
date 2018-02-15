@@ -7,8 +7,6 @@ uniform mat4 vmtMmatrix;
 uniform mat4 vMatrix;
 uniform mat3 vmtNormalMatrix;
 
-uniform vec3 uAmbientIllumination;
-
 uniform vec2 uTexCoordsScale = vec2(1, 1);
 
 // Material data:
@@ -20,6 +18,13 @@ layout(location = 116) uniform float uShininess;
 layout(location = 120) uniform sampler2D uDiffuseTexSampler;
 //layout(location = 127) uniform sampler2D uOpacityTexSampler;
 // ----------------------------------------------
+
+// #################### Lights ##################
+struct AmbientLightData
+{
+	vec4 color;
+};
+uniform AmbientLightData uAmbientLight;
 
 // ################## SSBO DATA #################
 // Match the structure in the C++ code
@@ -106,7 +111,7 @@ void main()
 	vec3 diff_tex_color = texture(uDiffuseTexSampler, scaledTexCoords).rgb;
 	
 	// initialize all the colors
-	vec3 ambient = uAmbientIllumination * uAmbientReflectivity;
+	vec3 ambient = uAmbientLight.color.rgb * uAmbientReflectivity;
 	vec3 emissive = uEmissiveLight;
 	vec3 diffuse_and_specular  = vec3(0,0,0);
 

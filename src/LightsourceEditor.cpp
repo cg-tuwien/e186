@@ -187,6 +187,32 @@ namespace e186
 	}
 
 
+	void TW_CALL LightsourceEditor::SetAmbientLightColorCallback(const void *value, void *clientData)
+	{
+		auto* alt = reinterpret_cast<AmbientLight*>(clientData);
+		alt->set_light_color(*reinterpret_cast<const glm::vec3*>(value));
+	}
+
+	void TW_CALL LightsourceEditor::GetAmbientLightColorCallback(void *value, void *clientData)
+	{
+		auto* alt = reinterpret_cast<AmbientLight*>(clientData);
+		*reinterpret_cast<glm::vec3*>(value) = alt->light_color();
+	}
+
+	void TW_CALL LightsourceEditor::SetAmbientEnabledCallback(const void *value, void *clientData)
+	{
+		auto* alt = reinterpret_cast<AmbientLight*>(clientData);
+		alt->set_enabled(*reinterpret_cast<const bool*>(value));
+	}
+
+	void TW_CALL LightsourceEditor::GetAmbientEnabledCallback(void *value, void *clientData)
+	{
+		auto* alt = reinterpret_cast<AmbientLight*>(clientData);
+		*reinterpret_cast<bool*>(value) = alt->enabled();
+	}
+
+
+
 	void TW_CALL LightsourceEditor::SetPositionCallback(const void *value, void *clientData)
 	{
 		auto* tpl = reinterpret_cast<std::tuple<LightsourceEditor*, size_t>*>(clientData);
@@ -282,7 +308,7 @@ namespace e186
 		m_point_lights(),
 		m_point_lights_orig_pos(),
 		m_point_lights_tw_index_helper(),
-		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Lightsource Gizmos")),
+		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Lightsources")),
 		m_transparency(.3f),
 		m_gizmo_scale(40.0f),
 		m_gizmo_param(4.0f),
@@ -296,8 +322,8 @@ namespace e186
 		m_point_lights_orig_pos.reserve(kMaxPointLights);
 		m_point_lights_tw_index_helper.reserve(kMaxPointLights);
 
-		TwAddButton(m_tweak_bar, "Enable all", EnableAllCallback, this, nullptr);
-		TwAddButton(m_tweak_bar, "Disable all", DisableAllCallback, this, nullptr);
+		TwAddButton(m_tweak_bar, "Enable all point lights", EnableAllCallback, this, nullptr);
+		TwAddButton(m_tweak_bar, "Disable all point lights", DisableAllCallback, this, nullptr);
 		TwAddVarCB(m_tweak_bar, "Offset", TW_TYPE_DIR3F, SetUniformPositionOffsetCallback, GetUniformPositionOffsetCallback, this, nullptr);
 		TwAddVarCB(m_tweak_bar, "Set light color for all", TW_TYPE_COLOR3F, SetLightColorForAllCallback, GetLightColorForAllCallback, this, nullptr);
 		TwAddVarCB(m_tweak_bar, "Set const-atten for all", TW_TYPE_FLOAT, SetConstAttenuationForAllCallback, GetConstAttenuationForAllCallback, this, " min=0.0 step=0.01 ");
@@ -313,10 +339,18 @@ namespace e186
 	{
 	}
 
+	void LightsourceEditor::Set(AmbientLight* ambient_light)
+	{
+		m_ambient_light = ambient_light;
+		auto groupAssignment = " group='Amb.Light' ";
+		TwAddVarCB(m_tweak_bar, "enabled", TW_TYPE_BOOLCPP, SetAmbientEnabledCallback, GetAmbientEnabledCallback, ambient_light, groupAssignment);
+		TwAddVarCB(m_tweak_bar, "light-col", TW_TYPE_COLOR3F, SetAmbientLightColorCallback, GetAmbientLightColorCallback, ambient_light, groupAssignment);
+	}
+
 	void LightsourceEditor::Set(DirectionalLight* directional_light)
 	{
 		m_directional_light = directional_light;
-		auto groupAssignment = " group='DL' ";
+		auto groupAssignment = " group='Dir.Light' ";
 		TwAddVarCB(m_tweak_bar, "enabled", TW_TYPE_BOOLCPP, SetDLEnabledCallback, GetDLEnabledCallback, directional_light, groupAssignment);
 		TwAddVarCB(m_tweak_bar, "direction", TW_TYPE_DIR3F, SetDLDirectionCallback, GetDLDirectionCallback, directional_light, groupAssignment);
 		TwAddVarCB(m_tweak_bar, "light-col", TW_TYPE_COLOR3F, SetDLLightColorCallback, GetDLLightColorCallback, directional_light, groupAssignment);
