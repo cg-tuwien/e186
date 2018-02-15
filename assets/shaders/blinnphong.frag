@@ -7,10 +7,6 @@ uniform mat4 vmtMmatrix;
 uniform mat4 vMatrix;
 uniform mat3 vmtNormalMatrix;
 
-// directional light
-uniform vec3 uDirLight_direction = vec3(0, 0, 0); ///< light-direction in view-space, must be normalized
-uniform vec3 uDirLight_color = vec3(1, -1, 1);
-
 uniform vec3 uAmbientIllumination;
 
 uniform vec2 uTexCoordsScale = vec2(1, 1);
@@ -32,9 +28,15 @@ layout(location = 120) uniform sampler2D uDiffuseTexSampler;
 // and OpenGL
 struct PointLightData
 {
-  vec4 positionVS;
-  vec4 color;
-  vec4 atten;
+	vec4 positionVS;
+	vec4 color;
+	vec4 atten;
+};
+
+struct DirectionalLightData
+{
+	vec4 directionVS;
+	vec4 color;
 };
 
 // force this block to be assigned to index 0
@@ -43,7 +45,12 @@ struct PointLightData
 // make the packing consistent across OpenGL implementations
 layout(std430, binding = 0) buffer PointLightBlock
 {
-    PointLightData uPointLights[];
+	PointLightData uPointLights[];
+};
+
+layout(std430, binding = 2) buffer DirectionalLightBlock
+{
+	DirectionalLightData uDirectionalLight;
 };
 // ----------------------------------------------
 
@@ -65,9 +72,9 @@ out vec4 oFragColor;
 float CalcAttenuation(int lightIdx, float dist, float dist2, float dist3)
 {
 	return    uPointLights[lightIdx].atten[0]
-			+ uPointLights[lightIdx].atten[1] * dist
-			+ uPointLights[lightIdx].atten[2] * dist2
-			+ uPointLights[lightIdx].atten[3] * dist3;
+	        + uPointLights[lightIdx].atten[1] * dist
+	        + uPointLights[lightIdx].atten[2] * dist2
+	        + uPointLights[lightIdx].atten[3] * dist3;
 }
 
 // Calculates the diffuse and specular illumination contribution for the given
@@ -103,10 +110,12 @@ void main()
 	vec3 emissive = uEmissiveLight;
 	vec3 diffuse_and_specular  = vec3(0,0,0);
 
-    // directional light
-    if (uDirLight_direction.x != 0 || uDirLight_direction.y != 0 || uDirLight_direction.z != 0)
-        diffuse_and_specular = uDirLight_color * CalcBlinnPhongDiffAndSpecContribution(-uDirLight_direction, to_eye_nrm, normal, diff_tex_color);
-
+	// directional light
+	vec3 light_direction_vs = uDirectionalLight.directionVS.xyz;
+	vec3 light_intensity = uDirectionalLight.color.rgb;
+	diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(-light_direction_vs, to_eye_nrm, normal, diff_tex_color);
+	
+	// point lights
 	for (int i = 0; i < uPointLights.length(); ++i)
 	{
 		vec3 light_pos_vs = uPointLights[i].positionVS.xyz;
