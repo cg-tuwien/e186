@@ -5,7 +5,7 @@
 
 namespace e186
 {
-	Engine* Engine::current(nullptr);
+	Engine* Engine::g_current(nullptr);
 
 	Engine::Engine(GLFWwindow* mainWindow) :
 		m_mainWindow(mainWindow),
@@ -139,11 +139,11 @@ namespace e186
 
 	void Engine::glfw_windowsize_callback(GLFWwindow* window, int width, int height)
 	{
-		current->m_main_wnd_width = width;
-		current->m_main_wnd_height = height;
-		current->m_main_wnd_aspectRatio = static_cast<float>(current->m_main_wnd_width) / static_cast<float>(current->m_main_wnd_height);
+		current()->m_main_wnd_width = width;
+		current()->m_main_wnd_height = height;
+		current()->m_main_wnd_aspectRatio = static_cast<float>(current()->m_main_wnd_width) / static_cast<float>(current()->m_main_wnd_height);
 
-		for (auto* c : Engine::current->m_windowsize_callbacks)
+		for (auto* c : Engine::current()->m_windowsize_callbacks)
 		{
 			(*c)(window, width, height);
 		}
@@ -151,7 +151,7 @@ namespace e186
 
 	void Engine::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	{
-		for (auto& c : Engine::current->m_mouse_button_callbacks)
+		for (auto& c : Engine::current()->m_mouse_button_callbacks)
 		{
 			(*c)(window, button, action, mods);
 		}
@@ -159,7 +159,7 @@ namespace e186
 
 	void Engine::glfw_cursor_pos_callback(GLFWwindow* window, double xpos, double ypos)
 	{
-		for (auto& c : Engine::current->m_cursor_pos_callbacks)
+		for (auto& c : Engine::current()->m_cursor_pos_callbacks)
 		{
 			(*c)(window, xpos, ypos);
 		}
@@ -167,7 +167,7 @@ namespace e186
 
 	void Engine::glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	{
-		for (auto& c : Engine::current->m_scroll_callbacks)
+		for (auto& c : Engine::current()->m_scroll_callbacks)
 		{
 			(*c)(window, xoffset, yoffset);
 		}
@@ -175,19 +175,19 @@ namespace e186
 
 	void Engine::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		for (auto& c : Engine::current->m_key_callbacks)
+		for (auto& c : Engine::current()->m_key_callbacks)
 		{
 			(*c)(window, key, scancode, action, mods);
 		}
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		{
-			Engine::current->m_current_scene->Terminate();
+			Engine::current()->m_current_scene->Terminate();
 		}
 	}
 
 	void Engine::glfw_char_callback(GLFWwindow* window, unsigned int codepoint)
 	{
-		for (auto& c : Engine::current->m_char_callbacks)
+		for (auto& c : Engine::current()->m_char_callbacks)
 		{
 			(*c)(window, codepoint);
 		}
@@ -538,23 +538,23 @@ namespace e186
 			// initializes the GL extension loader library (glad).
 			// (has to be static, so that it gets destructed last)
 			static e186::Engine app(wnd);
-			e186::Engine::current = &app;
+			e186::Engine::g_current = &app;
 
 			// Set the root scene generation function, if we have one
 			if (root_scene_gen_func)
 			{
-				e186::Engine::current->SetRootSceneGenFunc(std::move(root_scene_gen_func));
+				e186::Engine::current()->SetRootSceneGenFunc(std::move(root_scene_gen_func));
 			}
 
 			// Set the first scene, if we have one
 			if (first_scene_gen_func)
 			{	
-				e186::Engine::current->SetNextScene(std::move(first_scene_gen_func()));
+				e186::Engine::current()->SetNextScene(std::move(first_scene_gen_func()));
 			}
 
 			// Let's go! This will load either the first scene or the root scene and run in a loop forever
 			// (Or, if no scene was set, it will return immediately and exit the application.)
-			e186::Engine::current->Run();
+			e186::Engine::current()->Run();
 		}
 		catch (e186::ExceptionWithCallstack& ecs)
 		{

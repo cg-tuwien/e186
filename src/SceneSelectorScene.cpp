@@ -23,13 +23,13 @@ namespace e186
 				}
 			}
 		};
-		Engine::current->SubscribeToKeyCallbacks(m_key_handler);
+		Engine::current()->SubscribeToKeyCallbacks(m_key_handler);
 	}
 
 
 	SceneSelectorScene::~SceneSelectorScene()
 	{
-		Engine::current->UnsubscribeFromKeyCallbacks(m_key_handler);
+		Engine::current()->UnsubscribeFromKeyCallbacks(m_key_handler);
 	}
 
 	void SceneSelectorScene::Terminate()
@@ -39,14 +39,14 @@ namespace e186
 
 	void SceneSelectorScene::Run()
 	{
-		auto twbar = Engine::current->tweak_bar_manager().create_new_tweak_bar("Scene Selector");
+		auto twbar = Engine::current()->tweak_bar_manager().create_new_tweak_bar("Scene Selector");
 		for (const auto& tup : m_scenes)
 		{
 			auto& name = std::get<0>(tup);
 			const std::function<void()>& func_ref = std::get<1>(tup);
 
 			TwAddButton(twbar, name.c_str(), [](void *clientData) {
-				//Engine::current->m_pending_actions.push([clientData]() {
+				//Engine::current()->m_pending_actions.push([clientData]() {
 					std::function<void()>* func = reinterpret_cast<std::function<void()>*>(clientData);
 					(*func)();
 				//});
@@ -56,14 +56,14 @@ namespace e186
 
 		while (!m_termination_requested)
 		{
-			Engine::current->BeginFrame();
+			Engine::current()->BeginFrame();
 
 			// render scene to back buffer
-			glViewport(0, 0, Engine::current->window_width(), Engine::current->window_height());
+			glViewport(0, 0, Engine::current()->window_width(), Engine::current()->window_height());
 			glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			Engine::current->EndFrame();
+			Engine::current()->EndFrame();
 		}
 	}
 }

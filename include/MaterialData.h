@@ -4,10 +4,10 @@
 
 namespace e186
 {
-	enum BlendMode : unsigned int
+	enum struct BlendMode : uint32_t
 	{
-		BlendMode_AlphaBlended,
-		BlendMode_Additive
+		AlphaBlended,
+		Additive
 	};
 
 	UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);

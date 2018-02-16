@@ -57,6 +57,7 @@ namespace e186
 		std::queue<std::function<void()>> m_pending_actions;
 
 	private:
+		static Engine* g_current;
 		GLFWwindow* m_mainWindow;
 		bool m_running;
 		int m_main_wnd_width;
@@ -83,7 +84,7 @@ namespace e186
 		Engine& operator=(const Engine&) = delete;
 		Engine& operator=(Engine&&) = delete;
 
-		static Engine* current;
+		static Engine* current() { return Engine::g_current; }
 
 		void SubscribeToWindowsizeCallbacks(std::function<void(GLFWwindow*, int, int)>& fu);
 		void SubscribeToWindowsizeCallbacks(std::function<void(GLFWwindow*, int, int)>&& fu);

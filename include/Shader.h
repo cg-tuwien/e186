@@ -10,7 +10,7 @@ namespace e186
 
 	class Shader
 	{
-		static GLuint Compile(const char* source, GLenum shaderType);
+		static GLuint Compile(GLsizei sources_count, const GLchar* const* sources, GLenum shaderType);
 		void CheckErrorAndPrintInfoLog(const char* gl_error_location_hint, const char* info_log_description);
 		void PrintInfoLog(const char* info_log_description);
 		void DetermineTessData();
@@ -22,6 +22,7 @@ namespace e186
 		void DetermineWhichAutoMatsToCalc();
 		void PrepareAutoMatActionConfigs();
 		void CreateAutoMatCalcers();
+		static std::vector<const GLchar*> GetAsCStrs(const std::vector<std::string>& string_array);
 
 	public:
 		Shader();
@@ -34,12 +35,17 @@ namespace e186
 		explicit operator GLuint() const;
 		GLuint handle() const;
 
-		Shader& AddVertexShaderSource(std::string shaderSource);
-		Shader& AddTesselationControlShaderSource(std::string shaderSource);
-		Shader& AddTesselationEvaluationShaderSource(std::string shaderSource);
-		Shader& AddGeometryShaderSource(std::string shaderSource);
-		Shader& AddFragmentShaderSource(std::string shaderSource, std::vector<std::tuple<GLuint, const GLchar*>> outputs);
-		Shader& AddComputeShaderSource(std::string shaderSource);
+		static std::string version_string();
+
+		Shader& AddVertexShaderSource(std::string shader_source);
+		Shader& AddTesselationControlShaderSource(std::string shader_source);
+		Shader& AddTesselationEvaluationShaderSource(std::string shader_source);
+		Shader& AddGeometryShaderSource(std::string shader_source);
+		Shader& AddFragmentShaderSource(std::string shader_source);
+		Shader& AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs);
+		Shader& AddFragmentShaderOutput(std::vector<std::tuple<GLuint, const GLchar*>> outputs);
+		Shader& AddComputeShaderSource(std::string shader_source);
+		Shader& AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders);
 		Shader& AddVertexShaderSourceFromFile(std::string path);
 		Shader& AddTesselationControlShaderSourceFromFile(std::string path);
 		Shader& AddTesselationEvaluationShaderSourceFromFile(std::string path);
@@ -60,9 +66,9 @@ namespace e186
 		GLuint GetOptionalUniformLocation(const std::string& name);
 		GLuint GetUniformLocation(const std::string& name);
 		GLuint GetMandatoryUniformLocation(const std::string& name);
-		bool HasTesselationShaders() const;
+		bool has_tesselation_shaders() const;
 		GLint patch_vertices() const;
-		bool HasGeometryShader() const;
+		bool has_geometry_shader() const;
 		VertexAttribData vertex_attrib_config() const;
 		GLenum kind_of_primitives() const;
 		void set_kind_of_primitives(GLenum mode);
@@ -150,7 +156,7 @@ namespace e186
 
 		void SetLight(GLuint position_loc, GLuint color_loc, GLuint attenuation_loc, const PointLightGpuData& data)
 		{
-			SetUniform(position_loc, data.m_position_vs);
+			SetUniform(position_loc, data.m_position);
 			SetUniform(color_loc, data.m_light_color);
 			SetUniform(attenuation_loc, data.m_attenuation);
 		}
@@ -288,12 +294,12 @@ namespace e186
 
 	private:
 		GLuint m_prog_handle;
-		std::string m_vertex_shader_source;
-		std::string m_tess_control_shader_source;
-		std::string m_tess_eval_shader_source;
-		std::string m_geometry_shader_source;
-		std::string m_fragment_shader_source;
-		std::string m_compute_shader_source;
+		std::vector<std::string> m_vertex_shader_sources;
+		std::vector<std::string> m_tess_control_shader_sources;
+		std::vector<std::string> m_tess_eval_shader_sources;
+		std::vector<std::string> m_geometry_shader_sources;
+		std::vector<std::string> m_fragment_shader_sources;
+		std::vector<std::string> m_compute_shader_sources;
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
 		std::unordered_map<std::string, GLuint> m_uniform_locations;
 		std::vector<const char*> m_transform_feedback_varyings;

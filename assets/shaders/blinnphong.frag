@@ -1,4 +1,3 @@
-#version 430 core
 #extension GL_ARB_explicit_uniform_location : enable
 
 // ################# UNIFORM DATA ###############
@@ -16,53 +15,53 @@ layout(location = 112) uniform vec3 uAmbientReflectivity;
 layout(location = 113) uniform vec3 uEmissiveLight;
 layout(location = 116) uniform float uShininess;
 layout(location = 120) uniform sampler2D uDiffuseTexSampler;
-//layout(location = 127) uniform sampler2D uOpacityTexSampler;
 // ----------------------------------------------
 
-// #################### Lights ##################
+// #################### LIGHTS ##################
 struct AmbientLightData
 {
 	vec4 color;
 };
-uniform AmbientLightData uAmbientLight;
-
-// ################## SSBO DATA #################
-// Match the structure in the C++ code
-// I don't use vec3 because padding
-// rules sometimes differ between c++
-// and OpenGL
-struct PointLightData
-{
-	vec4 positionVS;
-	vec4 color;
-	vec4 atten;
-};
 
 struct DirectionalLightData
 {
-	vec4 directionVS;
+	vec4 direction;
 	vec4 color;
 };
 
+struct PointLightData
+{
+	vec4 position;
+	vec4 color;
+	vec4 attenuation;
+};
+
+uniform AmbientLightData uAmbientLight;
+uniform DirectionalLightData uDirectionalLight;
+
+#if PARSER(A_VER <= A1_EXR)
+uniform PointLightData uPointLight;
+#else
+// ----> Upload PointLights as SSBO DATA <----
 // force this block to be assigned to index 0
-// std430 specifies that the structured data should
-// follow a specific set of packing rules. This will
-// make the packing consistent across OpenGL implementations
+// std430 specifies that the structured data 
+// should follow a specific set of packing 
+// rules. This will make the packing consistent 
+// across OpenGL implementations
 layout(std430, binding = 0) buffer PointLightBlock
 {
 	PointLightData uPointLights[];
 };
-
-layout(std430, binding = 2) buffer DirectionalLightBlock
-{
-	DirectionalLightData uDirectionalLight;
-};
+#endif
 // ----------------------------------------------
 
 // ################# VARYING DATA ###############
-in vec2 vTexCoords;
-in vec3 vPositionVS; ///< vertex position in view-space
-in vec3 vNormalVS;   ///< vertex normal in view-space
+in VertexData
+{
+	vec2 texCoords;
+	vec3 positionVS; ///< vertex position in view-space
+	vec3 normalVS;   ///< vertex normal in view-space
+} fs_in;
 // ----------------------------------------------
 
 // ################## OUTPUT DATA ###############
@@ -70,16 +69,14 @@ out vec4 oFragColor;
 // ----------------------------------------------
 
 // ############### HELPER FUNCTIONS #############
-// Calculates the light attenuation divident for the given light source.
+// Calculates the light attenuation divident for the given attenuation vector.
+// @param atten attenuation data
 // @param dist  distance
 // @param dist2 squared distance
 // @param dist3 cubed distance
-float CalcAttenuation(int lightIdx, float dist, float dist2, float dist3)
+float CalcAttenuation(vec4 atten, float dist, float dist2, float dist3)
 {
-	return    uPointLights[lightIdx].atten[0]
-	        + uPointLights[lightIdx].atten[1] * dist
-	        + uPointLights[lightIdx].atten[2] * dist2
-	        + uPointLights[lightIdx].atten[3] * dist3;
+	return atten[0] + atten[1] * dist + atten[2] * dist2 + atten[3] * dist3;
 }
 
 // Calculates the diffuse and specular illumination contribution for the given
@@ -100,41 +97,51 @@ vec3 CalcBlinnPhongDiffAndSpecContribution(vec3 to_light, vec3 to_eye, vec3 norm
 
 void main()
 {
-	//float opacity = texture(uOpacityTexSampler, vTexCoords).r;
-	//if (opacity == 0.0)
-	//	discard;
-
+	vec3 pos_vs = fs_in.positionVS;
 	vec3 eye_pos_vs = vec3(0.0, 0.0, 0.0);
-	vec3 to_eye_nrm = normalize(eye_pos_vs - vPositionVS);
-	vec3 normal = normalize(vNormalVS);
-	vec2 scaledTexCoords = uTexCoordsScale * vTexCoords;
+	vec3 to_eye_nrm_vs = normalize(eye_pos_vs - pos_vs);
+	vec3 normal_vs = normalize(fs_in.normalVS);
+	vec2 scaledTexCoords = uTexCoordsScale * fs_in.texCoords;
 	vec3 diff_tex_color = texture(uDiffuseTexSampler, scaledTexCoords).rgb;
 	
 	// initialize all the colors
-	vec3 ambient = uAmbientLight.color.rgb * uAmbientReflectivity;
+	vec3 ambient = uAmbientLight.color.rgb * uAmbientReflectivity * diff_tex_color;
 	vec3 emissive = uEmissiveLight;
 	vec3 diffuse_and_specular  = vec3(0,0,0);
 
 	// directional light
-	vec3 light_direction_vs = uDirectionalLight.directionVS.xyz;
-	vec3 light_intensity = uDirectionalLight.color.rgb;
-	diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(-light_direction_vs, to_eye_nrm, normal, diff_tex_color);
+	vec3 to_light_dir_vs = -uDirectionalLight.direction.xyz;
+	vec3 dl_intensity = uDirectionalLight.color.rgb;
+	diffuse_and_specular += dl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_dir_vs, to_eye_nrm_vs, normal_vs, diff_tex_color);
 	
+#if PARSER(A_VER <= A1_EXR)
+	// point light 1
+	vec3 light_pos_vs = uPointLight.position.xyz;
+	vec3 to_light = light_pos_vs - pos_vs;
+	float dist_sq = dot(to_light, to_light);
+	float dist = sqrt(dist_sq);
+	vec3 to_light_nrm = to_light / dist;
+	float atten = CalcAttenuation(uPointLight.attenuation, dist, dist_sq, dist * dist_sq);
+	vec3 pl_intensity = uPointLight.color.rgb / atten;
+	diffuse_and_specular += pl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm_vs, normal_vs, diff_tex_color);
+#else
 	// point lights
 	for (int i = 0; i < uPointLights.length(); ++i)
 	{
-		vec3 light_pos_vs = uPointLights[i].positionVS.xyz;
-		vec3 to_light = light_pos_vs - vPositionVS;
+		vec3 light_pos_vs = uPointLights[i].position.xyz;
+		vec3 to_light = light_pos_vs - pos_vs;
 		float dist_sq = dot(to_light, to_light);
 		float dist = sqrt(dist_sq);
 		vec3 to_light_nrm = to_light / dist;
 
-		float atten = CalcAttenuation(i, dist, dist_sq, dist * dist_sq);
-		vec3 light_intensity = uPointLights[i].color.rgb / atten;
+		float atten = CalcAttenuation(uPointLights[i].attenuation, dist, dist_sq, dist * dist_sq);
+		vec3 pl_intensity = uPointLights[i].color.rgb / atten;
 		
-		diffuse_and_specular += light_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm, normal, diff_tex_color);
+		diffuse_and_specular += pl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm_vs, normal_vs, diff_tex_color);
 	}
+#endif
 
 	// add all together
 	oFragColor = vec4(ambient + emissive + diffuse_and_specular, 1.0);
 }
+// ----------------------------------------------

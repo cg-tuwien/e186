@@ -12,7 +12,7 @@ namespace e186
 		m_transparent_color(1.0f, 1.0f, 1.0f),
 		m_wireframe_mode(false),
 		m_twosided(false),
-		m_blend_mode(BlendMode_AlphaBlended),
+		m_blend_mode(BlendMode::AlphaBlended),
 		m_opacity(1.0f),
 		m_shininess(0.0f),
 		m_shininess_strength(0.0f),
@@ -78,8 +78,8 @@ namespace e186
 
 		if (AI_SUCCESS == aimat->Get(AI_MATKEY_BLEND_FUNC, blendMode)) {
 			m_blend_mode = blendMode == aiBlendMode_Additive
-				? BlendMode_Additive
-				: BlendMode_AlphaBlended;
+				? BlendMode::Additive
+				: BlendMode::AlphaBlended;
 		}
 
 		if (AI_SUCCESS == aimat->Get(AI_MATKEY_OPACITY, floatVal)) {

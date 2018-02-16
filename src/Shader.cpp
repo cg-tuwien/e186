@@ -20,12 +20,12 @@ namespace e186
 
 	Shader::Shader()
 		: m_prog_handle(0),
-		m_vertex_shader_source(),
-		m_tess_control_shader_source(),
-		m_tess_eval_shader_source(),
-		m_geometry_shader_source(),
-		m_fragment_shader_source(),
-		m_compute_shader_source(),
+		m_vertex_shader_sources(),
+		m_tess_control_shader_sources(),
+		m_tess_eval_shader_sources(),
+		m_geometry_shader_sources(),
+		m_fragment_shader_sources(),
+		m_compute_shader_sources(),
 		m_fragment_outputs(),
 		m_uniform_locations(),
 		m_transform_feedback_varyings(),
@@ -81,12 +81,12 @@ namespace e186
 
 	Shader::Shader(Shader&& other) noexcept
 		: m_prog_handle(other.m_prog_handle),
-		m_vertex_shader_source(std::move(other.m_vertex_shader_source)),
-		m_tess_control_shader_source(std::move(other.m_tess_control_shader_source)),
-		m_tess_eval_shader_source(std::move(other.m_tess_eval_shader_source)),
-		m_geometry_shader_source(std::move(other.m_geometry_shader_source)),
-		m_fragment_shader_source(std::move(other.m_fragment_shader_source)),
-		m_compute_shader_source(std::move(other.m_compute_shader_source)),
+		m_vertex_shader_sources(std::move(other.m_vertex_shader_sources)),
+		m_tess_control_shader_sources(std::move(other.m_tess_control_shader_sources)),
+		m_tess_eval_shader_sources(std::move(other.m_tess_eval_shader_sources)),
+		m_geometry_shader_sources(std::move(other.m_geometry_shader_sources)),
+		m_fragment_shader_sources(std::move(other.m_fragment_shader_sources)),
+		m_compute_shader_sources(std::move(other.m_compute_shader_sources)),
 		m_fragment_outputs(std::move(other.m_fragment_outputs)),
 		m_uniform_locations(std::move(other.m_uniform_locations)),
 		m_transform_feedback_varyings(std::move(other.m_transform_feedback_varyings)),
@@ -125,12 +125,12 @@ namespace e186
 
 		m_kind_of_primitives = other.m_kind_of_primitives;
 
-		m_vertex_shader_source = std::move(other.m_vertex_shader_source);
-		m_tess_control_shader_source = std::move(other.m_tess_control_shader_source);
-		m_tess_eval_shader_source = std::move(other.m_tess_eval_shader_source);
-		m_geometry_shader_source = std::move(other.m_geometry_shader_source);
-		m_fragment_shader_source = std::move(other.m_fragment_shader_source);
-		m_compute_shader_source = std::move(other.m_compute_shader_source);
+		m_vertex_shader_sources = std::move(other.m_vertex_shader_sources);
+		m_tess_control_shader_sources = std::move(other.m_tess_control_shader_sources);
+		m_tess_eval_shader_sources = std::move(other.m_tess_eval_shader_sources);
+		m_geometry_shader_sources = std::move(other.m_geometry_shader_sources);
+		m_fragment_shader_sources = std::move(other.m_fragment_shader_sources);
+		m_compute_shader_sources = std::move(other.m_compute_shader_sources);
 		m_fragment_outputs = std::move(other.m_fragment_outputs);
 		m_uniform_locations = std::move(other.m_uniform_locations); 
 		m_transform_feedback_varyings = std::move(other.m_transform_feedback_varyings);
@@ -331,6 +331,17 @@ namespace e186
 		}
 	}
 
+	std::vector<const GLchar*> Shader::GetAsCStrs(const std::vector<std::string>& string_array)
+	{
+		std::vector<const GLchar*> c_strs;
+		c_strs.reserve(string_array.size());
+		for (const auto& s : string_array)
+		{
+			c_strs.push_back(s.c_str());
+		}
+		return c_strs;
+	}
+
 	void Shader::PrepareAutoMatActionConfigs()
 	{
 		for (const auto& tpl : m_auto_matrices)
@@ -401,44 +412,85 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::AddVertexShaderSource(std::string shaderSource)
+	Shader& Shader::AddVertexShaderSource(std::string shader_source)
 	{
-		m_vertex_shader_source = std::move(shaderSource);
+		m_vertex_shader_sources.push_back(std::move(shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddTesselationControlShaderSource(std::string shaderSource)
+	Shader& Shader::AddTesselationControlShaderSource(std::string shader_source)
 	{
-		m_tess_control_shader_source = std::move(shaderSource);
+		m_tess_control_shader_sources.push_back(std::move(shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddTesselationEvaluationShaderSource(std::string shaderSource)
+	Shader& Shader::AddTesselationEvaluationShaderSource(std::string shader_source)
 	{
-		m_tess_eval_shader_source = std::move(shaderSource);
+		m_tess_eval_shader_sources.push_back(std::move(shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddGeometryShaderSource(std::string shaderSource)
+	Shader& Shader::AddGeometryShaderSource(std::string shader_source)
 	{
-		m_geometry_shader_source = std::move(shaderSource);
+		m_geometry_shader_sources.push_back(std::move(shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddFragmentShaderSource(std::string shaderSource, std::vector<std::tuple<GLuint, const GLchar*>> outputs)
+	Shader& Shader::AddFragmentShaderSource(std::string shader_source)
 	{
-		m_fragment_shader_source = std::move(shaderSource);
-		m_fragment_outputs = std::move(outputs);
+		m_fragment_shader_sources.push_back(std::move(shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddComputeShaderSource(std::string shaderSource)
+	Shader& Shader::AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs)
 	{
-		m_compute_shader_source = std::move(shaderSource);
+		AddFragmentShaderSource(std::move(shader_source));
+		AddFragmentShaderOutput(std::move(outputs));
 		return *this;
 	}
 
-	bool Shader::HasTesselationShaders() const
+	Shader& Shader::AddFragmentShaderOutput(std::vector<std::tuple<GLuint, const GLchar*>> outputs)
+	{
+		m_fragment_outputs.insert(std::end(m_fragment_outputs), std::begin(outputs), std::end(outputs));
+		return *this;
+	}
+
+	Shader& Shader::AddComputeShaderSource(std::string shader_source)
+	{
+		m_compute_shader_sources.push_back(std::move(shader_source));
+		return *this;
+	}
+
+	Shader& Shader::AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders)
+	{
+		if (ShaderType::None != (which_shaders & ShaderType::Vertex))
+		{
+			AddVertexShaderSource(shader_source);
+		}
+		if (ShaderType::None != (which_shaders & ShaderType::TessControl))
+		{
+			AddTesselationControlShaderSource(shader_source);
+		}
+		if (ShaderType::None != (which_shaders & ShaderType::TessEval))
+		{
+			AddTesselationEvaluationShaderSource(shader_source);
+		}
+		if (ShaderType::None != (which_shaders & ShaderType::Geometry))
+		{
+			AddGeometryShaderSource(shader_source);
+		}
+		if (ShaderType::None != (which_shaders & ShaderType::Fragment))
+		{
+			AddFragmentShaderSource(shader_source);
+		}
+		if (ShaderType::None != (which_shaders & ShaderType::Compute))
+		{
+			AddComputeShaderSource(shader_source);
+		}
+		return *this;
+	}
+
+	bool Shader::has_tesselation_shaders() const
 	{
 		return 0 != m_shaderHandles[1] && 0 != m_shaderHandles[2];
 	}
@@ -463,14 +515,14 @@ namespace e186
 		m_kind_of_primitives = mode;
 	}
 
-	bool Shader::HasGeometryShader() const
+	bool Shader::has_geometry_shader() const
 	{
 		return 0 != m_shaderHandles[3];
 	}
 
 	void Shader::DetermineTessData()
 	{
-		if (HasTesselationShaders())
+		if (has_tesselation_shaders())
 		{
 			glGetIntegerv(GL_PATCH_VERTICES, &m_patch_vertices);
 		}
@@ -578,7 +630,7 @@ namespace e186
 
 	void Shader::DeterminePrimitivesMode()
 	{
-		if (HasTesselationShaders())
+		if (has_tesselation_shaders())
 		{
 			m_kind_of_primitives = GL_PATCHES;
 		}
@@ -613,12 +665,24 @@ namespace e186
 
 	Shader& Shader::Build()
 	{
-		m_shaderHandles[0] = m_vertex_shader_source.empty()       ? 0 : Compile(m_vertex_shader_source.c_str(),       GL_VERTEX_SHADER);
-		m_shaderHandles[1] = m_tess_control_shader_source.empty() ? 0 : Compile(m_tess_control_shader_source.c_str(), GL_TESS_CONTROL_SHADER);
-		m_shaderHandles[2] = m_tess_eval_shader_source.empty()    ? 0 : Compile(m_tess_eval_shader_source.c_str(),    GL_TESS_EVALUATION_SHADER);
-		m_shaderHandles[3] = m_geometry_shader_source.empty()     ? 0 : Compile(m_geometry_shader_source.c_str(),     GL_GEOMETRY_SHADER);
-		m_shaderHandles[4] = m_fragment_shader_source.empty()     ? 0 : Compile(m_fragment_shader_source.c_str(),     GL_FRAGMENT_SHADER);
-		m_shaderHandles[5] = m_compute_shader_source.empty()      ? 0 : Compile(m_compute_shader_source.c_str(),      GL_COMPUTE_SHADER);
+		m_shaderHandles[0] = m_vertex_shader_sources.empty()       
+			? 0 
+			: Compile(m_vertex_shader_sources.size(), GetAsCStrs(m_vertex_shader_sources).data(),				GL_VERTEX_SHADER);
+		m_shaderHandles[1] = m_tess_control_shader_sources.empty() 
+			? 0 
+			: Compile(m_tess_control_shader_sources.size(), GetAsCStrs(m_tess_control_shader_sources).data(),	GL_TESS_CONTROL_SHADER);
+		m_shaderHandles[2] = m_tess_eval_shader_sources.empty()    
+			? 0 
+			: Compile(m_tess_eval_shader_sources.size(), GetAsCStrs(m_tess_eval_shader_sources).data(),			GL_TESS_EVALUATION_SHADER);
+		m_shaderHandles[3] = m_geometry_shader_sources.empty()     
+			? 0 
+			: Compile(m_geometry_shader_sources.size(), GetAsCStrs(m_geometry_shader_sources).data(),			GL_GEOMETRY_SHADER);
+		m_shaderHandles[4] = m_fragment_shader_sources.empty()     
+			? 0 
+			: Compile(m_fragment_shader_sources.size(), GetAsCStrs(m_fragment_shader_sources).data(),			GL_FRAGMENT_SHADER);
+		m_shaderHandles[5] = m_compute_shader_sources.empty()      
+			? 0 
+			: Compile(m_compute_shader_sources.size(), GetAsCStrs(m_compute_shader_sources).data(),				GL_COMPUTE_SHADER);
 
 		const auto progHandle = glCreateProgram();
 
@@ -649,13 +713,6 @@ namespace e186
 		}
 
 		// Don't define attribute locations - set them im shader files using layout (location = 0)
-		/*for (auto const& attrLoc : attribLocations)
-		{
-		auto index = std::get<0>(attrLoc);
-		auto name = std::get<1>(attrLoc);
-		glBindAttribLocation(progHandle, index, name);
-		check_gl_error((std::string("fu.shader.Build at attribute location for ") + name).c_str());
-		}*/
 
 		if (m_transform_feedback_varyings.size() > 0)
 		{
@@ -844,6 +901,13 @@ namespace e186
 		return m_prog_handle;
 	}
 
+	std::string Shader::version_string()
+	{
+		return std::string("#version ")
+				+ std::to_string(Context::current()->gl_major_version() * 100 + Context::current()->gl_minor_version() * 10) 
+				+ (Context::current()->is_core_profile() ? " core\n" : "\n");
+	}
+
 	void Shader::CheckErrorAndPrintInfoLog(const char* gl_error_location_hint, const char* info_log_description)
 	{
 		if (check_gl_error(gl_error_location_hint))
@@ -866,9 +930,9 @@ namespace e186
 		}
 	}
 
-	GLuint Shader::Compile(const char* source, GLenum shaderType)
+	GLuint Shader::Compile(GLsizei sources_count, const GLchar* const* sources, GLenum shaderType)
 	{
-		if (!source)
+		if (!sources)
 		{
 			return GLuint(0);
 		}
@@ -879,7 +943,7 @@ namespace e186
 			return GLuint(0);
 		}
 
-		glShaderSource(shaderHandle, 1, &source, 0);
+		glShaderSource(shaderHandle, sources_count, sources, 0);
 		glCompileShader(shaderHandle);
 
 		GLint compileSuccess;

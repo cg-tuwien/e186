@@ -42,7 +42,7 @@ namespace e186
 		QuakeCamera cam;
 		cam.set_position(glm::vec3(100.0f, 100.0f, -100.0f));
 		cam.LookAt(glm::vec3(0.0f));
-		cam.SetPerspectiveProjection(20.0f, Engine::current->aspect_ratio(), 1.0f, 5000.0f);
+		cam.SetPerspectiveProjection(20.0f, Engine::current()->aspect_ratio(), 1.0f, 5000.0f);
 
 		// create a timer
 		MaxFpsTimer timer;
@@ -60,7 +60,7 @@ namespace e186
 
 		while (!m_termination_requested)
 		{
-			Engine::current->BeginFrame();
+			Engine::current()->BeginFrame();
 			timer.Tick();
 
 			cam.Update(timer.delta_time());
@@ -69,7 +69,7 @@ namespace e186
 			glm::mat4 mM = glm::scale(glm::vec3(100.0f, 100.0f, 100.0f));
 
 			// render scene to back buffer
-			glViewport(0, 0, Engine::current->window_width(), Engine::current->window_height());
+			glViewport(0, 0, Engine::current()->window_width(), Engine::current()->window_height());
 			glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -89,7 +89,7 @@ namespace e186
 
 			RenderMesh(shader, ico->mesh_at(0));
 
-			Engine::current->EndFrame();
+			Engine::current()->EndFrame();
 		}
 	}
 

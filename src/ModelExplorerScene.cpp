@@ -57,7 +57,7 @@ namespace e186
 		// get VAOs of all selected meshes
 		auto vaos_nm = Model::GetOrCreateVAOs(shader_nrm, meshes_nm);
 
-		auto fubar = Engine::current->tweak_bar_manager().create_new_tweak_bar("settings");
+		auto fubar = Engine::current()->tweak_bar_manager().create_new_tweak_bar("settings");
 		bool whot = false;
 		TwAddVarRW(fubar, "umschalten", TW_TYPE_BOOLCPP, &whot, "");
 
@@ -69,7 +69,7 @@ namespace e186
 		QuakeCamera cam;
 		cam.set_position(glm::vec3(0.0f, 0.0f, 0.0f));
 		cam.LookAlong(glm::vec3(0.0f, 0.0f, -1.0f));
-		cam.SetPerspectiveProjection(20.0f, Engine::current->aspect_ratio(), 1.0f, 5000.0f);
+		cam.SetPerspectiveProjection(20.0f, Engine::current()->aspect_ratio(), 1.0f, 5000.0f);
 
 		// create a timer
 		MaxFpsTimer timer;
@@ -89,7 +89,7 @@ namespace e186
 
 		while (!m_termination_requested)
 		{
-			Engine::current->BeginFrame();
+			Engine::current()->BeginFrame();
 			timer.Tick();
 
 			cam.Update(timer.delta_time());
@@ -97,7 +97,7 @@ namespace e186
 			auto vM = cam.CalculateViewMatrix();
 
 			// render scene to back buffer
-			glViewport(0, 0, Engine::current->window_width(), Engine::current->window_height());
+			glViewport(0, 0, Engine::current()->window_width(), Engine::current()->window_height());
 			glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -143,7 +143,7 @@ namespace e186
 				UnbindVAO();
 			}
 
-			Engine::current->EndFrame();
+			Engine::current()->EndFrame();
 		}
 	}
 }

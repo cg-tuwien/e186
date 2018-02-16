@@ -234,6 +234,9 @@
     <ClInclude Include="..\include\AmbientLight.h">
       <Filter>Header Files\lightsources</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\ShaderType.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">

@@ -29,7 +29,7 @@ namespace e186
 
 		glm::vec2 m_accumulated_mouse_movement;
 		bool m_capture_input;
-		bool m_f_pressed;
+		bool m_tab_pressed;
 		bool m_i_pressed;
 
 		std::function<void(GLFWwindow*, int, int, int, int)> m_key_handler;

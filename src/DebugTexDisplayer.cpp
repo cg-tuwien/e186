@@ -6,7 +6,7 @@ namespace e186
 {
 
 	DebugTexDisplayer::DebugTexDisplayer() :
-		m_tweak_bar(Engine::current->tweak_bar_manager().create_new_tweak_bar("Textures"))
+		m_tweak_bar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("Textures"))
 	{
 		m_texture_configs.reserve(kVecSize);
 
@@ -78,8 +78,8 @@ namespace e186
 
 	void DebugTexDisplayer::Render()
 	{
-		const auto wnd_width = Engine::current->window_width();
-		const auto wnd_height = Engine::current->window_height();
+		const auto wnd_width = Engine::current()->window_width();
+		const auto wnd_height = Engine::current()->window_height();
 		
 		Camera orthoCam; 
 		orthoCam.SetOrthogonalProjection(0.0f, static_cast<float>(wnd_width), 0.0f, static_cast<float>(wnd_height), 0.0f, 100.0f);

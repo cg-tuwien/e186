@@ -2,6 +2,8 @@
 
 namespace e186
 {
+	Context* Context::g_current(nullptr);
+
 	void Context::glfw_error_callback(int error, const char* description)
 	{
 		std::cout << "glfw_error_callback #" << error << ": " << description << std::endl;
@@ -33,7 +35,11 @@ namespace e186
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 		
+			m_gl_major_version = glMajorVersion;
+			m_gl_minor_version = glMinorVersion;
+			m_is_core_profile = true;
 			m_good = true;
+			Context::g_current = this;
 		}
 	}
 

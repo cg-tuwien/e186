@@ -12,40 +12,40 @@ namespace e186
 		m_slow_multiplier(0.2f), // 1.2 m/s
 		m_accumulated_mouse_movement(0.0f, 0.0f)
 	{
-		glfwSetInputMode(Engine::current->main_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		glfwSetInputMode(Engine::current()->main_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 		m_key_handler = [this](GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
 			if (action != GLFW_PRESS)
 				return;
 
-			if (key == GLFW_KEY_F)
+			if (key == GLFW_KEY_TAB)
 			{
-				m_f_pressed = true;
+				m_tab_pressed = true;
 			}
 			if (key == GLFW_KEY_I)
 			{
 				m_i_pressed = true;
 			}
 		};
-		Engine::current->SubscribeToKeyCallbacks(m_key_handler);
+		Engine::current()->SubscribeToKeyCallbacks(m_key_handler);
 	}
 
 	QuakeCamera::~QuakeCamera()
 	{
-		Engine::current->UnsubscribeFromKeyCallbacks(m_key_handler);
-		glfwSetInputMode(Engine::current->main_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		Engine::current()->UnsubscribeFromKeyCallbacks(m_key_handler);
+		glfwSetInputMode(Engine::current()->main_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
 	void QuakeCamera::AddToCameraPositionRelative(const glm::vec4& homoVectorToAdd, double deltaTime)
 	{
 		glm::vec3 rotatedVector = glm::vec3(m_rotation * homoVectorToAdd);
 		float speedMultiplier = 1.0f;
-		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_SHIFT))
+		if (glfwGetKey(Engine::current()->main_window(), GLFW_KEY_LEFT_SHIFT))
 		{
 			speedMultiplier = m_fast_multiplier;
 		}
-		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_CONTROL))
+		if (glfwGetKey(Engine::current()->main_window(), GLFW_KEY_LEFT_CONTROL))
 		{
 			speedMultiplier = m_slow_multiplier;
 		}
@@ -56,11 +56,11 @@ namespace e186
 	void QuakeCamera::AddToCameraPositionAbsolute(const glm::vec4& homoVectorToAdd, double deltaTime)
 	{
 		float speedMultiplier = 1.0f;
-		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_SHIFT))
+		if (glfwGetKey(Engine::current()->main_window(), GLFW_KEY_LEFT_SHIFT))
 		{
 			speedMultiplier = m_fast_multiplier;
 		}
-		if (glfwGetKey(Engine::current->main_window(), GLFW_KEY_LEFT_CONTROL))
+		if (glfwGetKey(Engine::current()->main_window(), GLFW_KEY_LEFT_CONTROL))
 		{
 			speedMultiplier = m_slow_multiplier;
 		}
@@ -70,18 +70,18 @@ namespace e186
 
 	void QuakeCamera::HandleInputOnly()
 	{
-		auto wnd = Engine::current->main_window();
-		auto width = Engine::current->window_width();
-		auto height = Engine::current->window_height();
+		auto wnd = Engine::current()->main_window();
+		auto width = Engine::current()->window_width();
+		auto height = Engine::current()->window_height();
 
 		// switch mode
-		if (m_f_pressed)
+		if (m_tab_pressed)
 		{
 			auto newInputMode = GLFW_CURSOR_HIDDEN == glfwGetInputMode(wnd, GLFW_CURSOR) ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_HIDDEN;
 			glfwSetInputMode(wnd, GLFW_CURSOR, newInputMode);
 			m_capture_input = GLFW_CURSOR_HIDDEN == newInputMode;
 			glfwSetCursorPos(wnd, width / 2.0, height / 2.0);
-			m_f_pressed = false;
+			m_tab_pressed = false;
 		}
 
 		// display info
@@ -103,9 +103,9 @@ namespace e186
 			return;
 		}
 
-		auto wnd = Engine::current->main_window();
-		auto width = Engine::current->window_width();
-		auto height = Engine::current->window_height();
+		auto wnd = Engine::current()->main_window();
+		auto width = Engine::current()->window_width();
+		auto height = Engine::current()->window_height();
 
 		// query the position of the mouse cursor
 		double mouse_x, mouse_y;
@@ -132,9 +132,9 @@ namespace e186
 			AddToCameraPositionRelative( kSideVec4, deltaTime);
 		if (glfwGetKey(wnd, 'A'))
 			AddToCameraPositionRelative(-kSideVec4, deltaTime);
-		if (glfwGetKey(wnd, GLFW_KEY_LEFT_ALT))
+		if (glfwGetKey(wnd, 'Q'))
 			AddToCameraPositionAbsolute(-kUpVec4, deltaTime);
-		if (glfwGetKey(wnd, GLFW_KEY_SPACE))
+		if (glfwGetKey(wnd, 'E'))
 			AddToCameraPositionAbsolute( kUpVec4, deltaTime);
 
 		// reset the mouse-cursor to the center of the screen

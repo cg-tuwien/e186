@@ -13,7 +13,7 @@ namespace e186
 		void AddScene(std::string scene_name = "")
 		{
 			m_scenes.emplace_back(scene_name.empty() ? typeid(SceneType).name() : scene_name, []() {
-				Engine::current->SetNextScene(std::make_unique<SceneType>());
+				Engine::current()->SetNextScene(std::make_unique<SceneType>());
 			});
 		}
 
@@ -21,7 +21,7 @@ namespace e186
 		void AddSceneGenFunc(std::string scene_name, GenFuncT gen_func)
 		{
 			m_scenes.emplace_back(scene_name, [gen_func = std::move(gen_func)]() {
-				Engine::current->SetNextScene(gen_func());
+				Engine::current()->SetNextScene(gen_func());
 			});
 		}
 
