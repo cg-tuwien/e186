@@ -7,9 +7,9 @@ namespace e186
 {
 	QuakeCamera::QuakeCamera() : 
 		m_rotation_speed(0.001f),
-		m_move_speed(6.0f), // 6 m/s
-		m_fast_multiplier(5.0f), // 30 m/s
-		m_slow_multiplier(0.2f), // 1.2 m/s
+		m_move_speed(4.5f), // 4.5 m/s
+		m_fast_multiplier(6.0f), // 27 m/s
+		m_slow_multiplier(0.2f), // 0.9 m/s
 		m_accumulated_mouse_movement(0.0f, 0.0f)
 	{
 		glfwSetInputMode(Engine::current()->main_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);

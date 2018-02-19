@@ -22,7 +22,7 @@ namespace e186
 		PointLight& operator=(PointLight&& other) noexcept = default;
 		~PointLight();
 
-		glm::vec3 position() { return m_position; }
+		glm::vec3 position() const { return m_position; }
 		const glm::vec3& light_color() const { return m_light_color; }
 		glm::vec4 attenuation() const { return m_attenuation;  }
 		float const_attenuation() const { return m_attenuation.x; }

@@ -310,8 +310,8 @@ namespace e186
 		m_point_lights_tw_index_helper(),
 		m_tweak_bar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("Lightsources")),
 		m_transparency(.3f),
-		m_gizmo_scale(40.0f),
-		m_gizmo_param(4.0f),
+		m_gizmo_scale(8.0f),
+		m_gizmo_param(3.0f),
 		m_uniform_position_offset(0.0f, 0.0f, 0.0f)
 	{
 		m_sphere = Model::LoadFromFile("assets/models/sphere.obj", glm::mat4(1.0f), MOLF_triangulate | MOLF_smoothNormals);
