@@ -1,10 +1,9 @@
 #extension GL_ARB_explicit_uniform_location : enable
 
 // ################# UNIFORM DATA ###############
-uniform mat4 pvmtMatrix;
-uniform mat4 vmtMmatrix;
-uniform mat4 vMatrix;
-uniform mat3 vmtNormalMatrix;
+uniform mat4 pMatrix;
+uniform mat4 vmMatrix;
+uniform mat3 vmNormalMatrix;
 
 layout(location = 131) uniform vec2 uTexCoordsScale = vec2(1, 1);
 // ----------------------------------------------
@@ -26,11 +25,13 @@ out VertexData
 
 // ############ VERTEX SHADER MAIN ##############
 void main()
-{	
-	v_out.texCoords = aVertexTexCoord * uTexCoordsScale;
-	v_out.positionVS = (vmtMmatrix * aVertexPosition).xyz;
-	v_out.normalVS = vmtNormalMatrix * aVertexNormal;
+{
+	vec4 positionVS = vmMatrix * aVertexPosition;
 
-	gl_Position = pvmtMatrix * aVertexPosition;
+	v_out.texCoords = aVertexTexCoord * uTexCoordsScale;
+	v_out.positionVS = positionVS.xyz;
+	v_out.normalVS = vmNormalMatrix * aVertexNormal;
+
+	gl_Position = pMatrix * positionVS;
 }
 // ----------------------------------------------

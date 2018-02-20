@@ -1,11 +1,6 @@
 #extension GL_ARB_explicit_uniform_location : enable
 
 // ################# UNIFORM DATA ###############
-uniform mat4 pvmtMatrix;
-uniform mat4 vmtMmatrix;
-uniform mat4 vMatrix;
-uniform mat3 vmtNormalMatrix;
-
 layout(location = 131) uniform vec2 uTexCoordsScale = vec2(1, 1);
 
 // Material data:
