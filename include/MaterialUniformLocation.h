@@ -66,7 +66,10 @@ namespace e186
 		ReflectionTexture,
 
 		/*! Lightmap texture sampler at layout (location = 130) */
-		LightmapTexture
+		LightmapTexture,
+
+		/*! Tiling or Texture Scale (location = 131) */
+		TextureTiling
 	};
 
 	template<typename T>

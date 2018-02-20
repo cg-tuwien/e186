@@ -6,7 +6,7 @@ uniform mat4 vmtMmatrix;
 uniform mat4 vMatrix;
 uniform mat3 vmtNormalMatrix;
 
-uniform vec2 uTexCoordsScale = vec2(1, 1);
+layout(location = 131) uniform vec2 uTexCoordsScale = vec2(1, 1);
 // ----------------------------------------------
 
 // ################### INPUT DATA ###############

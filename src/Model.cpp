@@ -928,7 +928,7 @@ namespace e186
 		for (unsigned int i = 0; i < n; i++)
 		{
 			auto* ai_mat = GetAssimpMaterialPtr(scene, i);
-			m_meshes[i].m_material_data = std::make_unique<MaterialData>(ai_mat, tlh);
+			m_meshes[i].m_material_data = std::make_shared<MaterialData>(ai_mat, tlh);
 		}
 	}
 

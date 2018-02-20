@@ -51,13 +51,14 @@ namespace e186
 		const std::shared_ptr<Tex2D>& displacement_tex() const { return m_displacement_tex; }
 		const std::shared_ptr<Tex2D>& reflection_tex() const { return m_reflection_tex; }
 		const std::shared_ptr<Tex2D>& lightmap_tex() const { return m_lightmap_tex; }
+		const glm::vec2& tiling() const { return m_tiling; }
 
 		void set_name(std::string value) { m_name = std::move(value); }
-		void set_diffuse_reflectivity(glm::vec3 value) { m_diffuse_reflectivity = std::move(value); }
-		void set_specular_reflectivity(glm::vec3 value) { m_specular_reflectivity = std::move(value); }
-		void set_ambient_reflectivity(glm::vec3 value) { m_ambient_reflectivity = std::move(value); }
-		void set_emissive_color(glm::vec3 value) { m_emissive_color = std::move(value); }
-		void set_transparent_color(glm::vec3 value) { m_transparent_color = std::move(value); }
+		void set_diffuse_reflectivity(const glm::vec3& value) { m_diffuse_reflectivity = value; }
+		void set_specular_reflectivity(const glm::vec3& value) { m_specular_reflectivity = value; }
+		void set_ambient_reflectivity(const glm::vec3& value) { m_ambient_reflectivity = value; }
+		void set_emissive_color(const glm::vec3& value) { m_emissive_color = value; }
+		void set_transparent_color(const glm::vec3& value) { m_transparent_color = value; }
 		void set_wireframe_mode(bool enabled) { m_wireframe_mode = enabled; }
 		void set_twosided(bool enabled) { m_twosided = enabled; }
 		void set_blend_mode(BlendMode value) { m_blend_mode = value; }
@@ -77,6 +78,7 @@ namespace e186
 		void set_displacement_tex(std::shared_ptr<Tex2D> tex) { m_displacement_tex = std::move(tex); }
 		void set_reflection_tex  (std::shared_ptr<Tex2D> tex) { m_reflection_tex   = std::move(tex); }
 		void set_lightmap_tex    (std::shared_ptr<Tex2D> tex) { m_lightmap_tex     = std::move(tex); }
+		void set_tiling(const glm::vec2& value) { m_tiling = value; }
 
 	private:
 		std::string m_name;
@@ -105,6 +107,7 @@ namespace e186
 		std::shared_ptr<Tex2D> m_displacement_tex;
 		std::shared_ptr<Tex2D> m_reflection_tex;
 		std::shared_ptr<Tex2D> m_lightmap_tex;
+		glm::vec2 m_tiling;
 
 		static TexParams ai_mapping_mode_to_tex_params(aiTextureMapMode aimm);
 	};

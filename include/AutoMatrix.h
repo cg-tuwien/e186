@@ -11,6 +11,8 @@ namespace e186
 		IsNormalMatrix		= 0x0010,
 		IsOptional			= 0x0020,
 		IsMandatory			= 0x0040,
+		DoTranspose			= 0x0080,
+		DoInvert			= 0x0100,
 	};
 
 	inline AutoMatrix operator| (AutoMatrix a, AutoMatrix b)

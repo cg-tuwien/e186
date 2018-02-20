@@ -17,7 +17,8 @@ namespace e186
 		m_shininess(0.0f),
 		m_shininess_strength(0.0f),
 		m_refraction_index(0.0f),
-		m_reflectivity(0.0f)
+		m_reflectivity(0.0f),
+		m_tiling(1.0f, 1.0f)
 	{ 
 	}
 

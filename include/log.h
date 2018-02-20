@@ -10,7 +10,7 @@ namespace e186
 	// 4 ... everything
 
 	#if !defined(LOG_LEVEL)
-	#define LOG_LEVEL 4
+	#define LOG_LEVEL 3
 	#endif
 
 	#if LOG_LEVEL > 0

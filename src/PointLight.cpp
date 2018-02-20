@@ -83,18 +83,25 @@ namespace e186
 		m_enabled = is_enabled;
 	}
 
-	PointLightGpuData PointLight::GetGpuData(const glm::mat4& view_space_trans_mat) const
+	PointLightGpuData PointLight::GetGpuData() const
 	{
 		PointLightGpuData gdata;
-		FillGpuDataIntoTarget(gdata, view_space_trans_mat);
+		FillGpuDataIntoTarget(gdata);
 		return gdata;
 	}
 
-	void PointLight::FillGpuDataIntoTarget(PointLightGpuData& target, const glm::mat4& view_space_trans_mat) const
+	PointLightGpuData PointLight::GetGpuData(const glm::mat4& mat) const
+	{
+		PointLightGpuData gdata;
+		FillGpuDataIntoTarget(gdata, mat);
+		return gdata;
+	}
+
+	void PointLight::FillGpuDataIntoTarget(PointLightGpuData& target) const
 	{
 		if (m_enabled)
 		{
-			target.m_position = view_space_trans_mat * glm::vec4(m_position, 1.0f);
+			target.m_position = glm::vec4(m_position, 1.0f);
 			target.m_light_color = glm::vec4(m_light_color, 1.0f);
 			target.m_attenuation = m_attenuation;
 		}
@@ -104,5 +111,26 @@ namespace e186
 			target.m_light_color = glm::vec4(0.0f);
 			target.m_attenuation = glm::vec4(0.0f);
 		}
+	}
+
+	void PointLight::FillGpuDataIntoTarget(PointLightGpuData& target, const glm::mat4& mat) const
+	{
+		if (m_enabled)
+		{
+			target.m_position = mat * glm::vec4(m_position, 1.0f);
+			target.m_light_color = glm::vec4(m_light_color, 1.0f);
+			target.m_attenuation = m_attenuation;
+		}
+		else
+		{
+			target.m_position = glm::vec4(0.0f);
+			target.m_light_color = glm::vec4(0.0f);
+			target.m_attenuation = glm::vec4(0.0f);
+		}
+	}
+
+	PointLight::operator PointLightGpuData() const
+	{
+		return GetGpuData();
 	}
 }

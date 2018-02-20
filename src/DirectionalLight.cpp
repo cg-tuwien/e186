@@ -36,18 +36,25 @@ namespace e186
 		m_enabled = is_enabled;
 	}
 
-	DirectionalLightGpuData DirectionalLight::GetGpuData(const glm::mat3& view_space_nrm_trans_mat) const
+	DirectionalLightGpuData DirectionalLight::GetGpuData() const
 	{
 		DirectionalLightGpuData gdata;
-		FillGpuDataIntoTarget(gdata, view_space_nrm_trans_mat);
+		FillGpuDataIntoTarget(gdata);
 		return gdata;
 	}
 
-	void DirectionalLight::FillGpuDataIntoTarget(DirectionalLightGpuData& target, const glm::mat3& view_space_nrm_trans_mat) const
+	DirectionalLightGpuData DirectionalLight::GetGpuData(const glm::mat3& nrm_mat) const
+	{
+		DirectionalLightGpuData gdata;
+		FillGpuDataIntoTarget(gdata, nrm_mat);
+		return gdata;
+	}
+
+	void DirectionalLight::FillGpuDataIntoTarget(DirectionalLightGpuData& target) const
 	{
 		if (m_enabled)
 		{
-			target.m_light_dir_vs = glm::vec4(view_space_nrm_trans_mat * m_light_direction, 0.0f);
+			target.m_light_dir_vs = glm::vec4(m_light_direction, 0.0f);
 			target.m_light_color = glm::vec4(m_light_color, 1.0f);
 		}
 		else
@@ -57,4 +64,22 @@ namespace e186
 		}
 	}
 
+	void DirectionalLight::FillGpuDataIntoTarget(DirectionalLightGpuData& target, const glm::mat3& nrm_mat) const
+	{
+		if (m_enabled)
+		{
+			target.m_light_dir_vs = glm::vec4(nrm_mat * m_light_direction, 0.0f);
+			target.m_light_color = glm::vec4(m_light_color, 1.0f);
+		}
+		else
+		{
+			target.m_light_dir_vs = glm::vec4(1.0f);
+			target.m_light_color = glm::vec4(0.0f);
+		}
+	}
+
+	DirectionalLight::operator DirectionalLightGpuData() const
+	{
+		return GetGpuData();
+	}
 }

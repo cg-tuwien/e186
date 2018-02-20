@@ -102,7 +102,7 @@ namespace e186
 
 		glm::mat4 m_scene_transformation_matrix;
 
-		std::unique_ptr<MaterialData> m_material_data;
+		std::shared_ptr<MaterialData> m_material_data;
 
 	public:
 		// Constructor - initialize everything
@@ -135,10 +135,10 @@ namespace e186
 		MeshIdx index() const { return m_index; }
 		GLuint indices_length() const { return m_indices_len; } 
 		const glm::mat4& transformation_matrix() const { return m_scene_transformation_matrix; }
-		const std::unique_ptr<MaterialData>& material_data() const { return m_material_data; }
-		std::unique_ptr<MaterialData>& material_data() { return m_material_data; }
+		const std::shared_ptr<MaterialData>& material_data() const { return m_material_data; }
+		std::shared_ptr<MaterialData>& material_data() { return m_material_data; }
 
-		void set_material_data(std::unique_ptr<MaterialData> mat_data) { m_material_data = std::move(mat_data); }
+		void set_material_data(std::shared_ptr<MaterialData> mat_data) { m_material_data = std::move(mat_data); }
 
 		static VAOType GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader);
 		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);

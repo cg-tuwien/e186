@@ -115,6 +115,18 @@
     <Filter Include="Resource Files\shaders\gizmo">
       <UniqueIdentifier>{80619a84-d8ac-472a-91f2-8051cfcda612}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\external">
+      <UniqueIdentifier>{2d9a8f1e-7b91-4db0-8684-e62f1e496e54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\external">
+      <UniqueIdentifier>{ecbe968a-fe46-4a7a-8a21-0e9668029e72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\external\FileWatcher">
+      <UniqueIdentifier>{922ad76e-46a5-4abd-8a6e-8ec47d5bd92a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\external\FileWatcher">
+      <UniqueIdentifier>{a50bdad6-ae35-4d03-94b2-cd9e55a64c76}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\e186stdafx.h">
@@ -237,6 +249,21 @@
     <ClInclude Include="..\include\ShaderType.h">
       <Filter>Header Files\shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherImpl.h">
+      <Filter>Header Files\external\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherLinux.h">
+      <Filter>Header Files\external\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherOSX.h">
+      <Filter>Header Files\external\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherWin32.h">
+      <Filter>Header Files\external\FileWatcher</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcher.h">
+      <Filter>Header Files\external\FileWatcher</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
@@ -299,9 +326,6 @@
     <ClCompile Include="..\src\SampleSceneTessIco.cpp">
       <Filter>Source Files\sample_scenes</Filter>
     </ClCompile>
-    <ClCompile Include="..\external\src\glad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\SceneSelectorScene.cpp">
       <Filter>Source Files\sample_scenes</Filter>
     </ClCompile>
@@ -337,6 +361,21 @@
     </ClCompile>
     <ClCompile Include="..\src\AmbientLight.cpp">
       <Filter>Source Files\lightsources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\src\glad.cpp">
+      <Filter>Source Files\external</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcher.cpp">
+      <Filter>Source Files\external\FileWatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcherLinux.cpp">
+      <Filter>Source Files\external\FileWatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcherOSX.cpp">
+      <Filter>Source Files\external\FileWatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcherWin32.cpp">
+      <Filter>Source Files\external\FileWatcher</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

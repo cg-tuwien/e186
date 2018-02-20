@@ -11,6 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcher.h" />
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherImpl.h" />
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherLinux.h" />
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherOSX.h" />
+    <ClInclude Include="..\external\include\FileWatcher\FileWatcherWin32.h" />
     <ClInclude Include="..\include\AmbientLight.h" />
     <ClInclude Include="..\include\Animator.h" />
     <ClInclude Include="..\include\AntTweakBarManager.h" />
@@ -53,6 +58,10 @@
     <ClInclude Include="..\include\VertexAttribLocation.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcher.cpp" />
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcherLinux.cpp" />
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcherOSX.cpp" />
+    <ClCompile Include="..\external\src\FileWatcher\FileWatcherWin32.cpp" />
     <ClCompile Include="..\external\src\glad.cpp" />
     <ClCompile Include="..\src\AmbientLight.cpp" />
     <ClCompile Include="..\src\Animator.cpp" />
@@ -117,14 +126,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -154,7 +163,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DISABLE_PRINT_CALLSTACK;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\external\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>e186stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>e186stdafx.h</ForcedIncludeFiles>
@@ -171,7 +180,7 @@
       </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalDependencies>assimp-vc140.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>stb_image.lib;assimp-vc140.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -183,7 +192,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DISABLE_PRINT_CALLSTACK;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\include;$(ProjectDir)..\external\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>e186stdafx.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>e186stdafx.h</ForcedIncludeFiles>
@@ -200,7 +209,7 @@
       </Command>
     </PostBuildEvent>
     <Lib>
-      <AdditionalDependencies>assimp-vc140.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>stb_image.lib;assimp-vc140.lib;glfw3.lib;AntTweakBar64.lib;DbgHelp.Lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\external\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

@@ -1,5 +1,5 @@
 #include "log.h"
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(DISABLE_PRINT_CALLSTACK)
 #include <Windows.h>
 #include <DbgHelp.h>
 #include <sstream>
@@ -108,7 +108,7 @@ namespace e186
 
 	std::string GetCurrentCallstack()
 	{
-#ifdef _WIN32
+#if defined(_WIN32) && defined (_DBGHELP_)
 		void         * stack[100];
 
 		HANDLE process = GetCurrentProcess();

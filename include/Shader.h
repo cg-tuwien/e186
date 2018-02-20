@@ -310,8 +310,7 @@ namespace e186
 		VertexAttribData m_vertex_attrib_config;
 		GLenum m_kind_of_primitives;
 		std::vector<std::tuple<std::string, AutoMatrix>> m_auto_matrices;
-		std::vector<std::tuple<GLuint, AutoMatrix>> m_auto_mats_action_config;
-		std::vector<std::tuple<GLuint, AutoMatrix>> m_auto_mats_action_config_nrm;
+		std::vector<std::function<void()>> m_auto_mats_action_config;
 		std::array<bool, 16> m_auto_mat_do_calc;
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;

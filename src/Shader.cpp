@@ -36,7 +36,6 @@ namespace e186
 		m_kind_of_primitives(GL_TRIANGLES),
 		m_auto_matrices(),
 		m_auto_mats_action_config(),
-		m_auto_mats_action_config_nrm(),
 		m_auto_mat_do_calc
 		{
 			false,  // 00 AutoMatrix::Nothing
@@ -97,7 +96,6 @@ namespace e186
 		m_kind_of_primitives(other.m_kind_of_primitives),
 		m_auto_matrices(std::move(other.m_auto_matrices)),
 		m_auto_mats_action_config(std::move(other.m_auto_mats_action_config)),
-		m_auto_mats_action_config_nrm(std::move(other.m_auto_mats_action_config_nrm)),
 		m_auto_mat_do_calc(std::move(other.m_auto_mat_do_calc)),
 		m_auto_mat_action_cache(std::move(other.m_auto_mat_action_cache)),
 		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers))
@@ -137,7 +135,6 @@ namespace e186
 		m_shaderHandles = std::move(other.m_shaderHandles);
 		m_auto_matrices = std::move(other.m_auto_matrices);
 		m_auto_mats_action_config = std::move(other.m_auto_mats_action_config);
-		m_auto_mats_action_config_nrm = std::move(other.m_auto_mats_action_config_nrm);
 		m_auto_mat_do_calc = std::move(other.m_auto_mat_do_calc);
 		m_auto_mat_action_cache = std::move(other.m_auto_mat_action_cache);
 		m_auto_mat_calcers = std::move(other.m_auto_mat_calcers);
@@ -349,7 +346,8 @@ namespace e186
 			const auto& name = std::get<0>(tpl);
 			auto params = std::get<1>(tpl);
 			auto matidx = static_cast<uint8_t>(params) & 0xF;
-			auto is_normal_matrix = (params & AutoMatrix::IsNormalMatrix) != AutoMatrix::Nothing;
+
+			// Handle optional/mandatory
 			auto is_optional = (params & AutoMatrix::IsOptional) != AutoMatrix::Nothing;
 			auto is_mandatory = (params & AutoMatrix::IsMandatory) != AutoMatrix::Nothing;
 
@@ -361,13 +359,70 @@ namespace e186
 			else
 				loc = GetUniformLocation(name);
 
+			// Check which transformations to apply:
+			auto is_normal_matrix = (params & AutoMatrix::IsNormalMatrix) != AutoMatrix::Nothing;
+			auto do_transpose = (params & AutoMatrix::DoTranspose) != AutoMatrix::Nothing;
+			auto do_invert = (params & AutoMatrix::DoInvert) != AutoMatrix::Nothing;
+
 			if (is_normal_matrix)
 			{
-				m_auto_mats_action_config_nrm.push_back(std::make_tuple(loc, static_cast<AutoMatrix>(matidx)));
+				if (do_transpose)
+				{
+					if (do_invert)
+					{
+						m_auto_mats_action_config.push_back([this, loc, matidx]() {
+							SetUniform(loc, glm::mat3(m_auto_mat_action_cache[matidx]));
+						});
+					}
+					else
+					{
+						m_auto_mats_action_config.push_back([this, loc, matidx]() {
+							SetUniform(loc, glm::mat3(glm::inverse(m_auto_mat_action_cache[matidx])));
+						});
+					}
+				}
+				else if (do_invert)
+				{
+					m_auto_mats_action_config.push_back([this, loc, matidx]() {
+						SetUniform(loc, glm::mat3(glm::transpose(m_auto_mat_action_cache[matidx])));
+					});
+				}
+				else
+				{
+					m_auto_mats_action_config.push_back([this, loc, matidx]() {
+						SetUniform(loc, glm::mat3(glm::inverseTranspose(m_auto_mat_action_cache[matidx])));
+					});
+				}
 			}
 			else
 			{
-				m_auto_mats_action_config.push_back(std::make_tuple(loc, static_cast<AutoMatrix>(matidx)));
+				if (do_transpose)
+				{
+					if (do_invert)
+					{
+						m_auto_mats_action_config.push_back([this, loc, matidx]() {
+							SetUniform(loc, glm::inverseTranspose(m_auto_mat_action_cache[matidx]));
+						});
+					}
+					else
+					{
+						m_auto_mats_action_config.push_back([this, loc, matidx]() {
+							SetUniform(loc, glm::transpose(m_auto_mat_action_cache[matidx]));
+						});
+					}
+				}
+				else if (do_invert)
+				{
+					m_auto_mats_action_config.push_back([this, loc, matidx]() {
+						SetUniform(loc, glm::inverse(m_auto_mat_action_cache[matidx]));
+					});
+				}
+				else
+				{
+					m_auto_mats_action_config.push_back([this, loc, matidx]() {
+						SetUniform(loc, m_auto_mat_action_cache[matidx]);
+					});
+				}
 			}
 		}
 	}
@@ -653,13 +708,9 @@ namespace e186
 			fu();
 		}
 		// upload matrices to shader
-		for (const auto& tpl : m_auto_mats_action_config_nrm)
+		for (const auto& fu : m_auto_mats_action_config)
 		{
-			SetUniform(std::get<0>(tpl), glm::mat3(glm::inverseTranspose(m_auto_mat_action_cache[static_cast<uint8_t>(std::get<1>(tpl))])));
-		}
-		for (const auto& tpl : m_auto_mats_action_config)
-		{
-			SetUniform(std::get<0>(tpl), m_auto_mat_action_cache[static_cast<uint8_t>(std::get<1>(tpl))]);
+			fu();
 		}
 	}
 
@@ -685,6 +736,7 @@ namespace e186
 			: Compile(m_compute_shader_sources.size(), GetAsCStrs(m_compute_shader_sources).data(),				GL_COMPUTE_SHADER);
 
 		const auto progHandle = glCreateProgram();
+		m_prog_handle = progHandle;
 
 		for (int i = 0; i < kMaxShaders; ++i)
 		{
@@ -717,24 +769,21 @@ namespace e186
 		if (m_transform_feedback_varyings.size() > 0)
 		{
 			glTransformFeedbackVaryings(progHandle, static_cast<GLsizei>(m_transform_feedback_varyings.size()), &m_transform_feedback_varyings[0], m_transform_feedback_buffer_mode);
+			CheckErrorAndPrintInfoLog("Shader::Build after glTransformFeedbackVaryings", "Could not set Transform Feedback Varyings");
 		}
 
 		glLinkProgram(progHandle);
-		CheckErrorAndPrintInfoLog("Shader::Build after glLinkProgram", "Could not link program");
-
 		GLint linkSuccess;
 		glGetProgramiv(progHandle, GL_LINK_STATUS, &linkSuccess);
 
 		if (linkSuccess == GL_FALSE)
 		{
-			PrintInfoLog("Could not link program");
-
+			PrintInfoLog("Linking shader program failed");
 			Destroy();
 			throw ExceptionWithCallstack("Linking shader program failed");
 		}
 
 		// success!
-		m_prog_handle = progHandle;
 		DetermineVertexAttribConfig();
 		DetermineTessData();
 		DeterminePrimitivesMode();
@@ -743,6 +792,7 @@ namespace e186
 		PrepareAutoMatActionConfigs();
 		CreateAutoMatCalcers();
 
+		CheckErrorAndPrintInfoLog("Shader::Build END", "Something went wrong");
 		return *this;
 	}
 
@@ -920,7 +970,7 @@ namespace e186
 	{
 		GLint infoLen = 0;
 		glGetProgramiv(handle(), GL_INFO_LOG_LENGTH, &infoLen);
-
+		
 		if (infoLen)
 		{
 			char* buf = new char[infoLen];

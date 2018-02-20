@@ -41,8 +41,12 @@ namespace e186
 		void set_cubic_attenuation(float attenuation);
 		void set_enabled(bool is_enabled);
 
+		PointLightGpuData GetGpuData() const;
 		PointLightGpuData GetGpuData(const glm::mat4& mat) const;
+		void FillGpuDataIntoTarget(PointLightGpuData& target) const;
 		void FillGpuDataIntoTarget(PointLightGpuData& target, const glm::mat4& mat) const;
+
+		operator PointLightGpuData() const;
 
 	private:
 		//Transform m_transform;
