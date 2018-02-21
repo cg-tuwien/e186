@@ -50,11 +50,25 @@ The following files are is part of AntTweakBar, Copyright (c) Philippe Decaudin,
  * `external/lib/debug/AntTweakBar64.lib`
  * `external/bin/release/AntTweakBar64.dll`
  * `external/bin/debug/AntTweakBar64.dll`
- * See `external/include/AntTweakBar.h` or http://anttweakbar.sourceforge.net/doc/tools:anttweakbar:license for full license details.
+ 
+See `external/include/AntTweakBar.h` or http://anttweakbar.sourceforge.net/doc/tools:anttweakbar:license for full license details.
 
 **stb_image**
 
-The file `external/include/stb_image.h`, Copyright (c) by Sean Barrett, is licensed under the MIT License and released into the Public Domain. See `external/include/stb_image.h` or https://github.com/nothings/stb for full license details.
+The following files are part of stb_image, Copyright (c) by Sean Barrett, licensed under the MIT License and released into the Public Domain.     
+ * `external/include/stb_image.h`
+ * `external/lib/release/stb_image.lib`
+ * `external/lib/debug/stb_image.lib`
+
+See `external/include/stb_image.h` or https://github.com/nothings/stb for full license details.
+
+**FileWatcher**
+
+The following files are part of FileWatcher, Copyright (c) by James Wynn, licensed under the MIT License.     
+ * all files under `external/include/FileWatcher`
+ * all files under `external/src/FileWatcher`
+ 
+See `external/include/FileWatcher/FileWatcher.h` or https://code.google.com/archive/p/simplefilewatcher for full license details.
 
 **3D Models and Textures under CC BY 3.0**
 
