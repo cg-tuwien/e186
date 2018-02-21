@@ -1,5 +1,6 @@
 #pragma once
 #include "AntTweakBarManager.h"
+#include "FileWatcher/FileWatcher.h"
 
 namespace e186
 {
@@ -23,6 +24,31 @@ namespace e186
 	class PointLight;
 	using PointLightRef = std::reference_wrapper<PointLight>;
 #pragma endregion
+
+	// where UpdateListener is defined as such
+	class UpdateListener : public FW::FileWatchListener
+	{
+	public:
+		UpdateListener() {}
+		void handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename,
+			FW::Action action)
+		{
+			switch (action)
+			{
+			case FW::Actions::Add:
+				std::cout << "File (" << dir + "\\" + filename << ") Added! " << std::endl;
+				break;
+			case FW::Actions::Delete:
+				std::cout << "File (" << dir + "\\" + filename << ") Deleted! " << std::endl;
+				break;
+			case FW::Actions::Modified:
+				std::cout << "File (" << dir + "\\" + filename << ") Modified! " << std::endl;
+				break;
+			default:
+				std::cout << "Should never happen!" << std::endl;
+			}
+		}
+	};
 
 	class Engine
 	{

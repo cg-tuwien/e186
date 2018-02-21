@@ -27,6 +27,7 @@ namespace e186
 		~MaterialData() = default;
 
 		const std::string& name() const { return m_name;  }
+		bool is_hidden() const { return m_hidden; }
 		const glm::vec3& diffuse_reflectivity() const { return m_diffuse_reflectivity; }
 		const glm::vec3& specular_reflectivity() const { return m_specular_reflectivity; }
 		const glm::vec3& ambient_reflectivity() const { return m_ambient_reflectivity; }
@@ -51,9 +52,19 @@ namespace e186
 		const std::shared_ptr<Tex2D>& displacement_tex() const { return m_displacement_tex; }
 		const std::shared_ptr<Tex2D>& reflection_tex() const { return m_reflection_tex; }
 		const std::shared_ptr<Tex2D>& lightmap_tex() const { return m_lightmap_tex; }
+		const glm::vec3& albedo() const { return m_albedo; }
+		float metallic() const { return m_metallic; }
+		float smoothness() const { return m_smoothness; }
+		float sheen() const { return m_sheen; }
+		float thickness() const { return m_thickness; }
+		float roughness() const { return m_roughness; }
+		float anisotropy() const { return m_anisotropy; }
+		const glm::vec3& anisotropy_rotation() const { return m_anisotropy_rotation; }
+		const glm::vec2& offset() const { return m_offset; }
 		const glm::vec2& tiling() const { return m_tiling; }
 
 		void set_name(std::string value) { m_name = std::move(value); }
+		void set_is_hidden(bool is_hidden) { m_hidden = is_hidden; }
 		void set_diffuse_reflectivity(const glm::vec3& value) { m_diffuse_reflectivity = value; }
 		void set_specular_reflectivity(const glm::vec3& value) { m_specular_reflectivity = value; }
 		void set_ambient_reflectivity(const glm::vec3& value) { m_ambient_reflectivity = value; }
@@ -78,11 +89,23 @@ namespace e186
 		void set_displacement_tex(std::shared_ptr<Tex2D> tex) { m_displacement_tex = std::move(tex); }
 		void set_reflection_tex  (std::shared_ptr<Tex2D> tex) { m_reflection_tex   = std::move(tex); }
 		void set_lightmap_tex    (std::shared_ptr<Tex2D> tex) { m_lightmap_tex     = std::move(tex); }
+		void set_albedo(const glm::vec3& value) { m_albedo = value; }
+		void set_metallic(float value) { m_metallic = value; }
+		void set_smoothness(float value) { m_smoothness = value; }
+		void set_sheen(float value) { m_sheen = value; }
+		void set_thickness(float value) { m_thickness = value; }
+		void set_roughness(float value) { m_roughness = value; }
+		void set_anisotropy(float value) { m_anisotropy = value; }
+		void set_anisotropy_rotation(const glm::vec3& value) { m_anisotropy_rotation = value; }
+		void set_offset(const glm::vec2& value) { m_offset = value; }
 		void set_tiling(const glm::vec2& value) { m_tiling = value; }
 
 	private:
+		// The first two are not uploaded to the shader, i.e. no uniform setters generated for these 
 		std::string m_name;
-
+		bool m_hidden;
+		// All of the following properties can be uploaded to the shader, if the respective locations 
+		// are defined in the shader; i.e. uniform setters can be generated for all of the following:
 		glm::vec3 m_diffuse_reflectivity;
 		glm::vec3 m_specular_reflectivity;
 		glm::vec3 m_ambient_reflectivity;
@@ -107,6 +130,15 @@ namespace e186
 		std::shared_ptr<Tex2D> m_displacement_tex;
 		std::shared_ptr<Tex2D> m_reflection_tex;
 		std::shared_ptr<Tex2D> m_lightmap_tex;
+		glm::vec3 m_albedo;
+		float m_metallic;
+		float m_smoothness;
+		float m_sheen;
+		float m_thickness;
+		float m_roughness;
+		float m_anisotropy;
+		glm::vec3 m_anisotropy_rotation;
+		glm::vec2 m_offset;
 		glm::vec2 m_tiling;
 
 		static TexParams ai_mapping_mode_to_tex_params(aiTextureMapMode aimm);

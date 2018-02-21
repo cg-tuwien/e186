@@ -5,12 +5,12 @@ namespace e186
 	class TexData : public TexInfo
 	{
 	protected:
-		std::variant<unsigned char*, float*> m_data;
-		std::variant<std::function<void(unsigned char*)>, std::function<void(float*)>> m_destroyer;
+		std::variant<uint8_t*, float*> m_data;
+		std::variant<std::function<void(uint8_t*)>, std::function<void(float*)>> m_destroyer;
 			
 	public:
 		TexData(GLenum texTarget);
-		TexData(GLenum texTarget, unsigned char* data, std::function<void(unsigned char*)>&& destroyerFu);
+		TexData(GLenum texTarget, uint8_t* data, std::function<void(uint8_t*)>&& destroyerFu);
 		TexData(GLenum texTarget, float* data, std::function<void(float*)>&& destroyerFu);
 		TexData(const TexData& other) = delete;
 		TexData& operator=(const TexData& other) = delete;

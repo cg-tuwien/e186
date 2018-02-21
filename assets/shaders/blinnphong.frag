@@ -1,7 +1,7 @@
 #extension GL_ARB_explicit_uniform_location : enable
 
 // ################# UNIFORM DATA ###############
-layout(location = 131) uniform vec2 uTexCoordsScale = vec2(1, 1);
+layout(location = 140) uniform vec2 uTexCoordsScale = vec2(1, 1);
 
 // Material data:
 layout(location = 110) uniform vec3 uDiffuseReflectivity;

@@ -68,8 +68,35 @@ namespace e186
 		/*! Lightmap texture sampler at layout (location = 130) */
 		LightmapTexture,
 
-		/*! Tiling or Texture Scale (location = 131) */
-		TextureTiling
+		/*! Albedo color at layout (location = 131) */
+		Albedo,
+
+		/*! Metallic factor at layout (location = 132) */
+		Metallic,
+
+		/*! Smoothness factor at layout (location = 133) */
+		Smoothness,
+		
+		/*! Sheen factor at layout (location = 134) */
+		Sheen,
+
+		/*! Thickness factor at layout (location = 135) */
+		Thickness,
+
+		/*! Roughness factor at layout (location = 136) */
+		Roughness,
+
+		/*! Anisotropy at layout (location = 137) */
+		Anisotropy,
+
+		/*! Anisotropy Rotation at layout (location = 138) */
+		AnisotropyRotation,
+
+		/*! (Texturecoordinate-)Offset at layout (location = 139) */
+		Offset,
+
+		/*! (Texture-)Tiling or Texture Scale at layout (location = 140) */
+		Tiling,
 	};
 
 	template<typename T>
@@ -98,6 +125,16 @@ namespace e186
 		case MaterialUniformLocation::DisplacementTexture:
 		case MaterialUniformLocation::ReflectionTexture:
 		case MaterialUniformLocation::LightmapTexture:
+		case MaterialUniformLocation::Albedo:
+		case MaterialUniformLocation::Metallic:
+		case MaterialUniformLocation::Smoothness:
+		case MaterialUniformLocation::Sheen:
+		case MaterialUniformLocation::Thickness:
+		case MaterialUniformLocation::Roughness:
+		case MaterialUniformLocation::Anisotropy:
+		case MaterialUniformLocation::AnisotropyRotation:
+		case MaterialUniformLocation::Offset:
+		case MaterialUniformLocation::Tiling:
 			return true;
 		}
 		return false;

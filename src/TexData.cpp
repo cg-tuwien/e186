@@ -5,7 +5,7 @@ namespace e186
 	{
 	}
 
-	TexData::TexData(GLenum texTarget, unsigned char* data, std::function<void(unsigned char*)>&& destroyerFu) :
+	TexData::TexData(GLenum texTarget, uint8_t* data, std::function<void(uint8_t*)>&& destroyerFu) :
 		TexInfo(texTarget)
 	{
 		m_data_type = GL_FLOAT;
@@ -55,8 +55,8 @@ namespace e186
 		}
 		else
 		{
-			auto destructor = std::get<std::function<void(unsigned char*)>>(m_destroyer);
-			auto data = std::get<unsigned char*>(m_data);
+			auto destructor = std::get<std::function<void(uint8_t*)>>(m_destroyer);
+			auto data = std::get<uint8_t*>(m_data);
 			destructor(data);
 		}
 

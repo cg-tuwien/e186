@@ -20,7 +20,7 @@ namespace e186
 		m_destroyer = destroyerFu;
 	}
 
-	Tex2D::Tex2D(unsigned char* data, GLsizei width, GLsizei height, GLsizei colorChannels, std::function<void(unsigned char*)>&& destroyerFu) :
+	Tex2D::Tex2D(uint8_t* data, GLsizei width, GLsizei height, GLsizei colorChannels, std::function<void(uint8_t*)>&& destroyerFu) :
 		TexData(GL_TEXTURE_2D),
 		m_width(width),
 		m_height(height),
@@ -30,7 +30,7 @@ namespace e186
 		m_destroyer = destroyerFu;
 	}
 
-	Tex2D::Tex2D(Tex2D&& other) :
+	Tex2D::Tex2D(Tex2D&& other) noexcept :
 		TexData(std::move(other)),
 		// it's all simple data types, so no std::move neccessary here
 		m_width(other.m_width),
@@ -42,7 +42,7 @@ namespace e186
 		other.m_color_channels = 0;
 	}
 
-	Tex2D& Tex2D::operator=(Tex2D&& other)
+	Tex2D& Tex2D::operator=(Tex2D&& other) noexcept
 	{
 		TexData::operator=(std::move(other));
 		// it's all simple data types, so no std::move neccessary here
@@ -75,19 +75,19 @@ namespace e186
 		return m_color_channels;
 	}
 
-	Tex2D& Tex2D::Generate1pxWhite()
+	Tex2D& Tex2D::Generate1pxTexture(uint8_t color_r, uint8_t color_g, uint8_t color_b, GLint image_format)
 	{
-		auto one_px = new unsigned char[3];
-		one_px[0] = 255;
-		one_px[1] = 255;
-		one_px[2] = 255;
+		auto one_px = new uint8_t[3];
+		one_px[0] = color_r;
+		one_px[1] = color_g;
+		one_px[2] = color_b;
 		m_data = one_px;
-		m_destroyer = [](unsigned char* data) { delete[] data; };
+		m_destroyer = [](uint8_t* data) { delete[] data; };
 		m_data_type = GL_UNSIGNED_BYTE;
 		m_width = 1;
 		m_height = 1;
 		m_color_channels = 3;
-		m_image_format = GL_RGB;
+		m_image_format = image_format;
 		return *this;
 	}
 
@@ -116,7 +116,7 @@ namespace e186
 				return *this;
 			}
 			m_data = data;
-			m_destroyer = [](unsigned char* data) {	stbi_image_free(data); };
+			m_destroyer = [](uint8_t* data) {	stbi_image_free(data); };
 			m_data_type = GL_UNSIGNED_BYTE;
 		}
 
@@ -155,28 +155,28 @@ namespace e186
 		}
 			
 		float* flipped_f;
-		unsigned char* flipped_uc;
+		uint8_t* flipped_uc;
 
 		auto x = m_width;
 		auto y = m_height;
 		auto n = m_color_channels;
 
 		size_t cSize;
-		unsigned char* orig;
-		unsigned char* flip;
+		uint8_t* orig;
+		uint8_t* flip;
 		auto isFloat = std::holds_alternative<float*>(m_data);
 		if (isFloat)
 		{
 			flipped_f = new float[x * y * n];
 			cSize = sizeof(float);
-			orig = reinterpret_cast<unsigned char*>(std::get<float*>(m_data));
-			flip = reinterpret_cast<unsigned char*>(flipped_f);
+			orig = reinterpret_cast<uint8_t*>(std::get<float*>(m_data));
+			flip = reinterpret_cast<uint8_t*>(flipped_f);
 		}
 		else
 		{
-			flipped_uc = new unsigned char[x * y * n];
-			cSize = sizeof(unsigned char);
-			orig = std::get<unsigned char*>(m_data);
+			flipped_uc = new uint8_t[x * y * n];
+			cSize = sizeof(uint8_t);
+			orig = std::get<uint8_t*>(m_data);
 			flip = flipped_uc;
 		}
 
@@ -197,7 +197,7 @@ namespace e186
 		else
 		{
 			m_data = flipped_uc;
-			m_destroyer = [](unsigned char* data) { delete[] data; };
+			m_destroyer = [](uint8_t* data) { delete[] data; };
 		}
 
 		return *this;
@@ -220,8 +220,8 @@ namespace e186
 
 		//store the texture data for OpenGL use
 		auto bits = std::holds_alternative<float*>(m_data)
-			? reinterpret_cast<unsigned char*>(std::get<float*>(m_data))
-			: std::get<unsigned char*>(m_data);
+			? reinterpret_cast<uint8_t*>(std::get<float*>(m_data))
+			: std::get<uint8_t*>(m_data);
 		glTexImage2D(GL_TEXTURE_2D, level, internal_format, m_width, m_height, border, m_image_format, m_data_type, bits);
 
 		check_gl_error("After glTexImage2D in Tex2D::Upload");

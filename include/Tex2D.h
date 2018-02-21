@@ -8,19 +8,19 @@ namespace e186
 
 	public:
 		Tex2D();
-		Tex2D(unsigned char* data, GLsizei width, GLsizei height, GLsizei colorChannels, std::function<void(unsigned char*)>&& destroyerFu);
+		Tex2D(uint8_t* data, GLsizei width, GLsizei height, GLsizei colorChannels, std::function<void(uint8_t*)>&& destroyerFu);
 		Tex2D(float* data, GLsizei width, GLsizei height, GLsizei colorChannels, std::function<void(float*)>&& destroyerFu);
 		Tex2D(const Tex2D& other) = delete;
 		Tex2D& operator=(const Tex2D& other) = delete;
-		Tex2D(Tex2D&& other);
-		Tex2D& operator=(Tex2D&& other);
+		Tex2D(Tex2D&& other) noexcept;
+		Tex2D& operator=(Tex2D&& other) noexcept;
 		virtual ~Tex2D();
 
 		GLsizei width() const;
 		GLsizei height() const;
 		GLsizei color_channels() const;
 
-		Tex2D& Generate1pxWhite();
+		Tex2D& Generate1pxTexture(uint8_t color_r, uint8_t color_g, uint8_t color_b, GLint image_format = GL_RGB);
 		Tex2D& FromFile(const std::string& path, bool isHDR = false);
 		Tex2D& Flip();
 		Tex2D& Upload(GLint internal_format = -1, GLint border = 0, GLint level = 0);

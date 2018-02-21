@@ -5,6 +5,7 @@ namespace e186
 {
 	MaterialData::MaterialData() :
 		m_name(""),
+		m_hidden(false),
 		m_diffuse_reflectivity(1.0f, 1.0f, 1.0f),
 		m_specular_reflectivity(1.0f, 1.0f, 1.0f),
 		m_ambient_reflectivity(1.0f, 1.0f, 1.0f),
@@ -18,7 +19,12 @@ namespace e186
 		m_shininess_strength(0.0f),
 		m_refraction_index(0.0f),
 		m_reflectivity(0.0f),
-		m_tiling(1.0f, 1.0f)
+		m_albedo(0.0f, 0.0f, 0.0f),
+		m_metallic(0.0f),
+		m_smoothness(0.0f),
+		m_roughness(0.0f),
+		m_tiling(1.0f, 1.0f),
+		m_offset(0.0f, 0.0f)
 	{ 
 	}
 
@@ -207,6 +213,8 @@ namespace e186
 		GLuint current_texture_unit = 0;
 
 		auto white_tex = std::make_shared<Tex2D>();
+		auto black_tex = std::make_shared<Tex2D>();
+		auto straight_up_normal_tex = std::make_shared<Tex2D>();
 		
 		GLint count;
 		glGetProgramiv(shader.handle(), GL_ACTIVE_UNIFORMS, &count);
@@ -337,7 +345,7 @@ namespace e186
 						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], height texture sampler is named [%s]", &material_data, shader.handle(), name);
 						if (!material_data.m_height_tex)
 						{
-							material_data.m_height_tex = white_tex;
+							material_data.m_height_tex = black_tex;
 						}
 						setter_funcs.push_back([tex_unit = current_texture_unit++](const Shader& shdr, const MaterialData& mat)
 						{
@@ -348,7 +356,7 @@ namespace e186
 						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], normals texture sampler is named [%s]", &material_data, shader.handle(), name);
 						if (!material_data.m_normals_tex)
 						{
-							material_data.m_normals_tex = white_tex;
+							material_data.m_normals_tex = straight_up_normal_tex;
 						}
 						setter_funcs.push_back([tex_unit = current_texture_unit++](const Shader& shdr, const MaterialData& mat)
 						{
@@ -381,7 +389,7 @@ namespace e186
 						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], displacement texture sampler is named [%s]", &material_data, shader.handle(), name);
 						if (!material_data.m_displacement_tex)
 						{
-							material_data.m_displacement_tex = white_tex;
+							material_data.m_displacement_tex = black_tex;
 						}
 						setter_funcs.push_back([tex_unit = current_texture_unit++](const Shader& shdr, const MaterialData& mat)
 						{
@@ -410,6 +418,77 @@ namespace e186
 							shdr.SetSampler(static_cast<GLuint>(MaterialUniformLocation::LightmapTexture), *mat.lightmap_tex(), tex_unit);
 						});
 						break;
+					case MaterialUniformLocation::Albedo:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], albedo uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Albedo), mat.albedo());
+						});
+						break;
+						break;
+					case MaterialUniformLocation::Metallic:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], metallic uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Metallic), mat.metallic());
+						});
+						break;
+					case MaterialUniformLocation::Smoothness:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], smoothness uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Smoothness), mat.smoothness());
+						});
+						break;
+					case MaterialUniformLocation::Sheen:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], sheen uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Sheen), mat.sheen());
+						});
+						break;
+					case MaterialUniformLocation::Thickness:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], thickness uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Thickness), mat.thickness());
+						});
+						break;
+					case MaterialUniformLocation::Roughness:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], roughness uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Roughness), mat.roughness());
+						});
+						break;
+					case MaterialUniformLocation::Anisotropy:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], anisotropy uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Anisotropy), mat.anisotropy());
+						});
+						break;
+					case MaterialUniformLocation::AnisotropyRotation:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], anisotropy-rotation uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::AnisotropyRotation), mat.anisotropy_rotation());
+						});
+						break;
+					case MaterialUniformLocation::Offset:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], offset uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Offset), mat.offset());
+						});
+						break;
+					case MaterialUniformLocation::Tiling:
+						log_debug_verbose("In MaterialData[0x%p] for shader with handle[%u], tiling uniform is named [%s]", &material_data, shader.handle(), name);
+						setter_funcs.push_back([](const Shader& shdr, const MaterialData& mat)
+						{
+							shdr.SetUniform(static_cast<GLuint>(MaterialUniformLocation::Tiling), mat.tiling());
+						});
+						break;
 				}
 			}
 		}
@@ -417,9 +496,21 @@ namespace e186
 		// Upload white texture only if we have used it!
 		if (white_tex.use_count() > 1)
 		{
-			white_tex->Generate1pxWhite().Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
+			white_tex->Generate1pxTexture(255, 255, 255).Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
 		}
-		
+
+		// Upload black texture only if we have used it!
+		if (black_tex.use_count() > 1)
+		{
+			black_tex->Generate1pxTexture(0, 0, 0).Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
+		}
+
+		// Upload straight-up-normal texture only if we have used it!
+		if (straight_up_normal_tex.use_count() > 1)
+		{
+			straight_up_normal_tex->Generate1pxTexture(127, 127, 255).Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
+		}
+
 		return[n = setter_funcs.size(), setters = std::move(setter_funcs)](const Shader& shdr, const MaterialData& mat)
 		{
 			for (auto i = 0; i < n; ++i)
