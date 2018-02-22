@@ -42,5 +42,26 @@ namespace e186
 			}
 			return cleaned_up;
 		}
+
+		std::string CombinePaths(const std::string& first, const std::string& second)
+		{
+			return CleanUpPath(first + SEP_TO_USE + second);
+		}
+
+		std::string CombinePaths(const char* first, const std::string& second)
+		{
+			return CombinePaths(std::string(first), second);
+		}
+
+		std::string CombinePaths(const std::string& first, const char* second)
+		{
+			return CombinePaths(first, std::string(second));
+		}
+
+		std::string CombinePaths(const char* first, const char* second)
+		{
+			return CombinePaths(std::string(first), std::string(second));
+		}
+
 	}
 }

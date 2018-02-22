@@ -146,6 +146,9 @@ namespace e186
 
 	Shader::~Shader()
 	{
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		Engine::current()->StopFileChangeNotifyCallbacks(&m_files_changed);
+#endif
 		if (0 != m_prog_handle)
 		{
 			log_debug("Destructing Shader with m_prog_handle[%u]", m_prog_handle);
@@ -792,6 +795,23 @@ namespace e186
 		PrepareAutoMatActionConfigs();
 		CreateAutoMatCalcers();
 
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		m_files_changed = [this]()
+		{
+			log_info("RELOAD THIS SHADER!");
+			Shader nuShader;
+			nuShader.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
+				.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
+				.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong.frag", { std::make_tuple(0, "oFragColor") })
+				.Build();
+			*this = std::move(nuShader);
+		};
+		std::vector<std::string> files;
+		files.push_back("assets/shaders/blinnphong.vert");
+		files.push_back("assets/shaders/blinnphong.frag");
+		Engine::current()->NotifyOnFileChanges(std::move(files), &m_files_changed);
+#endif
+
 		CheckErrorAndPrintInfoLog("Shader::Build END", "Something went wrong");
 		return *this;
 	}
@@ -1073,7 +1093,7 @@ namespace e186
 	{
 		// If one of the following asserts fails, you are probably trying to render using the wrong shader!
 		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
-		assert(shader.handle() == uniform_setters.m_shader_handle);
+		//assert(shader.handle() == uniform_setters.m_shader_handle);
 
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)

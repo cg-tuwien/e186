@@ -1,6 +1,7 @@
 #pragma once
 #include "AntTweakBarManager.h"
 #include "FileWatcher/FileWatcher.h"
+#include "string_utils.h"
 
 namespace e186
 {
@@ -24,31 +25,6 @@ namespace e186
 	class PointLight;
 	using PointLightRef = std::reference_wrapper<PointLight>;
 #pragma endregion
-
-	// where UpdateListener is defined as such
-	class UpdateListener : public FW::FileWatchListener
-	{
-	public:
-		UpdateListener() {}
-		void handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename,
-			FW::Action action)
-		{
-			switch (action)
-			{
-			case FW::Actions::Add:
-				std::cout << "File (" << dir + "\\" + filename << ") Added! " << std::endl;
-				break;
-			case FW::Actions::Delete:
-				std::cout << "File (" << dir + "\\" + filename << ") Deleted! " << std::endl;
-				break;
-			case FW::Actions::Modified:
-				std::cout << "File (" << dir + "\\" + filename << ") Modified! " << std::endl;
-				break;
-			default:
-				std::cout << "Should never happen!" << std::endl;
-			}
-		}
-	};
 
 	class Engine
 	{
@@ -79,6 +55,25 @@ namespace e186
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>> m_stored_char_callbacks;
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>*> m_char_callbacks;
 
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		std::vector<std::string> m_files_to_update;
+		std::vector<std::tuple<std::vector<std::string>, std::function<void()>*>> m_file_update_callbacks;
+
+		class UpdateListener : public FW::FileWatchListener
+		{
+			Engine* m_engine; 
+
+		public:
+			UpdateListener(Engine* engine);
+			void handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename, FW::Action action);
+		};
+
+		void HandleFileUpdateCallbacks();
+	public:
+		void NotifyOnFileChanges(std::vector<std::string> files, std::function<void()>* callback);
+		void StopFileChangeNotifyCallbacks(std::function<void()>* callback);
+#endif
+
 	public:
 		std::queue<std::function<void()>> m_pending_actions;
 
@@ -99,6 +94,11 @@ namespace e186
 		std::function<std::unique_ptr<IScene>()> m_root_scene_generator_func;
 
 		AntTweakBarManager m_ant_tweak_bar_manager;
+
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		FW::FileWatcher m_file_watcher;
+		UpdateListener m_update_listener;
+#endif
 
 		void SetRootSceneAsNextScene();
 

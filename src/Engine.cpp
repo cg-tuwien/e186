@@ -17,6 +17,9 @@ namespace e186
 		m_next_is_root(false),
 		m_current_is_root(false),
 		m_ant_tweak_bar_manager()
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		, m_update_listener(this)
+#endif
 	{
 		glfwGetFramebufferSize(m_mainWindow, &m_main_wnd_width, &m_main_wnd_height);
 		m_main_wnd_aspectRatio = static_cast<float>(m_main_wnd_width) / static_cast<float>(m_main_wnd_height);
@@ -355,6 +358,9 @@ namespace e186
 	void Engine::BeginFrame()
 	{
 		WorkOffPendingActions();
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		m_file_watcher.update();
+#endif
 		ProcessEvents();
 		WorkOffPendingActions();
 		glFinish();
@@ -570,4 +576,74 @@ namespace e186
 			getchar();
 		}
 	}
+
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+	Engine::UpdateListener::UpdateListener(Engine* engine) 
+		: m_engine{ engine }
+	{
+		
+	}
+
+	void Engine::UpdateListener::handleFileAction(FW::WatchID watchid, const FW::String& dir, const FW::String& filename, FW::Action action)
+	{
+		if (FW::Actions::Modified == action)
+		{
+			m_engine->m_files_to_update.push_back(utils::CombinePaths(dir.c_str(), filename.c_str()));
+			m_engine->m_pending_actions.push([this]()
+			{
+				m_engine->HandleFileUpdateCallbacks();
+			});
+		}
+		// don't care about the other cases
+	}
+
+	void Engine::HandleFileUpdateCallbacks()
+	{
+		// uniqueify files:
+		std::set<std::string> file_set(m_files_to_update.begin(), m_files_to_update.end());
+		m_files_to_update.clear();
+
+		// gather unique callbacks:
+		std::set<std::function<void()>*> callbacks;
+		for (const auto& tup : m_file_update_callbacks)
+		{
+			const auto& possi_files = std::get<0>(tup);
+			auto* callback = std::get<1>(tup);
+			for (const auto& f : possi_files)
+			{
+				for (const auto& u : file_set)
+				{
+					if (u.find(f) != std::string::npos)
+					{
+						callbacks.insert(callback);
+					}
+				}
+			}
+		}
+
+		// update the callbacks
+		for (const auto* cb : callbacks)
+		{
+			(*cb)();
+		}
+	}
+
+	void Engine::NotifyOnFileChanges(std::vector<std::string> files, std::function<void()>* callback)
+	{
+		m_file_watcher.addWatch(utils::ExtractBasePath(files[0]), &m_update_listener); // TODO: handle folders, not just first one
+		m_file_update_callbacks.push_back(std::make_tuple(std::move(files), callback));
+	}
+
+	void Engine::StopFileChangeNotifyCallbacks(std::function<void()>* callback)
+	{
+		m_file_update_callbacks.erase(std::remove_if(
+			m_file_update_callbacks.begin(),
+			m_file_update_callbacks.end(),
+			[callback](const std::tuple<std::vector<std::string>, std::function<void()>*>& tup)
+			{
+				return std::get<1>(tup) == callback;
+			}),
+			m_file_update_callbacks.end());
+	}
+#endif
 }

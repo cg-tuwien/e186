@@ -314,6 +314,10 @@ namespace e186
 		std::array<bool, 16> m_auto_mat_do_calc;
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;
+
+#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		std::function<void()> m_files_changed;
+#endif
 	};
 
 	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len);

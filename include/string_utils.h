@@ -15,6 +15,9 @@ namespace e186
 
 		std::string ExtractBasePath(const std::string& path);
 		std::string CleanUpPath(const std::string& path);
-
+		std::string CombinePaths(const std::string& first, const std::string& second);
+		std::string CombinePaths(const char* first, const std::string& second);
+		std::string CombinePaths(const std::string& first, const char* second);
+		std::string CombinePaths(const char* first, const char* second);
 	}
 }
