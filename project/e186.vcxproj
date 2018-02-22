@@ -102,13 +102,6 @@
   <ItemGroup>
     <None Include="..\assets\shaders\blinnphong.frag" />
     <None Include="..\assets\shaders\blinnphong.vert" />
-    <None Include="..\assets\shaders\geodesic.frag" />
-    <None Include="..\assets\shaders\geodesic.geom" />
-    <None Include="..\assets\shaders\geodesic.tesc" />
-    <None Include="..\assets\shaders\geodesic.tese" />
-    <None Include="..\assets\shaders\geodesic.vert" />
-    <None Include="..\assets\shaders\terrain.frag" />
-    <None Include="..\assets\shaders\terrain.vert" />
     <None Include="..\assets\shaders\texture.frag" />
     <None Include="..\assets\shaders\texture.vert" />
     <None Include="..\assets\shaders\translucent_gizmo.frag" />
