@@ -33,21 +33,7 @@ struct PointLightData
 
 uniform AmbientLightData uAmbientLight;
 uniform DirectionalLightData uDirectionalLight;
-
-#if PARSER(A_VER <= A1_EXR)
 uniform PointLightData uPointLight;
-#else
-// ----> Upload PointLights as SSBO DATA <----
-// force this block to be assigned to index 0
-// std430 specifies that the structured data 
-// should follow a specific set of packing 
-// rules. This will make the packing consistent 
-// across OpenGL implementations
-layout(std430, binding = 0) buffer PointLightBlock
-{
-	PointLightData uPointLights[];
-};
-#endif
 // ----------------------------------------------
 
 // ################# VARYING DATA ###############
@@ -109,7 +95,6 @@ void main()
 	vec3 dl_intensity = uDirectionalLight.color.rgb;
 	diffuse_and_specular += dl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_dir_vs, to_eye_nrm_vs, normal_vs, diff_tex_color);
 	
-#if PARSER(A_VER <= A1_EXR)
 	// point light 1
 	vec3 light_pos_vs = uPointLight.position.xyz;
 	vec3 to_light = light_pos_vs - pos_vs;
@@ -119,22 +104,6 @@ void main()
 	float atten = CalcAttenuation(uPointLight.attenuation, dist, dist_sq, dist * dist_sq);
 	vec3 pl_intensity = uPointLight.color.rgb / atten;
 	diffuse_and_specular += pl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm_vs, normal_vs, diff_tex_color);
-#else
-	// point lights
-	for (int i = 0; i < uPointLights.length(); ++i)
-	{
-		vec3 light_pos_vs = uPointLights[i].position.xyz;
-		vec3 to_light = light_pos_vs - pos_vs;
-		float dist_sq = dot(to_light, to_light);
-		float dist = sqrt(dist_sq);
-		vec3 to_light_nrm = to_light / dist;
-
-		float atten = CalcAttenuation(uPointLights[i].attenuation, dist, dist_sq, dist * dist_sq);
-		vec3 pl_intensity = uPointLights[i].color.rgb / atten;
-		
-		diffuse_and_specular += pl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm_vs, normal_vs, diff_tex_color);
-	}
-#endif
 
 	// add all together
 	oFragColor = vec4(ambient + emissive + diffuse_and_specular, 1.0);
