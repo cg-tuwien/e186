@@ -45,14 +45,8 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{9cfafc6b-c37d-4061-8ede-a7e713bc3c80}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\shaders\geodesic">
-      <UniqueIdentifier>{a6eed9b7-e35b-412d-8a70-3a456c574fd6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\shaders\blinnphong">
       <UniqueIdentifier>{2bfedab1-feac-4a7a-a746-f300af367b7f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\shaders\terrain">
-      <UniqueIdentifier>{7040030c-61ef-4d63-89e2-d409eac6c5ef}</UniqueIdentifier>
     </Filter>
     <Filter Include="Resource Files\shaders\texture">
       <UniqueIdentifier>{072cf67b-d1c7-4d89-859a-72fa15cb9270}</UniqueIdentifier>
@@ -379,32 +373,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\assets\shaders\geodesic.tesc">
-      <Filter>Resource Files\shaders\geodesic</Filter>
-    </None>
-    <None Include="..\assets\shaders\geodesic.tese">
-      <Filter>Resource Files\shaders\geodesic</Filter>
-    </None>
-    <None Include="..\assets\shaders\geodesic.vert">
-      <Filter>Resource Files\shaders\geodesic</Filter>
-    </None>
-    <None Include="..\assets\shaders\geodesic.frag">
-      <Filter>Resource Files\shaders\geodesic</Filter>
-    </None>
-    <None Include="..\assets\shaders\geodesic.geom">
-      <Filter>Resource Files\shaders\geodesic</Filter>
-    </None>
     <None Include="..\assets\shaders\blinnphong.vert">
       <Filter>Resource Files\shaders\blinnphong</Filter>
     </None>
     <None Include="..\assets\shaders\blinnphong.frag">
       <Filter>Resource Files\shaders\blinnphong</Filter>
-    </None>
-    <None Include="..\assets\shaders\terrain.frag">
-      <Filter>Resource Files\shaders\terrain</Filter>
-    </None>
-    <None Include="..\assets\shaders\terrain.vert">
-      <Filter>Resource Files\shaders\terrain</Filter>
     </None>
     <None Include="..\assets\shaders\texture.frag">
       <Filter>Resource Files\shaders\texture</Filter>
