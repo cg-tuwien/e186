@@ -7,7 +7,7 @@
 
 namespace e186
 {
-	 
+
 
 	ModelExplorerScene::ModelExplorerScene(std::string model_to_load_path, glm::mat4 transformation_matrix, unsigned int model_loader_flags) : m_termination_requested(false)
 	{
@@ -29,12 +29,12 @@ namespace e186
 		// create a shader:
 		Shader shader;
 		shader.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
-			  .AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
-			  .AddFragmentShaderSourceFromFile("assets/shaders/blinnphong.frag", { std::make_tuple(0, "oFragColor") })
-			  .DeclareAutoMatrix("pMatrix", AutoMatrix::ProjectionMatrix)
-			  .DeclareAutoMatrix("vmMatrix", AutoMatrix::ViewMatrix | AutoMatrix::ModelMatrix | AutoMatrix::TransformMatrix)
-			  .DeclareAutoMatrix("vmNormalMatrix", AutoMatrix::ViewMatrix | AutoMatrix::ModelMatrix | AutoMatrix::TransformMatrix | AutoMatrix::IsNormalMatrix)
-			  .Build();
+			.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
+			.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong.frag", { std::make_tuple(0, "oFragColor") })
+			.DeclareAutoMatrix("pMatrix", AutoMatrix::ProjectionMatrix)
+			.DeclareAutoMatrix("vmMatrix", AutoMatrix::ViewMatrix | AutoMatrix::ModelMatrix | AutoMatrix::TransformMatrix)
+			.DeclareAutoMatrix("vmNormalMatrix", AutoMatrix::ViewMatrix | AutoMatrix::ModelMatrix | AutoMatrix::TransformMatrix | AutoMatrix::IsNormalMatrix)
+			.Build();
 
 		// select some meshes which we intend to render
 		auto meshes = m_model->SelectAllMeshes();
