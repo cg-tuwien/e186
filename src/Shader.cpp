@@ -721,22 +721,22 @@ namespace e186
 	{
 		m_shaderHandles[0] = m_vertex_shader_sources.empty()       
 			? 0 
-			: Compile(m_vertex_shader_sources.size(), GetAsCStrs(m_vertex_shader_sources).data(),				GL_VERTEX_SHADER);
+			: Compile(static_cast<GLsizei>(m_vertex_shader_sources.size()), GetAsCStrs(m_vertex_shader_sources).data(),             GL_VERTEX_SHADER);
 		m_shaderHandles[1] = m_tess_control_shader_sources.empty() 
 			? 0 
-			: Compile(m_tess_control_shader_sources.size(), GetAsCStrs(m_tess_control_shader_sources).data(),	GL_TESS_CONTROL_SHADER);
+			: Compile(static_cast<GLsizei>(m_tess_control_shader_sources.size()), GetAsCStrs(m_tess_control_shader_sources).data(), GL_TESS_CONTROL_SHADER);
 		m_shaderHandles[2] = m_tess_eval_shader_sources.empty()    
 			? 0 
-			: Compile(m_tess_eval_shader_sources.size(), GetAsCStrs(m_tess_eval_shader_sources).data(),			GL_TESS_EVALUATION_SHADER);
+			: Compile(static_cast<GLsizei>(m_tess_eval_shader_sources.size()), GetAsCStrs(m_tess_eval_shader_sources).data(),       GL_TESS_EVALUATION_SHADER);
 		m_shaderHandles[3] = m_geometry_shader_sources.empty()     
 			? 0 
-			: Compile(m_geometry_shader_sources.size(), GetAsCStrs(m_geometry_shader_sources).data(),			GL_GEOMETRY_SHADER);
+			: Compile(static_cast<GLsizei>(m_geometry_shader_sources.size()), GetAsCStrs(m_geometry_shader_sources).data(),         GL_GEOMETRY_SHADER);
 		m_shaderHandles[4] = m_fragment_shader_sources.empty()     
 			? 0 
-			: Compile(m_fragment_shader_sources.size(), GetAsCStrs(m_fragment_shader_sources).data(),			GL_FRAGMENT_SHADER);
+			: Compile(static_cast<GLsizei>(m_fragment_shader_sources.size()), GetAsCStrs(m_fragment_shader_sources).data(),         GL_FRAGMENT_SHADER);
 		m_shaderHandles[5] = m_compute_shader_sources.empty()      
 			? 0 
-			: Compile(m_compute_shader_sources.size(), GetAsCStrs(m_compute_shader_sources).data(),				GL_COMPUTE_SHADER);
+			: Compile(static_cast<GLsizei>(m_compute_shader_sources.size()), GetAsCStrs(m_compute_shader_sources).data(),           GL_COMPUTE_SHADER);
 
 		const auto progHandle = glCreateProgram();
 		m_prog_handle = progHandle;
