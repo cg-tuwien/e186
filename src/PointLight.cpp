@@ -109,7 +109,7 @@ namespace e186
 		{
 			target.m_position = glm::vec4(0.0f);
 			target.m_light_color = glm::vec4(0.0f);
-			target.m_attenuation = glm::vec4(0.0f);
+			target.m_attenuation = glm::vec4(1.0f);
 		}
 	}
 
@@ -125,7 +125,7 @@ namespace e186
 		{
 			target.m_position = glm::vec4(0.0f);
 			target.m_light_color = glm::vec4(0.0f);
-			target.m_attenuation = glm::vec4(0.0f);
+			target.m_attenuation = glm::vec4(1.0f);
 		}
 	}
 
