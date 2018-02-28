@@ -171,6 +171,11 @@ namespace e186
 			glfwSwapBuffers(m_mainWindow);
 		}
 
+		void SetVSync(bool on) const
+		{
+			glfwSwapInterval(on ? 1 : 0);
+		}
+
 		bool IsKeyPressed(int key) const
 		{
 			return 0 != glfwGetKey(m_mainWindow, key);

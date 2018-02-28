@@ -47,7 +47,7 @@ namespace e186
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 #endif
 
-		 glfwSwapInterval(0); // = vsync
+		glfwSwapInterval(0); // = vsync off
 	}
 
 	Engine::~Engine()
