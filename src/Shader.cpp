@@ -443,36 +443,36 @@ namespace e186
 	}
 
 
+	std::string Shader::kNewLine = "\n";
 
-
-	Shader& Shader::AddVertexShaderSourceFromFile(std::string path)
+	Shader& Shader::AddVertexShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddVertexShaderSource(LoadFromFile(path));
+		return AddVertexShaderSource(LoadFromFile(path), append_newline);
 	}
 
-	Shader& Shader::AddTesselationControlShaderSourceFromFile(std::string path)
+	Shader& Shader::AddTesselationControlShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddTesselationControlShaderSource(LoadFromFile(path));
+		return AddTesselationControlShaderSource(LoadFromFile(path), append_newline);
 	}
 
-	Shader& Shader::AddTesselationEvaluationShaderSourceFromFile(std::string path)
+	Shader& Shader::AddTesselationEvaluationShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddTesselationEvaluationShaderSource(LoadFromFile(path));
+		return AddTesselationEvaluationShaderSource(LoadFromFile(path), append_newline);
 	}
 
-	Shader& Shader::AddGeometryShaderSourceFromFile(std::string path)
+	Shader& Shader::AddGeometryShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddGeometryShaderSource(LoadFromFile(path));
+		return AddGeometryShaderSource(LoadFromFile(path), append_newline);
 	}
 
-	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs)
+	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline)
 	{
-		return AddFragmentShaderSource(LoadFromFile(path), outputs);
+		return AddFragmentShaderSource(LoadFromFile(path), outputs, append_newline);
 	}
 
-	Shader& Shader::AddComputeShaderSourceFromFile(std::string path)
+	Shader& Shader::AddComputeShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddComputeShaderSource(LoadFromFile(path));
+		return AddComputeShaderSource(LoadFromFile(path), append_newline);
 	}
 
 	Shader& Shader::SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode)
@@ -482,39 +482,39 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::AddVertexShaderSource(std::string shader_source)
+	Shader& Shader::AddVertexShaderSource(std::string shader_source, bool append_newline)
 	{
-		m_vertex_shader_sources.push_back(std::move(shader_source));
+		m_vertex_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddTesselationControlShaderSource(std::string shader_source)
+	Shader& Shader::AddTesselationControlShaderSource(std::string shader_source, bool append_newline)
 	{
-		m_tess_control_shader_sources.push_back(std::move(shader_source));
+		m_tess_control_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddTesselationEvaluationShaderSource(std::string shader_source)
+	Shader& Shader::AddTesselationEvaluationShaderSource(std::string shader_source, bool append_newline)
 	{
-		m_tess_eval_shader_sources.push_back(std::move(shader_source));
+		m_tess_eval_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddGeometryShaderSource(std::string shader_source)
+	Shader& Shader::AddGeometryShaderSource(std::string shader_source, bool append_newline)
 	{
-		m_geometry_shader_sources.push_back(std::move(shader_source));
+		m_geometry_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddFragmentShaderSource(std::string shader_source)
+	Shader& Shader::AddFragmentShaderSource(std::string shader_source, bool append_newline)
 	{
-		m_fragment_shader_sources.push_back(std::move(shader_source));
+		m_fragment_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs)
+	Shader& Shader::AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline)
 	{
-		AddFragmentShaderSource(std::move(shader_source));
+		AddFragmentShaderSource(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		AddFragmentShaderOutput(std::move(outputs));
 		return *this;
 	}
@@ -525,37 +525,38 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::AddComputeShaderSource(std::string shader_source)
+	Shader& Shader::AddComputeShaderSource(std::string shader_source, bool append_newline)
 	{
-		m_compute_shader_sources.push_back(std::move(shader_source));
+		m_compute_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders)
+	Shader& Shader::AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, bool append_newline)
 	{
+		auto shader_src_with_or_without_newline = append_newline ? shader_source + kNewLine : shader_source;
 		if (ShaderType::None != (which_shaders & ShaderType::Vertex))
 		{
-			AddVertexShaderSource(shader_source);
+			AddVertexShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::TessControl))
 		{
-			AddTesselationControlShaderSource(shader_source);
+			AddTesselationControlShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::TessEval))
 		{
-			AddTesselationEvaluationShaderSource(shader_source);
+			AddTesselationEvaluationShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Geometry))
 		{
-			AddGeometryShaderSource(shader_source);
+			AddGeometryShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Fragment))
 		{
-			AddFragmentShaderSource(shader_source);
+			AddFragmentShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Compute))
 		{
-			AddComputeShaderSource(shader_source);
+			AddComputeShaderSource(shader_src_with_or_without_newline);
 		}
 		return *this;
 	}
@@ -973,9 +974,8 @@ namespace e186
 
 	std::string Shader::version_string()
 	{
-		return std::string("#version ")
-				+ std::to_string(Context::current()->gl_major_version() * 100 + Context::current()->gl_minor_version() * 10) 
-				+ (Context::current()->is_core_profile() ? " core\n" : "\n");
+		auto version = std::string("#version ") + std::to_string(Context::current()->gl_major_version() * 100 + Context::current()->gl_minor_version() * 10);
+		return Context::current()->is_core_profile() ? version + " core" : version;
 	}
 
 	void Shader::CheckErrorAndPrintInfoLog(const char* gl_error_location_hint, const char* info_log_description)
