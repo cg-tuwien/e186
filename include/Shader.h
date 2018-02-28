@@ -10,7 +10,7 @@ namespace e186
 
 	class Shader
 	{
-		static GLuint Compile(GLsizei sources_count, const GLchar* const* sources, GLenum shaderType);
+		static GLuint Compile(const std::string& complete_source, GLenum shaderType);
 		void CheckErrorAndPrintInfoLog(const char* gl_error_location_hint, const char* info_log_description);
 		void PrintInfoLog(const char* info_log_description);
 		void DetermineTessData();
@@ -22,7 +22,8 @@ namespace e186
 		void DetermineWhichAutoMatsToCalc();
 		void PrepareAutoMatActionConfigs();
 		void CreateAutoMatCalcers();
-		static std::vector<const GLchar*> GetAsCStrs(const std::vector<std::string>& string_array);
+		//static std::vector<const GLchar*> GetAsCStrs(const std::vector<std::string>& string_array);
+		static std::string ConcatSources(const std::vector<std::string>& sources);
 
 	public:
 		Shader();

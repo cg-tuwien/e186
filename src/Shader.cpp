@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include <glad/glad.h>
+#include <sstream>
 
 namespace e186
 {
@@ -331,16 +332,27 @@ namespace e186
 		}
 	}
 
-	std::vector<const GLchar*> Shader::GetAsCStrs(const std::vector<std::string>& string_array)
+	//std::vector<const GLchar*> Shader::GetAsCStrs(const std::vector<std::string>& string_array)
+	//{
+	//	std::vector<const GLchar*> c_strs;
+	//	c_strs.reserve(string_array.size());
+	//	for (const auto& s : string_array)
+	//	{
+	//		c_strs.push_back(s.c_str());
+	//	}
+	//	return c_strs;
+	//}
+
+	std::string Shader::ConcatSources(const std::vector<std::string>& sources)
 	{
-		std::vector<const GLchar*> c_strs;
-		c_strs.reserve(string_array.size());
-		for (const auto& s : string_array)
+		std::stringstream ss;
+		for (const auto& s : sources)
 		{
-			c_strs.push_back(s.c_str());
+			ss << s;
 		}
-		return c_strs;
+		return ss.str();
 	}
+
 
 	void Shader::PrepareAutoMatActionConfigs()
 	{
@@ -719,24 +731,12 @@ namespace e186
 
 	Shader& Shader::Build()
 	{
-		m_shaderHandles[0] = m_vertex_shader_sources.empty()       
-			? 0 
-			: Compile(static_cast<GLsizei>(m_vertex_shader_sources.size()), GetAsCStrs(m_vertex_shader_sources).data(),             GL_VERTEX_SHADER);
-		m_shaderHandles[1] = m_tess_control_shader_sources.empty() 
-			? 0 
-			: Compile(static_cast<GLsizei>(m_tess_control_shader_sources.size()), GetAsCStrs(m_tess_control_shader_sources).data(), GL_TESS_CONTROL_SHADER);
-		m_shaderHandles[2] = m_tess_eval_shader_sources.empty()    
-			? 0 
-			: Compile(static_cast<GLsizei>(m_tess_eval_shader_sources.size()), GetAsCStrs(m_tess_eval_shader_sources).data(),       GL_TESS_EVALUATION_SHADER);
-		m_shaderHandles[3] = m_geometry_shader_sources.empty()     
-			? 0 
-			: Compile(static_cast<GLsizei>(m_geometry_shader_sources.size()), GetAsCStrs(m_geometry_shader_sources).data(),         GL_GEOMETRY_SHADER);
-		m_shaderHandles[4] = m_fragment_shader_sources.empty()     
-			? 0 
-			: Compile(static_cast<GLsizei>(m_fragment_shader_sources.size()), GetAsCStrs(m_fragment_shader_sources).data(),         GL_FRAGMENT_SHADER);
-		m_shaderHandles[5] = m_compute_shader_sources.empty()      
-			? 0 
-			: Compile(static_cast<GLsizei>(m_compute_shader_sources.size()), GetAsCStrs(m_compute_shader_sources).data(),           GL_COMPUTE_SHADER);
+		m_shaderHandles[0] = m_vertex_shader_sources.empty()		? 0 : Compile(ConcatSources(m_vertex_shader_sources),		GL_VERTEX_SHADER);
+		m_shaderHandles[1] = m_tess_control_shader_sources.empty()	? 0 : Compile(ConcatSources(m_tess_control_shader_sources),	GL_TESS_CONTROL_SHADER);
+		m_shaderHandles[2] = m_tess_eval_shader_sources.empty()		? 0 : Compile(ConcatSources(m_tess_eval_shader_sources),	GL_TESS_EVALUATION_SHADER);
+		m_shaderHandles[3] = m_geometry_shader_sources.empty()		? 0 : Compile(ConcatSources(m_geometry_shader_sources),		GL_GEOMETRY_SHADER);
+		m_shaderHandles[4] = m_fragment_shader_sources.empty()		? 0	: Compile(ConcatSources(m_fragment_shader_sources),		GL_FRAGMENT_SHADER);
+		m_shaderHandles[5] = m_compute_shader_sources.empty()		? 0	: Compile(ConcatSources(m_compute_shader_sources),      GL_COMPUTE_SHADER);
 
 		const auto progHandle = glCreateProgram();
 		m_prog_handle = progHandle;
@@ -1000,20 +1000,16 @@ namespace e186
 		}
 	}
 
-	GLuint Shader::Compile(GLsizei sources_count, const GLchar* const* sources, GLenum shaderType)
+	GLuint Shader::Compile(const std::string& complete_source, GLenum shaderType)
 	{
-		if (!sources)
-		{
-			return GLuint(0);
-		}
-
 		auto shaderHandle = glCreateShader(shaderType);
 		if (!shaderHandle)
 		{
 			return GLuint(0);
 		}
 
-		glShaderSource(shaderHandle, sources_count, sources, 0);
+		const auto* source_c = static_cast<const GLchar*>(complete_source.c_str());
+		glShaderSource(shaderHandle, 1, &source_c, 0);
 		glCompileShader(shaderHandle);
 
 		GLint compileSuccess;
