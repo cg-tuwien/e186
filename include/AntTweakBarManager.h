@@ -40,6 +40,9 @@ namespace e186
 		void enable_tweak_bars();
 		AntTweakBarHandle create_new_tweak_bar(const char* name);
 		void Render();
+
+	private:
+		int currentScrollPos;
 	};
 
 }
