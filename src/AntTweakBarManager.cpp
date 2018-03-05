@@ -39,7 +39,7 @@ namespace e186
 
 	AntTweakBarManager::AntTweakBarManager() :
 		m_enabled(false),
-		currentScrollPos(0)
+		m_current_scroll_pos(0)
 	{
 	}
 	
@@ -95,8 +95,8 @@ namespace e186
 			{
 				if (m_enabled)
 				{
-					currentScrollPos += static_cast<int>(yoffset);
-					TwEventMouseWheelGLFW(currentScrollPos);
+					m_current_scroll_pos += static_cast<int>(yoffset);
+					TwEventMouseWheelGLFW(m_current_scroll_pos);
 				}
 			};
 			Engine::current()->SubscribeToScrollCallbacks(m_scroll_handler);
