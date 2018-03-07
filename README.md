@@ -2,7 +2,7 @@
 
 Developed at Vienna University of Technology, institute 193.
 
-**E**ngine**186**: Rocket jump into C++/OpenGL graphics programming in Visual Studio!
+**E**ngine**186**: Rocket jump into C++/OpenGL graphics programming! This is an unofficial fork for linux.
 
 
 # Credits and Copyright Notices
