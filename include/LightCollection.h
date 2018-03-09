@@ -55,7 +55,7 @@ namespace e186
 
 		void UpdateGpuData()
 		{
-			for (size_t i = 0; i < 0; i++) {
+			for (size_t i = 0; i < size(); i++) {
 				m_lights_gpu[i] = m_lights_extract[i](m_lights[i]);
 			}
 			m_dirty = true;
