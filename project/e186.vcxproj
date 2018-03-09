@@ -31,6 +31,7 @@
     <ClInclude Include="..\include\FixedSimulationTimer.h" />
     <ClInclude Include="..\include\FrameBufferObject.h" />
     <ClInclude Include="..\include\IScene.h" />
+    <ClInclude Include="..\include\LightCollection.h" />
     <ClInclude Include="..\include\LightsourceEditor.h" />
     <ClInclude Include="..\include\log.h" />
     <ClInclude Include="..\include\MaterialData.h" />
