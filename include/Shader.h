@@ -61,12 +61,14 @@ namespace e186
 		Shader& QueryOptionalUniformLocation(const std::string& name);
 		Shader& QueryUniformLocation(const std::string& name);
 		Shader& QueryMandatoryUniformLocation(const std::string& name);
+		Shader& Shader::QueryUniformBlockIndex(const std::string& name);
 		Shader& DeclareAutoMatrix(std::string name, AutoMatrix properties);
 		Shader& Destroy();
 		bool HasUniform(const std::string& name) const;
 		GLuint GetOptionalUniformLocation(const std::string& name);
 		GLuint GetUniformLocation(const std::string& name);
 		GLuint GetMandatoryUniformLocation(const std::string& name);
+		GLuint GetUniformBlockIndex(const std::string& name);
 		bool has_tesselation_shaders() const;
 		GLint patch_vertices() const;
 		bool has_geometry_shader() const;
@@ -128,6 +130,11 @@ namespace e186
 		void SetUniform(GLuint location, const glm::mat4& value) const
 		{
 			glUniformMatrix4fv(location, 1, GL_FALSE, static_cast<const GLfloat*>(glm::value_ptr(value)));
+		}
+
+		void SetUniformBlockBinding(const std::string block_name, GLuint block_binding)
+		{
+			glUniformBlockBinding(m_prog_handle, GetUniformBlockIndex(block_name), block_binding);
 		}
 
 		void SetSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint texture_unit = 0) const
@@ -304,6 +311,7 @@ namespace e186
 		std::vector<std::string> m_compute_shader_sources;
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
 		std::unordered_map<std::string, GLuint> m_uniform_locations;
+		std::unordered_map<std::string, GLuint> m_uniform_block_indices;
 		std::vector<const char*> m_transform_feedback_varyings;
 		GLenum m_transform_feedback_buffer_mode;
 		GLint m_patch_vertices;

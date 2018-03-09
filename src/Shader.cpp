@@ -880,6 +880,23 @@ namespace e186
 		return *this;
 	}
 
+	Shader& Shader::QueryUniformBlockIndex(const std::string& name)
+	{
+		if (0 == m_prog_handle)
+		{
+			throw ExceptionWithCallstack("QueryUniformBlockIndex is useless since the program handle is 0");
+		}
+
+		glUseProgram(m_prog_handle);
+		auto loc = glGetUniformBlockIndex(m_prog_handle, name.c_str());
+		m_uniform_block_indices[name] = loc;
+		if (-1 == loc)
+		{
+			log_warning("Uniform block index of '%s' not found.", name.c_str());
+		}
+		return *this;
+	}
+
 	Shader& Shader::QueryMandatoryUniformLocation(const std::string& name)
 	{
 		QueryOptionalUniformLocation(name);
@@ -947,6 +964,17 @@ namespace e186
 		{
 			QueryUniformLocation(name);
 			return m_uniform_locations.at(name);
+		}
+		return loc->second;
+	}
+
+	GLuint Shader::GetUniformBlockIndex(const std::string& name)
+	{
+		const auto loc = m_uniform_block_indices.find(name);
+		if (loc == m_uniform_block_indices.end())
+		{
+			QueryUniformBlockIndex(name);
+			return m_uniform_block_indices.at(name);
 		}
 		return loc->second;
 	}

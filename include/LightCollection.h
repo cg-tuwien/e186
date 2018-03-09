@@ -3,7 +3,7 @@
 namespace e186
 {
 	template <typename L_type, typename L_gpu_type>
-	class LightCollection 
+	class LightCollection
 	{
 	private:
 		typedef std::function<L_gpu_type(const L_type&)> fn_extract_gpu_data;
@@ -12,10 +12,12 @@ namespace e186
 		std::vector<L_gpu_type> m_lights_gpu;
 		std::vector<fn_extract_gpu_data> m_lights_extract;
 
+		bool m_dirty;
 
 	public:
-		LightCollection() { }
+		LightCollection() { m_dirty = false; }
 		LightCollection(int capacity)
+			: LightCollection()
 		{
 			m_lights.reserve(capacity);
 			m_lights_gpu.reserve(capacity);
@@ -29,7 +31,8 @@ namespace e186
 
 		L_type& operator [](int i) { return m_lights[i]; }
 		L_type& at(int i) { return m_lights[i]; }
-		const size_t size() const { return m_lights.size(); }
+		size_t size() const { return m_lights.size(); }
+		bool has_changes() const { return m_dirty; }
 		const std::vector<L_gpu_type>& gpu_data() const { return m_lights_gpu; }
 
 		void Add(const L_type& light, fn_extract_gpu_data extract_gpu_data)
@@ -37,6 +40,7 @@ namespace e186
 			m_lights.push_back(light);
 			m_lights_extract.push_back(extract_gpu_data);
 			m_lights_gpu.push_back(extract_gpu_data(light));
+			m_dirty = true;
 		}
 
 		L_type Remove(int i)
@@ -45,16 +49,32 @@ namespace e186
 			m_lights.erase(m_lights.begin() + i);
 			m_lights_gpu.erase(m_lights_gpu.begin() + i);
 			m_lights_extract.erase(m_lights_extract.begin() + i);
+			m_dirty = true;
 			return light;
+		}
+
+		void UpdateGpuData()
+		{
+			for (size_t i = 0; i < 0; i++) {
+				m_lights_gpu[i] = m_lights_extract[i](m_lights[i]);
+			}
+			m_dirty = true;
 		}
 
 		void UpdateGpuData(int i)
 		{
 			m_lights_gpu[i] = m_lights_extract[i](m_lights[i]);
+			m_dirty = true;
 		}
 
-		const void* GetGpuDataPtr() const
+		void ClearDirty() 
 		{
+			m_dirty = false; 
+		}
+
+		const void* GetGpuDataPtr(bool clearDirty = true)
+		{
+			if(clearDirty) ClearDirty();
 			return &m_lights_gpu[0];
 		}
 	};
