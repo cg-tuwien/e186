@@ -7,7 +7,7 @@
 
 namespace e186
 {
-	 
+
 
 	ModelExplorerScene::ModelExplorerScene(std::string model_to_load_path, glm::mat4 transformation_matrix, unsigned int model_loader_flags) : m_termination_requested(false)
 	{
@@ -27,43 +27,30 @@ namespace e186
 	void ModelExplorerScene::Run()
 	{
 		// create a shader:
-		Shader shader_diffuse;
-		shader_diffuse.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
+		Shader shader;
+		shader.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
+			.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
 			.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong.frag", { std::make_tuple(0, "oFragColor") })
-			.Build();
-
-		Shader shader_nrm;
-		shader_nrm.AddVertexShaderSourceFromFile("assets/shaders/blinnphong_nm.vert")
-			.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong_nm.frag", { std::make_tuple(0, "oFragColor") })
+			.DeclareAutoMatrix("pMatrix", AutoMatrix::ProjectionMatrix)
+			.DeclareAutoMatrix("vmMatrix", AutoMatrix::ViewMatrix | AutoMatrix::ModelMatrix | AutoMatrix::TransformMatrix)
+			.DeclareAutoMatrix("vmNormalMatrix", AutoMatrix::ViewMatrix | AutoMatrix::ModelMatrix | AutoMatrix::TransformMatrix | AutoMatrix::IsNormalMatrix)
 			.Build();
 
 		// select some meshes which we intend to render
-		auto meshes_diffuse = m_model->SelectMeshes([](const Mesh& mesh)
-		{
-			return false == static_cast<bool>(mesh.material_data()->height_tex());
-		});
+		auto meshes = m_model->SelectAllMeshes();
 		// generate uniform setters for all selected meshes for a specific shader
-		auto uniset_diffuse = Model::CompileUniformSetters(shader_diffuse, meshes_diffuse);
+		auto unisetters = Model::CompileUniformSetters(shader, meshes);
 		// get VAOs of all selected meshes
-		auto vaos_diffuse = Model::GetOrCreateVAOs(shader_diffuse, meshes_diffuse);
+		auto vaos = Model::GetOrCreateVAOs(shader, meshes);
 
-		// select some meshes which we intend to render
-		auto meshes_nm = m_model->SelectMeshes([](const Mesh& mesh)
-		{
-			return true == static_cast<bool>(mesh.material_data()->height_tex());
-		});
-		// generate uniform setters for all selected meshes for a specific shader
-		auto uniset_nm = Model::CompileUniformSetters(shader_nrm, meshes_nm);
-		// get VAOs of all selected meshes
-		auto vaos_nm = Model::GetOrCreateVAOs(shader_nrm, meshes_nm);
+		AmbientLight ambient_light(glm::vec3(0.1f, 0.1f, 0.1f));
+		ambient_light.set_enabled(true);
 
-		auto fubar = Engine::current()->tweak_bar_manager().create_new_tweak_bar("settings");
-		bool whot = false;
-		TwAddVarRW(fubar, "umschalten", TW_TYPE_BOOLCPP, &whot, "");
+		DirectionalLight directional_light(glm::vec3(0.25f, 0.25f, 0.25f), glm::vec3(-0.25f, -1.0f, 0.0f));
+		directional_light.set_enabled(true);
 
-		Tex2D tex;
-		tex.FromFile("assets/textures/altitudes.png").UploadSRGBIfPossible().SetTextureParameters(TexParams_LinearFiltering | TexParams_ClampToEdge);
-		check_gl_error("LoadedTextures::altitudes()");
+		PointLight point_light(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f));
+		point_light.set_enabled(false);
 
 		// create a camera for view and projection matrices:
 		QuakeCamera cam;
@@ -82,9 +69,6 @@ namespace e186
 		glFrontFace(GL_CCW);
 		glDisable(GL_BLEND);
 
-		glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		auto& tM = m_model->transformation_matrix();
 
 		while (!m_termination_requested)
@@ -101,47 +85,13 @@ namespace e186
 			glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//const auto& pM = cam.projection_matrix();
-			//auto vM = cam.CalculateViewMatrix();
-			//auto mM = glm::rotate(timer.absolute_timef(), glm::vec3(0.0f, 1.0f, 0.0f));
-
-			auto nM = glm::mat3(vM);
-
-			if (whot)
-			{
-				shader_diffuse.Use();
-				shader_diffuse.SetSampler("uDiffuseTexSampler", tex);
-				shader_diffuse.SetUniform("normalMatrix", nM);
-				shader_diffuse.SetUniform("vmtMmatrix", vM * tM);
-				shader_diffuse.SetUniform("pvmtMatrix", pM * vM * tM);
-				shader_diffuse.SetUniform("uLightDirection", glm::normalize(nM * glm::vec3(-0.2f, -1.0f, -0.3f)));
-				shader_diffuse.SetUniform("uAmbientLightColor", glm::vec3(0.1f, 0.1f, 0.1f));
-				shader_diffuse.SetUniform("uDiffuseColor", glm::vec3(1.0f, 0.0f, 0.0f));
-				shader_diffuse.SetUniform("uSpecularColor", glm::vec3(0.0f, 1.0f, 0.0f));
-				shader_diffuse.SetUniform("uAmbientColor", glm::vec3(0.1f, 0.1f, 0.3f));
-				shader_diffuse.SetUniform("uEmissiveColor", glm::vec3(0.0f, 0.0f, 0.1f));
-				shader_diffuse.SetUniform("uShininess", 10.0f);
-				RenderMeshesWithAlignedUniformSetters(shader_diffuse, vaos_diffuse, uniset_diffuse);
-				UnbindVAO();
-			}
-			else
-			{
-				shader_nrm.Use();
-				shader_nrm.SetSampler("uDiffuseTexSampler", tex);
-				shader_nrm.SetSampler("uNormalTexSampler", tex);
-				shader_nrm.SetUniform("normalMatrix", nM);
-				shader_nrm.SetUniform("vmtMmatrix", vM * tM);
-				shader_nrm.SetUniform("pvmtMatrix", pM * vM * tM);
-				shader_nrm.SetUniform("uLightDirection", glm::normalize(nM * glm::vec3(-0.2f, -1.0f, -0.3f)));
-				shader_nrm.SetUniform("uAmbientLightColor", glm::vec3(0.1f, 0.1f, 0.1f));
-				shader_nrm.SetUniform("uDiffuseColor", glm::vec3(1.0f, 0.0f, 0.0f));
-				shader_nrm.SetUniform("uSpecularColor", glm::vec3(0.0f, 1.0f, 0.0f));
-				shader_nrm.SetUniform("uAmbientColor", glm::vec3(0.1f, 0.1f, 0.3f));
-				shader_nrm.SetUniform("uEmissiveColor", glm::vec3(0.0f, 0.0f, 0.1f));
-				shader_nrm.SetUniform("uShininess", 10.0f);
-				RenderMeshesWithAlignedUniformSetters(shader_nrm, vaos_nm, uniset_nm);
-				UnbindVAO();
-			}
+			shader.Use();
+			shader.SetAutoMatrices(m_model->transformation_matrix(), glm::mat4(1.0f), vM, pM);
+			shader.SetLight("uAmbientLight", ambient_light);
+			shader.SetLight("uDirectionalLight", directional_light.GetGpuData(vM));
+			shader.SetLight("uPointLight", point_light.GetGpuData(vM));
+			RenderMeshesWithAlignedUniformSetters(shader, vaos, unisetters);
+			UnbindVAO();
 
 			Engine::current()->EndFrame();
 		}

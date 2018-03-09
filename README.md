@@ -70,6 +70,13 @@ The following files are part of FileWatcher, Copyright (c) by James Wynn, licens
  
 See `external/include/FileWatcher/FileWatcher.h` or https://code.google.com/archive/p/simplefilewatcher for full license details.
 
+**3D Models and Textures under Stanford Scan**
+
+The following 3D models and textures are released by Stanford University      
+ * all files under `assets/models/stanford_bunny`
+ 
+See http://www.graphics.stanford.edu/data/3Dscanrep/ for full license details.
+
 **3D Models and Textures under CC BY 3.0**
 
 The following 3D models and textures are released under the Attribution 3.0 Unported (CC BY 3.0) License      
@@ -79,12 +86,13 @@ The following 3D models and textures are released under the Attribution 3.0 Unpo
  
 See https://creativecommons.org/licenses/by/3.0/ for full license details.
 
-**3D Models and Textures under Stanford Scan**
+**3D Models and Textures under CC BY-NC 2.0 FR**
 
-The following 3D models and textures are released by Stanford University      
- * all files under `assets/models/stanford_bunny`
- 
-See http://www.graphics.stanford.edu/data/3Dscanrep/ for full license details.
+ * all files under `assets/textures/large_metal_debris`
+ * all files under `assets/textures/rough_cobblestones`
+ * all files under `assets/textures/small_metal_debris`
+
+See https://creativecommons.org/licenses/by-nc/2.0/fr/deed.en for full license details.
 
 **3D Models and Textures under CC0 1.0**
 

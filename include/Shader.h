@@ -10,7 +10,7 @@ namespace e186
 
 	class Shader
 	{
-		static GLuint Compile(GLsizei sources_count, const GLchar* const* sources, GLenum shaderType);
+		static GLuint Compile(const std::string& complete_source, GLenum shaderType);
 		void CheckErrorAndPrintInfoLog(const char* gl_error_location_hint, const char* info_log_description);
 		void PrintInfoLog(const char* info_log_description);
 		void DetermineTessData();
@@ -22,7 +22,8 @@ namespace e186
 		void DetermineWhichAutoMatsToCalc();
 		void PrepareAutoMatActionConfigs();
 		void CreateAutoMatCalcers();
-		static std::vector<const GLchar*> GetAsCStrs(const std::vector<std::string>& string_array);
+		//static std::vector<const GLchar*> GetAsCStrs(const std::vector<std::string>& string_array);
+		static std::string ConcatSources(const std::vector<std::string>& sources);
 
 	public:
 		Shader();
@@ -37,21 +38,21 @@ namespace e186
 
 		static std::string version_string();
 
-		Shader& AddVertexShaderSource(std::string shader_source);
-		Shader& AddTesselationControlShaderSource(std::string shader_source);
-		Shader& AddTesselationEvaluationShaderSource(std::string shader_source);
-		Shader& AddGeometryShaderSource(std::string shader_source);
-		Shader& AddFragmentShaderSource(std::string shader_source);
-		Shader& AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs);
+		Shader& AddVertexShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddTesselationControlShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddTesselationEvaluationShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddGeometryShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddFragmentShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
 		Shader& AddFragmentShaderOutput(std::vector<std::tuple<GLuint, const GLchar*>> outputs);
-		Shader& AddComputeShaderSource(std::string shader_source);
-		Shader& AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders);
-		Shader& AddVertexShaderSourceFromFile(std::string path);
-		Shader& AddTesselationControlShaderSourceFromFile(std::string path);
-		Shader& AddTesselationEvaluationShaderSourceFromFile(std::string path);
-		Shader& AddGeometryShaderSourceFromFile(std::string path);
-		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs);
-		Shader& AddComputeShaderSourceFromFile(std::string path);
+		Shader& AddComputeShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, bool append_newline = true);
+		Shader& AddVertexShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddTesselationControlShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddTesselationEvaluationShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddGeometryShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
+		Shader& AddComputeShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode);
 		Shader& Build();
 		Shader& QueryOptionalUniformLocations(const std::vector<std::string>& names);
@@ -294,6 +295,7 @@ namespace e186
 
 	private:
 		GLuint m_prog_handle;
+		static std::string kNewLine;
 		std::vector<std::string> m_vertex_shader_sources;
 		std::vector<std::string> m_tess_control_shader_sources;
 		std::vector<std::string> m_tess_eval_shader_sources;

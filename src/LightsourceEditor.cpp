@@ -322,6 +322,7 @@ namespace e186
 		m_point_lights_orig_pos.reserve(kMaxPointLights);
 		m_point_lights_tw_index_helper.reserve(kMaxPointLights);
 
+		TwDefine(" Lightsources color='65 65 65' text=light position='16 400' ");
 		TwAddButton(m_tweak_bar, "Enable all point lights", EnableAllCallback, this, nullptr);
 		TwAddButton(m_tweak_bar, "Disable all point lights", DisableAllCallback, this, nullptr);
 		TwAddVarCB(m_tweak_bar, "Offset", TW_TYPE_DIR3F, SetUniformPositionOffsetCallback, GetUniformPositionOffsetCallback, this, nullptr);
