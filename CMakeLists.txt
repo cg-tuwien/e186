@@ -1,0 +1,189 @@
+project(e186)
+cmake_minimum_required(VERSION 3.1)
+
+# add CMakeLists.txt source dir and cmake module dir to the cmake module path
+# cmake modules are cmake files used e.g. to find library files
+set(CMAKE_MODULE_PATH
+    ${CMAKE_MODULE_PATH}
+    "${CMAKE_SOURCE_DIR}"
+    "${CMAKE_SOURCE_DIR}/cmake"
+)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# https://github.com/sakra/cotire
+# see below for more info
+include(cotire)
+
+### COMPILER FLAGS ###
+
+IF (CMAKE_COMPILER_IS_GNUCC)
+    # setup debugging flags
+    SET(CMAKE_CXX_FLAGS "-g")
+    # Specify language's standard version
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+ENDIF ()
+
+# GLAD provides OpenGL headers, GLFW shouldnt include them again
+add_definitions(-DGLFW_INCLUDE_NONE)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+### EXTERNAL LIBRARIES ###
+
+find_package(OpenGL REQUIRED)
+find_package(GLFW REQUIRED)
+find_package(GLM REQUIRED)
+find_package(Assimp REQUIRED)
+find_package(Anttweakbar REQUIRED)
+
+
+### SOURCE FILES ###
+
+# relative paths to every single h and cpp file
+
+set(SRC_CPP
+    src/main.cpp
+    src/AmbientLight.cpp
+	src/Animator.cpp
+	src/AntTweakBarManager.cpp
+	src/Camera.cpp
+	src/Context.cpp
+	src/DebugTexDisplayer.cpp
+	src/DirectionalLight.cpp
+	src/Engine.cpp
+	src/ExceptionWithCallstack.cpp
+	src/FixedSimulationTimer.cpp
+	src/FrameBufferObject.cpp
+	src/LightsourceEditor.cpp
+	src/log.cpp
+	src/MaterialData.cpp
+	src/math_utils.cpp
+	src/MaxFpsTimer.cpp
+	src/Model.cpp
+	src/ModelExplorerScene.cpp
+	src/PointLight.cpp
+	src/QuakeCamera.cpp
+	src/SampleSceneTessIco.cpp
+	src/SceneSelectorScene.cpp
+	src/Shader.cpp
+	src/stdafx.cpp
+	src/Stopwatch.cpp
+	src/string_utils.cpp
+	src/Tex2D.cpp
+	src/Tex3D.cpp
+	src/TexData.cpp
+	src/TexInfo.cpp
+	src/TexLoadingHelper.cpp
+	src/Transform.cpp
+)
+
+set(SRC_H
+	include/AmbientLight.h
+	include/Animator.h
+	include/AntTweakBarManager.h
+	include/AutoMatrix.h
+	include/Camera.h
+	include/Context.h
+	include/DebugTexDisplayer.h
+	include/DirectionalLight.h
+	include/Engine.h
+	include/ExceptionWithCallstack.h
+	include/FixedSimulationTimer.h
+	include/FrameBufferObject.h
+	include/IScene.h
+	include/LightsourceEditor.h
+	include/log.h
+	include/MaterialData.h
+	include/MaterialUniformLocation.h
+	include/math_utils.h
+	include/MaxFpsTimer.h
+	include/Model.h
+	include/ModelExplorerScene.h
+	include/PointLight.h
+	include/QuakeCamera.h
+	include/SampleSceneTessIco.h
+	include/SceneSelectorScene.h
+	include/Shader.h
+	include/ShaderType.h
+	include/Stopwatch.h
+	include/string_utils.h
+	include/Tex2D.h
+	include/Tex3D.h
+	include/TexData.h
+	include/TexInfo.h
+	include/TexLoadingHelper.h
+	include/Transform.h
+	include/VertexAttribData.h
+	include/VertexAttribLocation.h
+)
+
+# relative path to shader files
+set(SRC_SHADERS
+    assets/shaders/blinnphong.frag
+	assets/shaders/blinnphong.vert
+	assets/shaders/geodesic.frag
+	assets/shaders/geodesic.geom
+	assets/shaders/geodesic.tesc
+	assets/shaders/geodesic.tese
+	assets/shaders/geodesic.vert
+	assets/shaders/terrain.frag
+	assets/shaders/terrain.vert
+	assets/shaders/texture.frag
+	assets/shaders/texture.vert
+	assets/shaders/translucent_gizmo.frag
+	assets/shaders/translucent_gizmo.vert
+)
+
+# adds an executable target with given name to be built from the source files listed afterwards
+add_executable(${PROJECT_NAME} ${SRC_H} ${SRC_CPP} ${SRC_SHADERS})
+
+### INCLUDE HEADER FILES ###
+
+set(SRC_INCLUDE_DIR include)
+
+set(OTHER_EXTERNAL_INCLUDE_DIRS
+    external/include
+    external/include
+    external/include/KHR
+    external/include/glad
+    external/include/FileWatcher
+)
+
+include_directories(
+    ${SRC_INCLUDE_DIR}
+    ${OPENGL_INCLUDE_DIRS}
+    ${GLFW_INCLUDE_DIRS}
+    ${ASSIMP_INCLUDE_DIRS}
+    ${OTHER_EXTERNAL_INCLUDE_DIRS}
+    ${ANT_TWEAK_BAR_INCLUDE_DIR}
+)
+
+### LINK LIBRARIES ###
+target_link_libraries(
+    ${PROJECT_NAME}
+    ${OPENGL_LIBRARIES}
+    ${GLFW_LIBRARIES}
+    ${ASSIMP_LIBRARIES}
+    ${ANT_TWEAK_BAR_LIBRARY}
+)
+
+### RUN COTIRE ###
+# using cotire cmake module to have "e186.h" as a precompiled prefix header (code inserted at beginning of every file) like visual studio does with the stdafx.h which in this case includes e186.h. without this, lots and lots of #includes would be missing in all files.
+# https://github.com/sakra/cotire/blob/master/MANUAL.md#using-a-manually-maintained-prefix-header-instead-of-the-automatically-generated-one
+set_target_properties(${PROJECT_NAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "include/e186.h")
+cotire(${PROJECT_NAME})
+
+### COPY ASSETS ###
+
+add_custom_target(assets)
+
+add_custom_command(TARGET assets PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets
+        ${CMAKE_BINARY_DIR}/assets
+)
+
+add_dependencies(${PROJECT_NAME} assets)
