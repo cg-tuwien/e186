@@ -1,4 +1,5 @@
 #pragma once
+
 namespace e186
 {
 	enum struct AutoMatrix : uint32_t

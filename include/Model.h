@@ -230,7 +230,7 @@ namespace e186
 
 		std::string GetMeshName(unsigned int meshIndex) const;
 		static std::string GetMeshName(const aiScene* scene, unsigned int meshIndex);
-		int Model::GetIndexOfMeshWithName(const aiScene* scene, const std::string& meshName);
+		int GetIndexOfMeshWithName(const aiScene* scene, const std::string& meshName);
 		static std::string GetDiffuseTextureName(const aiScene* scene, unsigned int meshIndex);
 		static std::string GetSpecularTextureName(const aiScene* scene, unsigned int meshIndex);
 		static std::string GetAmbientTextureName(const aiScene* scene, unsigned int meshIndex);
