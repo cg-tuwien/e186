@@ -1,4 +1,6 @@
-#include "e186stdafx.h"
+#if defined(_WIN32)
+    #include "e186stdafx.h"
+#endif
 #include "ModelExplorerScene.h"
 #include "MaxFpsTimer.h"
 #include "QuakeCamera.h"

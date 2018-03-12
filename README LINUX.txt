@@ -34,3 +34,5 @@ https://github.com/sakra/cotire/blob/master/MANUAL.md#using-a-manually-maintaine
 + made ExceptionWithCallstack a subtype of std::runtime_error which is a subtype of std::exception, rather than std::exception itself, because std::exception takes no string message argument in the official C++ standard version, MSVC ignores the standard and have their own implementation which takes a string. to be portable, the std::runtime_error subtype should be used.
 https://stackoverflow.com/questions/12261915/howto-throw-stdexceptions-with-variable-messages
 + replaced sprintf_s, which is a MSVC only thing, with the official standard implementation snprintf. both write formatted output to a C string in a pointed buffer and have same parameters.
++ added more #ifdefs for windows only things where needed
+
