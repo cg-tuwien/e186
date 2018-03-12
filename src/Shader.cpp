@@ -450,14 +450,14 @@ namespace e186
 		return AddVertexShaderSource(LoadFromFile(path), append_newline);
 	}
 
-	Shader& Shader::AddTesselationControlShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddTessellationControlShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddTesselationControlShaderSource(LoadFromFile(path), append_newline);
+		return AddTessellationControlShaderSource(LoadFromFile(path), append_newline);
 	}
 
-	Shader& Shader::AddTesselationEvaluationShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddTessellationEvaluationShaderSourceFromFile(std::string path, bool append_newline)
 	{
-		return AddTesselationEvaluationShaderSource(LoadFromFile(path), append_newline);
+		return AddTessellationEvaluationShaderSource(LoadFromFile(path), append_newline);
 	}
 
 	Shader& Shader::AddGeometryShaderSourceFromFile(std::string path, bool append_newline)
@@ -488,13 +488,13 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::AddTesselationControlShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddTessellationControlShaderSource(std::string shader_source, bool append_newline)
 	{
 		m_tess_control_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
 	}
 
-	Shader& Shader::AddTesselationEvaluationShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddTessellationEvaluationShaderSource(std::string shader_source, bool append_newline)
 	{
 		m_tess_eval_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
 		return *this;
@@ -540,11 +540,11 @@ namespace e186
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::TessControl))
 		{
-			AddTesselationControlShaderSource(shader_src_with_or_without_newline);
+			AddTessellationControlShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::TessEval))
 		{
-			AddTesselationEvaluationShaderSource(shader_src_with_or_without_newline);
+			AddTessellationEvaluationShaderSource(shader_src_with_or_without_newline);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Geometry))
 		{
@@ -561,7 +561,7 @@ namespace e186
 		return *this;
 	}
 
-	bool Shader::has_tesselation_shaders() const
+	bool Shader::has_tessellation_shaders() const
 	{
 		return 0 != m_shaderHandles[1] && 0 != m_shaderHandles[2];
 	}
@@ -593,7 +593,7 @@ namespace e186
 
 	void Shader::DetermineTessData()
 	{
-		if (has_tesselation_shaders())
+		if (has_tessellation_shaders())
 		{
 			glGetIntegerv(GL_PATCH_VERTICES, &m_patch_vertices);
 		}
@@ -701,7 +701,7 @@ namespace e186
 
 	void Shader::DeterminePrimitivesMode()
 	{
-		if (has_tesselation_shaders())
+		if (has_tessellation_shaders())
 		{
 			m_kind_of_primitives = GL_PATCHES;
 		}
@@ -1026,8 +1026,8 @@ namespace e186
 				glGetShaderInfoLog(shaderHandle, infoLen, nullptr, buf);
 				log_error((std::string("Could not compile ") + (
 					(shaderType == GL_VERTEX_SHADER) ? "vertex" :
-					(shaderType == GL_TESS_CONTROL_SHADER) ? "tesselation control" :
-					(shaderType == GL_TESS_EVALUATION_SHADER) ? "tesselation evaluation" :
+					(shaderType == GL_TESS_CONTROL_SHADER) ? "tessellation control" :
+					(shaderType == GL_TESS_EVALUATION_SHADER) ? "tessellation evaluation" :
 					(shaderType == GL_GEOMETRY_SHADER) ? "geometry" :
 					(shaderType == GL_FRAGMENT_SHADER) ? "fragment" :
 					(shaderType == GL_COMPUTE_SHADER) ? "compute" : "?") + " shader with handle[%u]\n    Reason: %s\n").c_str(), shaderHandle, buf);
@@ -1038,8 +1038,8 @@ namespace e186
 
 			throw ExceptionWithCallstack(std::string("Compiling ") + (
 				(shaderType == GL_VERTEX_SHADER) ? "vertex shader" :
-				(shaderType == GL_TESS_CONTROL_SHADER) ? "tesselation control" :
-				(shaderType == GL_TESS_EVALUATION_SHADER) ? "tesselation evaluation" :
+				(shaderType == GL_TESS_CONTROL_SHADER) ? "tessellation control" :
+				(shaderType == GL_TESS_EVALUATION_SHADER) ? "tessellation evaluation" :
 				(shaderType == GL_GEOMETRY_SHADER) ? "geometry shader" :
 				(shaderType == GL_FRAGMENT_SHADER) ? "fragment shader" :
 				(shaderType == GL_COMPUTE_SHADER) ? "compute shader" : "?") + " failed");

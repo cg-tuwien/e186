@@ -39,8 +39,8 @@ namespace e186
 		static std::string version_string();
 
 		Shader& AddVertexShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddTesselationControlShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddTesselationEvaluationShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddTessellationControlShaderSource(std::string shader_source, bool append_newline = true);
+		Shader& AddTessellationEvaluationShaderSource(std::string shader_source, bool append_newline = true);
 		Shader& AddGeometryShaderSource(std::string shader_source, bool append_newline = true);
 		Shader& AddFragmentShaderSource(std::string shader_source, bool append_newline = true);
 		Shader& AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
@@ -48,8 +48,8 @@ namespace e186
 		Shader& AddComputeShaderSource(std::string shader_source, bool append_newline = true);
 		Shader& AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, bool append_newline = true);
 		Shader& AddVertexShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddTesselationControlShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddTesselationEvaluationShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddTessellationControlShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddTessellationEvaluationShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddGeometryShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
 		Shader& AddComputeShaderSourceFromFile(std::string path, bool append_newline = true);
@@ -67,7 +67,7 @@ namespace e186
 		GLuint GetOptionalUniformLocation(const std::string& name);
 		GLuint GetUniformLocation(const std::string& name);
 		GLuint GetMandatoryUniformLocation(const std::string& name);
-		bool has_tesselation_shaders() const;
+		bool has_tessellation_shaders() const;
 		GLint patch_vertices() const;
 		bool has_geometry_shader() const;
 		VertexAttribData vertex_attrib_config() const;

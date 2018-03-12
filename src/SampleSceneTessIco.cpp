@@ -28,8 +28,8 @@ namespace e186
 		// create a shader:
 		Shader shader;
 		shader.AddVertexShaderSourceFromFile("assets/shaders/geodesic.vert")
-		      .AddTesselationControlShaderSourceFromFile("assets/shaders/geodesic.tesc")
-		      .AddTesselationEvaluationShaderSourceFromFile("assets/shaders/geodesic.tese")
+		      .AddTessellationControlShaderSourceFromFile("assets/shaders/geodesic.tesc")
+		      .AddTessellationEvaluationShaderSourceFromFile("assets/shaders/geodesic.tese")
 		      .AddGeometryShaderSourceFromFile("assets/shaders/geodesic.geom")
 		      .AddFragmentShaderSourceFromFile("assets/shaders/geodesic.frag", { std::make_tuple(0, "oFragColor") })
 		      .Build();
