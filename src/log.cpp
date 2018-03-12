@@ -22,7 +22,7 @@ namespace e186
 	std::string matrix_to_string(const glm::mat4& m)
 	{
 		char buf[128];
-		sprintf_s(buf, 128, 
+		snprintf(buf, 128, 
 			"\t%.3f\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\t%.3f\n",
 			m[0][0], m[0][1], m[0][2], m[0][3],
 			m[1][0], m[1][1], m[1][2], m[1][3],
@@ -34,7 +34,7 @@ namespace e186
 	std::string matrix_to_string(const glm::mat3& m)
 	{
 		char buf[128];
-		sprintf_s(buf, 128, 
+		snprintf(buf, 128, 
 			"\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n\t%.3f\t%.3f\t%.3f\n",
 			m[0][0], m[0][1], m[0][2],
 			m[1][0], m[1][1], m[1][2],
@@ -45,7 +45,7 @@ namespace e186
 	std::string matrix_to_string_compact(const glm::mat4& m)
 	{
 		char buf[128];
-		sprintf_s(buf, 128, 
+		snprintf(buf, 128, 
 			"{{%.2f, %.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f, %.2f}}\n",
 			m[0][0], m[0][1], m[0][2], m[0][3],
 			m[1][0], m[1][1], m[1][2], m[1][3],
@@ -57,7 +57,7 @@ namespace e186
 	std::string matrix_to_string_compact(const glm::mat3& m)
 	{
 		char buf[128];
-		sprintf_s(buf, 128, 
+		snprintf(buf, 128, 
 			"{{%.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f}, {%.2f, %.2f, %.2f}}\n",
 			m[0][0], m[0][1], m[0][2],
 			m[1][0], m[1][1], m[1][2],
@@ -69,21 +69,21 @@ namespace e186
 	std::string vector_to_string(const glm::vec2& v)
 	{
 		char buf[64];
-		sprintf_s(buf, 64, "(%.2f, %.2f)", v.x, v.y);
+		snprintf(buf, 64, "(%.2f, %.2f)", v.x, v.y);
 		return buf;
 	}
 
 	std::string vector_to_string(const glm::vec3& v)
 	{
 		char buf[64];
-		sprintf_s(buf, 64, "(%.2f, %.2f, %.2f)", v.x, v.y, v.z);
+		snprintf(buf, 64, "(%.2f, %.2f, %.2f)", v.x, v.y, v.z);
 		return buf;
 	}
 
 	std::string vector_to_string(const glm::vec4& v)
 	{
 		char buf[64];
-		sprintf_s(buf, 64, "(%.2f, %.2f, %.2f, %.2f)", v.x, v.y, v.z, v.w);
+		snprintf(buf, 64, "(%.2f, %.2f, %.2f, %.2f)", v.x, v.y, v.z, v.w);
 		return buf;
 	}
 

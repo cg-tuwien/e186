@@ -3,7 +3,7 @@
 namespace e186
 {
 
-	class ExceptionWithCallstack : public std::exception
+	class ExceptionWithCallstack : public std::runtime_error
 	{
 		std::string m_callstack;
 

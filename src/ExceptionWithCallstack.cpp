@@ -3,13 +3,13 @@
 namespace e186
 {
 	ExceptionWithCallstack::ExceptionWithCallstack(const std::string& what_arg)
-		: std::exception(what_arg.c_str())
+		: std::runtime_error(what_arg.c_str())
 	{
 		SaveCallstack();
 	}
 
 	ExceptionWithCallstack::ExceptionWithCallstack(const char* what_arg)
-		: std::exception(what_arg)
+		: std::runtime_error(what_arg)
 	{	
 		SaveCallstack();
 	}

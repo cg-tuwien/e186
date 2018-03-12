@@ -2,7 +2,7 @@ Engine186 LINUX VERSION
 
 -- DEPENDENCIES --
 
-instal1l the following shared (dynamically linked) libs via your linux package manager:
+install the following shared (dynamically linked) libs via your linux package manager:
 glm, glfw3, assimp, anttweakbar
 
 for the other libs the source code is included in this repo,
@@ -31,5 +31,6 @@ https://github.com/sakra/cotire
 https://github.com/sakra/cotire/blob/master/MANUAL.md#using-a-manually-maintained-prefix-header-instead-of-the-automatically-generated-one
 + fixed some small bugs gcc complained about that apparently visual studio doesnt care about (visual studio doesnt seem to care much about the c++ standard)
 + cmake add_definitions(-DGLFW_INCLUDE_NONE) to add #define GLFW_INCLUDE_NONE, since GLAD provides OpenGL headers, GLFW shouldnt include them again
-
-
++ made ExceptionWithCallstack a subtype of std::runtime_error which is a subtype of std::exception, rather than std::exception itself, because std::exception takes no string message argument in the official C++ standard version, MSVC ignores the standard and have their own implementation which takes a string. to be portable, the std::runtime_error subtype should be used.
+https://stackoverflow.com/questions/12261915/howto-throw-stdexceptions-with-variable-messages
++ replaced sprintf_s, which is a MSVC only thing, with the official standard implementation snprintf. both write formatted output to a C string in a pointed buffer and have same parameters.
