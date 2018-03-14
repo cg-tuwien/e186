@@ -21,6 +21,7 @@ namespace e186
 	const float Model::kDefaultBumpScaling = 1.0f;
 	const float Model::kDefaultRefraction = 0.0f;
 	const float Model::kDefaultReflectivity = 1.0f;
+	MeshEditor *Model::meshEditor = 0;
 
 
 	Model::Model(const glm::mat4& loadTransMatrix)
@@ -84,6 +85,9 @@ namespace e186
 
 	bool Model::Load(const std::string& path, const unsigned int modelLoaderFlags)
 	{
+		if (meshEditor)
+			meshEditor->SetModelLoaderFlags(modelLoaderFlags);
+
 		unsigned int assimpImportFlags = 0;
 		// process importer-flags
 		if (modelLoaderFlags & MOLF_flipUVs)
@@ -343,6 +347,9 @@ namespace e186
 			m_meshes[index].m_indices.push_back(Face.mIndices[1]);
 			m_meshes[index].m_indices.push_back(Face.mIndices[2]);
 		}
+
+		if (meshEditor)
+			meshEditor->EditIndices(m_meshes[index]);
 
 		// make a VBO for GL_ELEMENT_ARRAY_BUFFER data and store indices data
 		m_meshes[index].m_indices_vbo_id = 0;
