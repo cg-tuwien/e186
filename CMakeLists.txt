@@ -153,7 +153,6 @@ set(SRC_INCLUDE_DIR include)
 
 set(OTHER_EXTERNAL_INCLUDE_DIRS
     external/include
-    external/include
     external/include/KHR
     external/include/glad
     external/include/FileWatcher

@@ -20,7 +20,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <stb_image.h>
+#ifdef __WIN32
+// stb_image.h is a single-header lib. 
+// on linux it is included in Tex2D.cpp, according to https://github.com/nothings/stb/blob/master/stb_image.h
+// on windows a static library version is used
+    #include <stb_image.h>
+#endif
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
