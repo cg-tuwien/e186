@@ -351,6 +351,9 @@ namespace e186
 		if (meshEditor)
 			meshEditor->EditIndices(m_meshes[index]);
 
+		// update indicesCount because meshEditor might have changed it
+		indicesCount = m_meshes[index].m_indices.size();
+
 		// make a VBO for GL_ELEMENT_ARRAY_BUFFER data and store indices data
 		m_meshes[index].m_indices_vbo_id = 0;
 		glGenBuffers(1, &m_meshes[index].m_indices_vbo_id);

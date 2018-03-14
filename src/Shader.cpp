@@ -571,6 +571,11 @@ namespace e186
 		return m_patch_vertices;
 	}
 
+	void Shader::set_patch_vertices(GLint patch_vertices)
+	{
+		m_patch_vertices = patch_vertices;
+	}
+
 	VertexAttribData Shader::vertex_attrib_config() const
 	{
 		return m_vertex_attrib_config;
