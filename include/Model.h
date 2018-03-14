@@ -38,6 +38,8 @@ namespace e186
 		MOLF_loadTexCoords2 = 0x080000,
 		MOLF_loadTexCoords3 = 0x100000,
 		MOLF_loadBones = 0x200000,
+		// additional feature flags
+		MOLF_includeEdgeNeighbor = 0x400000,
 		// the default flags
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
@@ -62,9 +64,11 @@ namespace e186
 	MeshVaosForAttribConfig Concatenate(const MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append);
 
 	class Model;
+	class MeshEditor;
 	class Mesh
 	{
 		friend class Model;
+		friend class MeshEditor;
 
 		MeshIdx m_index;
 
@@ -143,6 +147,23 @@ namespace e186
 		static VAOType GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader);
 		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);
 	};
+
+	class MeshEditor
+	{
+	protected:
+		unsigned int modelLoaderFlags;
+		// helper functions
+		GLuint GetIndex(Mesh &mesh, size_t listIdx) { return mesh.m_indices.at(listIdx); }
+		glm::vec3 GetPosition(Mesh &mesh, GLuint listIdx) { return *reinterpret_cast<glm::vec3*>(&mesh.m_vertex_data[listIdx * mesh.m_size_one_vertex]); }
+		size_t IndicesCount(Mesh &mesh) { return mesh.m_indices.size(); }
+		void SetIndices(Mesh &mesh, std::vector<GLuint> newIndices) {
+			mesh.m_indices = newIndices;
+			mesh.m_indices_len = static_cast<GLuint>(newIndices.size());
+		}
+	public:
+		void SetModelLoaderFlags(unsigned int modelLoaderFlags) { this->modelLoaderFlags = modelLoaderFlags; }
+		virtual void EditIndices(Mesh &mesh) = 0;
+	};
 	
 	class Model
 	{
@@ -172,6 +193,8 @@ namespace e186
 
 		/// The transformation matrix specified while
 		glm::mat4 m_load_transformation_matrix;
+
+		static MeshEditor* meshEditor;
 
 	public:
 		Model(const glm::mat4& loadTransMatrix = glm::mat4(1.0f));
@@ -287,6 +310,7 @@ namespace e186
 		static bool GetBoneWeightsAndIndicesForMeshVertex(const aiScene* scene, const unsigned int meshIndex, const unsigned int vertexId, glm::uvec4& outBoneIndices, glm::vec4& outBoneWeights);
 		glm::vec3 GetVertexPosition(const unsigned meshIndex, const unsigned int vertexId) const;
 		glm::vec3 GetVertexNormal(const unsigned meshIndex, const unsigned int vertexId) const;
+		static void SetMeshEditor(MeshEditor *meshEditor) { Model::meshEditor = meshEditor; }
 	};
 
 }
