@@ -39,7 +39,7 @@ namespace e186
 		MOLF_loadTexCoords3 = 0x100000,
 		MOLF_loadBones = 0x200000,
 		// additional feature flags
-		MOLF_includeEdgeNeighbor = 0x400000,
+		MOLF_includeAdjacentEdge = 0x400000,
 		// the default flags
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
