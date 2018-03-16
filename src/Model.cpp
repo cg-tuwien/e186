@@ -177,6 +177,7 @@ namespace e186
 		}
 
 		m_meshes[index].m_index = index;
+		m_meshes[index].m_name = paiMesh->mName.data;
 
 		// calculate the size of the per-vertex memory and the strides
 		// positions and normals are always available
