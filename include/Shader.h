@@ -72,6 +72,7 @@ namespace e186
 		GLuint GetMandatoryUniformLocation(const std::string& name);
 		bool has_tessellation_shaders() const;
 		GLint patch_vertices() const;
+		void set_patch_vertices(GLint patch_vertices);
 		bool has_geometry_shader() const;
 		VertexAttribData vertex_attrib_config() const;
 		GLenum kind_of_primitives() const;

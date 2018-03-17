@@ -39,7 +39,7 @@ namespace e186
 		MOLF_loadTexCoords3 = 0x100000,
 		MOLF_loadBones = 0x200000,
 		// additional feature flags
-		MOLF_includeEdgeNeighbor = 0x400000,
+		MOLF_includeAdjacentEdge = 0x400000,
 		// the default flags
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
@@ -71,6 +71,7 @@ namespace e186
 		friend class MeshEditor;
 
 		MeshIdx m_index;
+		std::string m_name;
 
 		VertexAttribData m_vertex_data_layout;
 
@@ -137,6 +138,7 @@ namespace e186
 		{}
 
 		MeshIdx index() const { return m_index; }
+		const std::string& name() const { return m_name; }
 		GLuint indices_length() const { return m_indices_len; } 
 		const glm::mat4& transformation_matrix() const { return m_scene_transformation_matrix; }
 		const std::shared_ptr<MaterialData>& material_data() const { return m_material_data; }

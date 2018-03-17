@@ -177,6 +177,7 @@ namespace e186
 		}
 
 		m_meshes[index].m_index = index;
+		m_meshes[index].m_name = paiMesh->mName.data;
 
 		// calculate the size of the per-vertex memory and the strides
 		// positions and normals are always available
@@ -350,6 +351,9 @@ namespace e186
 
 		if (meshEditor)
 			meshEditor->EditIndices(m_meshes[index]);
+
+		// update indicesCount because meshEditor might have changed it
+		indicesCount = m_meshes[index].m_indices.size();
 
 		// make a VBO for GL_ELEMENT_ARRAY_BUFFER data and store indices data
 		m_meshes[index].m_indices_vbo_id = 0;
