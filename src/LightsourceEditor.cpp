@@ -315,6 +315,7 @@ namespace e186
 		m_uniform_position_offset(0.0f, 0.0f, 0.0f)
 	{
 		m_sphere = Model::LoadFromFile("assets/models/sphere.obj", glm::mat4(1.0f), MOLF_triangulate | MOLF_smoothNormals);
+		m_sphere->CreateAndUploadGpuData();
 		m_gizmo_shader.AddVertexShaderSourceFromFile("assets/shaders/translucent_gizmo.vert")
 			.AddFragmentShaderSourceFromFile("assets/shaders/translucent_gizmo.frag", { std::make_tuple(0, "oFragColor") })
 			.Build();

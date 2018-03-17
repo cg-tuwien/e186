@@ -264,6 +264,9 @@
     <ClInclude Include="..\external\include\FileWatcher\FileWatcher.h">
       <Filter>Header Files\external\FileWatcher</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\RenderConfig.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">

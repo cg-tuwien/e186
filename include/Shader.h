@@ -6,14 +6,13 @@
 namespace e186
 {
 	struct MeshUniformSettersForShader;
-	struct MeshVaosForAttribConfig;
+	struct MeshRenderData;
 
 	class Shader
 	{
 		static GLuint Compile(const std::string& complete_source, GLenum shaderType);
 		void CheckErrorAndPrintInfoLog(const char* gl_error_location_hint, const char* info_log_description);
 		void PrintInfoLog(const char* info_log_description);
-		void DetermineTessData();
 		void DetermineVertexAttribConfig();
 		void DeterminePrimitivesMode();
 
@@ -68,13 +67,12 @@ namespace e186
 		GLuint GetUniformLocation(const std::string& name);
 		GLuint GetMandatoryUniformLocation(const std::string& name);
 		bool has_tessellation_shaders() const;
-		GLint patch_vertices() const;
-		void set_patch_vertices(GLint patch_vertices);
 		bool has_geometry_shader() const;
 		VertexAttribData vertex_attrib_config() const;
 		GLenum kind_of_primitives() const;
 		void set_kind_of_primitives(GLenum mode);
 		void SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
+		GLint QueryPatchVertices();
 
 		void Use() const 
 		{
@@ -307,7 +305,6 @@ namespace e186
 		std::unordered_map<std::string, GLuint> m_uniform_locations;
 		std::vector<const char*> m_transform_feedback_varyings;
 		GLenum m_transform_feedback_buffer_mode;
-		GLint m_patch_vertices;
 		static const int kMaxShaders = 6;
 		std::array<GLuint, kMaxShaders> m_shaderHandles;
 		VertexAttribData m_vertex_attrib_config;
@@ -323,9 +320,9 @@ namespace e186
 #endif
 	};
 
-	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len);
+	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len);
 	void RenderMesh(const Shader& shader, Mesh& mesh);
-	void RenderMeshes(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos);
-	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters);
+	void RenderMeshes(const Shader& shader, const MeshRenderData& meshes_and_their_vaos);
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters);
 	void UnbindVAO();
 }

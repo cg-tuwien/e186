@@ -42,6 +42,7 @@
 #include "Context.h"
 #include "VertexAttribData.h"
 #include "Engine.h"
+#include "RenderConfig.h"
 #include "TexInfo.h"
 #include "TexData.h"
 #include "Transform.h"
