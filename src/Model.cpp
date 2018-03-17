@@ -7,7 +7,6 @@
 //
 
 #include "Model.h"
-#include "../../assignments/MeshEditorAdjacency.h"
 
 namespace e186
 {
