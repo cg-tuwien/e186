@@ -3,7 +3,8 @@
 Developed at Vienna University of Technology, institute 193.
 
 **E**ngine**186**: Rocket jump into C++/OpenGL graphics programming! 
-This is an unofficial fork of Engine186 for Linux. See "README LINUX.txt".
+
+This is an unofficial fork of Engine186 for Linux, using CMake as build tool. See "README LINUX.txt".
 
 
 # Credits and Copyright Notices
