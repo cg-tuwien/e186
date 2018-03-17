@@ -49,7 +49,10 @@ find_package(Anttweakbar REQUIRED)
 # relative paths to every single h and cpp file
 
 set(SRC_CPP
-    src/main.cpp
+
+    assignment1/main.cpp
+    #src/main.cpp
+
     src/AmbientLight.cpp
 	src/Animator.cpp
 	src/AntTweakBarManager.cpp
@@ -81,6 +84,8 @@ set(SRC_CPP
 	src/TexInfo.cpp
 	src/TexLoadingHelper.cpp
 	src/Transform.cpp
+	
+	assignment1/A1NormalMapping.cpp
 	
 	external/src/glad.cpp
 )
@@ -124,6 +129,8 @@ set(SRC_H
 	include/VertexAttribData.h
 	include/VertexAttribLocation.h
 	
+	assignment1/A1NormalMapping.h
+	
 	external/include/glad/glad.h
 )
 
@@ -131,6 +138,8 @@ set(SRC_H
 set(SRC_SHADERS
     assets/shaders/blinnphong.frag
 	assets/shaders/blinnphong.vert
+    assets/shaders/blinnphong_nm.frag
+	assets/shaders/blinnphong_nm.vert
 	assets/shaders/geodesic.frag
 	assets/shaders/geodesic.geom
 	assets/shaders/geodesic.tesc
