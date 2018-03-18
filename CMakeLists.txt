@@ -50,8 +50,10 @@ find_package(Anttweakbar REQUIRED)
 
 set(SRC_CPP
 
-    assignment1/main.cpp
-    #src/main.cpp
+    # note: instead of using the main entry points of the assignments
+    # use src/main.cpp and add scenes for assignments to the ui scene loader menu
+    #assignment1/main.cpp
+    src/main.cpp
 
     src/AmbientLight.cpp
 	src/Animator.cpp
