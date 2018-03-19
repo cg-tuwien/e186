@@ -58,3 +58,5 @@
 #include "Shader.h"
 #include "MaterialData.h"
 #include "Model.h"
+#include "Vertex.h"
+#include "Edge.h"

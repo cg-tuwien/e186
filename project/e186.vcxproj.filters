@@ -5,9 +5,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Header Files\model">
-      <UniqueIdentifier>{174ccd27-4c17-4485-97ca-855f0cd77852}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\framework">
       <UniqueIdentifier>{1e2b1cd5-5e9a-4bd7-8d08-f7b8c19a2cd6}</UniqueIdentifier>
     </Filter>
@@ -60,9 +57,6 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Source Files\model">
-      <UniqueIdentifier>{0e61d792-7e89-4b68-98ae-b6377564519b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\framework">
       <UniqueIdentifier>{96cf2a2b-8cad-4bf1-ade2-085b7129c2be}</UniqueIdentifier>
@@ -127,13 +121,19 @@
     <Filter Include="Source Files\external\FileWatcher">
       <UniqueIdentifier>{a50bdad6-ae35-4d03-94b2-cd9e55a64c76}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{174ccd27-4c17-4485-97ca-855f0cd77852}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\geometry">
+      <UniqueIdentifier>{0e61d792-7e89-4b68-98ae-b6377564519b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\e186stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Animator.h">
-      <Filter>Header Files\model</Filter>
+      <Filter>Header Files\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\include\AntTweakBarManager.h">
       <Filter>Header Files\ui</Filter>
@@ -163,7 +163,7 @@
       <Filter>Header Files\timer</Filter>
     </ClInclude>
     <ClInclude Include="..\include\Model.h">
-      <Filter>Header Files\model</Filter>
+      <Filter>Header Files\geometry</Filter>
     </ClInclude>
     <ClInclude Include="..\include\QuakeCamera.h">
       <Filter>Header Files\camera</Filter>
@@ -267,19 +267,25 @@
     <ClInclude Include="..\include\RenderConfig.h">
       <Filter>Header Files\shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Vertex.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\Edge.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Animator.cpp">
-      <Filter>Source Files\model</Filter>
+      <Filter>Source Files\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\src\AntTweakBarManager.cpp">
       <Filter>Source Files\ui</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Model.cpp">
-      <Filter>Source Files\model</Filter>
+      <Filter>Source Files\geometry</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Context.cpp">
       <Filter>Source Files\framework</Filter>
@@ -379,6 +385,12 @@
     </ClCompile>
     <ClCompile Include="..\external\src\FileWatcher\FileWatcherWin32.cpp">
       <Filter>Source Files\external\FileWatcher</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Edge.cpp">
+      <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Vertex.cpp">
+      <Filter>Source Files\geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
