@@ -31,7 +31,6 @@ namespace e186
 		m_uniform_locations(),
 		m_transform_feedback_varyings(),
 		m_transform_feedback_buffer_mode(0),
-		m_patch_vertices(0),
 		m_shaderHandles { 0, 0, 0, 0, 0, 0, },
 		m_vertex_attrib_config(VertexAttribData::Nothing),
 		m_kind_of_primitives(GL_TRIANGLES),
@@ -91,7 +90,6 @@ namespace e186
 		m_uniform_locations(std::move(other.m_uniform_locations)),
 		m_transform_feedback_varyings(std::move(other.m_transform_feedback_varyings)),
 		m_transform_feedback_buffer_mode(std::move(other.m_transform_feedback_buffer_mode)),
-		m_patch_vertices(other.m_patch_vertices),
 		m_shaderHandles(std::move(other.m_shaderHandles)),
 		m_vertex_attrib_config(other.m_vertex_attrib_config),
 		m_kind_of_primitives(other.m_kind_of_primitives),
@@ -102,7 +100,6 @@ namespace e186
 		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers))
 	{
 		other.m_prog_handle = 0;
-		other.m_patch_vertices = 0;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
 		other.m_transform_feedback_buffer_mode = 0;
 		log_debug("Move constructing Shader with m_prog_handle[%u]", m_prog_handle);
@@ -112,9 +109,6 @@ namespace e186
 	{
 		m_prog_handle = other.m_prog_handle;
 		other.m_prog_handle = 0;
-
-		m_patch_vertices = other.m_patch_vertices;
-		other.m_patch_vertices = 0;
 
 		m_vertex_attrib_config = other.m_vertex_attrib_config;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
@@ -566,16 +560,6 @@ namespace e186
 		return 0 != m_shaderHandles[1] && 0 != m_shaderHandles[2];
 	}
 
-	GLint Shader::patch_vertices() const
-	{
-		return m_patch_vertices;
-	}
-
-	void Shader::set_patch_vertices(GLint patch_vertices)
-	{
-		m_patch_vertices = patch_vertices;
-	}
-
 	VertexAttribData Shader::vertex_attrib_config() const
 	{
 		return m_vertex_attrib_config;
@@ -596,12 +580,15 @@ namespace e186
 		return 0 != m_shaderHandles[3];
 	}
 
-	void Shader::DetermineTessData()
+	GLint Shader::QueryPatchVertices()
 	{
 		if (has_tessellation_shaders())
 		{
-			glGetIntegerv(GL_PATCH_VERTICES, &m_patch_vertices);
+			GLint patch_vertices;
+			glGetIntegerv(GL_PATCH_VERTICES, &patch_vertices);
+			return patch_vertices;
 		}
+		return -1;
 	}
 
 	void Shader::DetermineVertexAttribConfig()
@@ -794,7 +781,6 @@ namespace e186
 
 		// success!
 		DetermineVertexAttribConfig();
-		DetermineTessData();
 		DeterminePrimitivesMode();
 
 		DetermineWhichAutoMatsToCalc();
@@ -895,6 +881,39 @@ namespace e186
 		return *this;
 	}
 
+	Shader& Shader::QueryOptionalUniformBlockIndex(const std::string& name)
+	{
+		if (0 == m_prog_handle)
+		{
+			throw ExceptionWithCallstack("QueryUniformBlockIndex is useless since the program handle is 0");
+		}
+
+		glUseProgram(m_prog_handle);
+		auto loc = glGetUniformBlockIndex(m_prog_handle, name.c_str());
+		m_uniform_block_indices[name] = loc;
+		return *this;
+	}
+	
+	Shader& Shader::QueryUniformBlockIndex(const std::string& name)
+	{
+		QueryOptionalUniformBlockIndex(name);
+		if (-1 == m_uniform_block_indices[name])
+		{
+			log_warning("Uniform block index location of '%s' not found.", name.c_str());
+		}
+		return *this;
+	}
+	
+	Shader& Shader::QueryMandatoryUniformBlockIndex(const std::string& name)
+	{
+		QueryOptionalUniformBlockIndex(name);
+		if (-1 == m_uniform_block_indices[name])
+		{
+			throw ExceptionWithCallstack("Uniform block index location of '" + name + "' not found.");
+		}
+		return *this;
+	}
+
 	Shader& Shader::DeclareAutoMatrix(std::string name, AutoMatrix properties)
 	{
 		for (const auto& tpl : m_auto_matrices)
@@ -966,7 +985,40 @@ namespace e186
 		}
 		return loc->second;
 	}
-	
+
+	GLuint Shader::GetOptionalUniformBlockIndex(const std::string& name)
+	{
+		const auto loc = m_uniform_block_indices.find(name);
+		if (loc == m_uniform_block_indices.end())
+		{
+			QueryOptionalUniformBlockIndex(name);
+			return m_uniform_block_indices.at(name);
+		}
+		return loc->second;
+	}
+
+	GLuint Shader::GetUniformBlockIndex(const std::string& name)
+	{
+		const auto loc = m_uniform_block_indices.find(name);
+		if (loc == m_uniform_block_indices.end())
+		{
+			QueryUniformBlockIndex(name);
+			return m_uniform_block_indices.at(name);
+		}
+		return loc->second;
+	}
+
+	GLuint Shader::GetMandatoryUniformBlockIndex(const std::string& name)
+	{
+		const auto loc = m_uniform_block_indices.find(name);
+		if (loc == m_uniform_block_indices.end())
+		{
+			QueryMandatoryUniformBlockIndex(name);
+			return m_uniform_block_indices.at(name);
+		}
+		return loc->second;
+	}
+
 	Shader::operator GLuint() const
 	{
 		return m_prog_handle;
@@ -1053,66 +1105,80 @@ namespace e186
 		return shaderHandle;
 	}
 
-	void RenderVAO(const Shader& shader, VAOType vao, GLuint indices_len)
+	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len)
 	{
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)
 		{
-			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
 		}
-		glBindVertexArray(vao);
+		else
+		{
+			mode = rnd_cfg.m_render_mode;
+		}
+		glBindVertexArray(rnd_cfg.m_vao_handle);
 		glDrawElements(mode, indices_len, GL_UNSIGNED_INT, nullptr);
 	}
 
 	void RenderMesh(const Shader& shader, Mesh& mesh)
 	{
-		RenderVAO(shader, Mesh::GetOrCreateVAOForShader(mesh, shader), mesh.indices_length());
+		Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
 	}
 
-	void RenderMeshes(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos)
+	void RenderMeshes(const Shader& shader, const MeshRenderData& mesh_render_data)
 	{
 		// If the following assert fails, you are probably trying to render using the wrong shader!
-		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
+		assert(shader.vertex_attrib_config() == mesh_render_data.m_vertex_attrib_config);
 
 		GLenum mode = shader.kind_of_primitives();
-		if (GL_PATCHES == mode)
-		{
-			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
-		}
 
-		for (auto& tupl : meshes_and_their_vaos.m_mesh_vaos)
+		for (auto& tupl : mesh_render_data.m_mesh_render_configs)
 		{
 			Mesh& mesh = std::get<0>(tupl);
-			VAOType vao = std::get<1>(tupl);
+			const RenderConfig& rnd_cfg = std::get<1>(tupl);
 
-			glBindVertexArray(vao);
+			if (GL_PATCHES == mode)
+			{
+				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+			}
+			else
+			{
+				mode = rnd_cfg.m_render_mode;
+			}
+
+			glBindVertexArray(rnd_cfg.m_vao_handle);
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 
-	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshVaosForAttribConfig& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters)
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters)
 	{
 		// If one of the following asserts fails, you are probably trying to render using the wrong shader!
 		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
 		//assert(shader.handle() == uniform_setters.m_shader_handle);
 
 		GLenum mode = shader.kind_of_primitives();
-		if (GL_PATCHES == mode)
-		{
-			glPatchParameteri(GL_PATCH_VERTICES, shader.patch_vertices());
-		}
 
-		assert(meshes_and_their_vaos.m_mesh_vaos.size() == uniform_setters.m_mesh_uniform_setters.size());
-		auto n = meshes_and_their_vaos.m_mesh_vaos.size();
+		assert(meshes_and_their_vaos.m_mesh_render_configs.size() == uniform_setters.m_mesh_uniform_setters.size());
+		auto n = meshes_and_their_vaos.m_mesh_render_configs.size();
 		for (auto i = 0; i < n; ++i)
 		{
-			auto& tupl = meshes_and_their_vaos.m_mesh_vaos[i];
+			auto& tupl = meshes_and_their_vaos.m_mesh_render_configs[i];
 			Mesh& mesh = std::get<0>(tupl);
 			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters.m_mesh_uniform_setters[i])));
-			VAOType vao = std::get<1>(tupl);
+			const RenderConfig& rnd_cfg = std::get<1>(tupl);
 			std::get<1>(uniform_setters.m_mesh_uniform_setters[i])(shader, *mesh.material_data());
 
-			glBindVertexArray(vao);
+			if (GL_PATCHES == mode)
+			{
+				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+			}
+			else
+			{
+				mode = rnd_cfg.m_render_mode;
+			}
+
+			glBindVertexArray(rnd_cfg.m_vao_handle);
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 		}
 	}

@@ -25,6 +25,10 @@ namespace e186
 
 	public:
 		Camera();
+		Camera(Camera&&) noexcept = default;
+		Camera(const Camera&) noexcept = default;
+		Camera& operator=(Camera&&) noexcept = default;
+		Camera& operator=(const Camera&) noexcept = default;
 		virtual ~Camera();
 
 		/// returns the projection matrix
@@ -59,6 +63,8 @@ namespace e186
 		/// calculates the view matrix based on position, front- and up-vectors;
 		/// a lookat-calculation is performed
 		glm::mat4 CalculateViewMatrix();
+
+		void CopyFrom(const Camera& other);
 
 	private:
 		void UpdateProjectionMatrix();

@@ -26,11 +26,13 @@
     <ClInclude Include="..\include\DirectionalLight.h" />
     <ClInclude Include="..\include\e186.h" />
     <ClInclude Include="..\include\e186stdafx.h" />
+    <ClInclude Include="..\include\Edge.h" />
     <ClInclude Include="..\include\Engine.h" />
     <ClInclude Include="..\include\ExceptionWithCallstack.h" />
     <ClInclude Include="..\include\FixedSimulationTimer.h" />
     <ClInclude Include="..\include\FrameBufferObject.h" />
     <ClInclude Include="..\include\IScene.h" />
+    <ClInclude Include="..\include\LightCollection.h" />
     <ClInclude Include="..\include\LightsourceEditor.h" />
     <ClInclude Include="..\include\log.h" />
     <ClInclude Include="..\include\MaterialData.h" />
@@ -41,6 +43,7 @@
     <ClInclude Include="..\include\ModelExplorerScene.h" />
     <ClInclude Include="..\include\PointLight.h" />
     <ClInclude Include="..\include\QuakeCamera.h" />
+    <ClInclude Include="..\include\RenderConfig.h" />
     <ClInclude Include="..\include\SampleSceneTessIco.h" />
     <ClInclude Include="..\include\SceneSelectorScene.h" />
     <ClInclude Include="..\include\Shader.h" />
@@ -54,6 +57,7 @@
     <ClInclude Include="..\include\TexInfo.h" />
     <ClInclude Include="..\include\TexLoadingHelper.h" />
     <ClInclude Include="..\include\Transform.h" />
+    <ClInclude Include="..\include\Vertex.h" />
     <ClInclude Include="..\include\VertexAttribData.h" />
     <ClInclude Include="..\include\VertexAttribLocation.h" />
   </ItemGroup>
@@ -74,6 +78,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\src\Edge.cpp" />
     <ClCompile Include="..\src\Engine.cpp" />
     <ClCompile Include="..\src\ExceptionWithCallstack.cpp" />
     <ClCompile Include="..\src\FixedSimulationTimer.cpp" />
@@ -98,6 +103,7 @@
     <ClCompile Include="..\src\TexInfo.cpp" />
     <ClCompile Include="..\src\TexLoadingHelper.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
+    <ClCompile Include="..\src\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\assets\shaders\blinnphong.frag" />

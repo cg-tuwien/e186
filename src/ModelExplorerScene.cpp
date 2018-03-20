@@ -14,6 +14,7 @@ namespace e186
 	ModelExplorerScene::ModelExplorerScene(std::string model_to_load_path, glm::mat4 transformation_matrix, unsigned int model_loader_flags) : m_termination_requested(false)
 	{
 		m_model = Model::LoadFromFile(model_to_load_path, transformation_matrix, model_loader_flags);
+		m_model->CreateAndUploadGpuData();
 	}
 
 
@@ -43,7 +44,7 @@ namespace e186
 		// generate uniform setters for all selected meshes for a specific shader
 		auto unisetters = Model::CompileUniformSetters(shader, meshes);
 		// get VAOs of all selected meshes
-		auto vaos = Model::GetOrCreateVAOs(shader, meshes);
+		auto render_data = Model::GetOrCreateRenderData(shader, meshes);
 
 		AmbientLight ambient_light(glm::vec3(0.1f, 0.1f, 0.1f));
 		ambient_light.set_enabled(true);
@@ -92,7 +93,7 @@ namespace e186
 			shader.SetLight("uAmbientLight", ambient_light);
 			shader.SetLight("uDirectionalLight", directional_light.GetGpuData(vM));
 			shader.SetLight("uPointLight", point_light.GetGpuData(vM));
-			RenderMeshesWithAlignedUniformSetters(shader, vaos, unisetters);
+			RenderMeshesWithAlignedUniformSetters(shader, render_data, unisetters);
 			UnbindVAO();
 
 			Engine::current()->EndFrame();

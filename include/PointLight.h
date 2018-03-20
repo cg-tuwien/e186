@@ -56,4 +56,68 @@ namespace e186
 		bool m_enabled;
 	};
 
+	class PointLightWrapper
+	{
+	public:
+		PointLightWrapper(PointLight& light, LightCollection<PointLight, PointLightGpuData, PointLightWrapper>* collection, int light_index = -1)
+			: m_light{ light }, m_collection{ collection }, m_light_index{ light_index } {};
+		glm::vec3 position() const { return m_light.position(); }
+		const glm::vec3& light_color() const { return m_light.light_color(); }
+		glm::vec4 attenuation() const { return m_light.attenuation(); }
+		float const_attenuation() const { return m_light.attenuation().x; }
+		float linear_attenuation() const { return m_light.attenuation().y; }
+		float quadratic_attenuation() const { return m_light.attenuation().z; }
+		float cubic_attenuation() const { return m_light.attenuation().w; }
+		bool enabled() const { return m_light.enabled(); }
+		void set_position(glm::vec3 position)
+		{
+			m_light.set_position(std::move(position)); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_light_color(glm::vec3 color)
+		{
+			m_light.set_light_color(std::move(color)); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_attenuation(glm::vec4 attenuation) { 
+			m_light.set_attenuation(std::move(attenuation)); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index); }
+		void set_const_attenuation(float attenuation)
+		{
+			m_light.set_const_attenuation(attenuation); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_linear_attenuation(float attenuation)
+		{
+			m_light.set_linear_attenuation(attenuation); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_quadratic_attenuation(float attenuation)
+		{
+			m_light.set_quadratic_attenuation(attenuation); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_cubic_attenuation(float attenuation)
+		{
+			m_light.set_cubic_attenuation(attenuation); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_enabled(bool is_enabled)
+		{
+			m_light.set_enabled(is_enabled); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+	private:
+		PointLight& m_light;
+		LightCollection<PointLight, PointLightGpuData, PointLightWrapper>* m_collection;
+		int m_light_index;
+	};
+
 }
+
+template<>
+inline e186::PointLightWrapper e186::LightCollection<e186::PointLight, e186::PointLightGpuData, e186::PointLightWrapper>::operator [](const int i)
+{
+	return PointLightWrapper{ m_lights[i], this, i };
+}
+

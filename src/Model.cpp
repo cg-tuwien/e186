@@ -21,8 +21,6 @@ namespace e186
 	const float Model::kDefaultBumpScaling = 1.0f;
 	const float Model::kDefaultRefraction = 0.0f;
 	const float Model::kDefaultReflectivity = 1.0f;
-	MeshEditor *Model::meshEditor = 0;
-
 
 	Model::Model(const glm::mat4& loadTransMatrix)
 		: m_meshes(0),
@@ -85,9 +83,6 @@ namespace e186
 
 	bool Model::Load(const std::string& path, const unsigned int modelLoaderFlags)
 	{
-		if (meshEditor)
-			meshEditor->SetModelLoaderFlags(modelLoaderFlags);
-
 		unsigned int assimpImportFlags = 0;
 		// process importer-flags
 		if (modelLoaderFlags & MOLF_flipUVs)
@@ -170,7 +165,7 @@ namespace e186
 	{
 		if (!(paiMesh->HasPositions() && paiMesh->HasNormals()))
 		{
-			log_error("A submesh is missing required vertex data! HasPositions[%s] && has_normals[%s]",
+			log_error("A submesh is missing required vertex data! HasPositions[%s] && HasNormals[%s]",
 				paiMesh->HasPositions() ? "true" : "false",
 				paiMesh->HasNormals() ? "true" : "false");
 			return false;
@@ -246,7 +241,7 @@ namespace e186
 		// alloc the temporary storage and FILL THE MEMORY
 		size_t bufferSize = paiMesh->mNumVertices * sizeOneVtx;
 		m_meshes[index].m_vertex_data.resize(bufferSize);
-		char* vertexData = &m_meshes[index].m_vertex_data[0];
+		auto* vertexData = &m_meshes[index].m_vertex_data[0];
 		for (unsigned int i = 0; i < paiMesh->mNumVertices; i++)
 		{
 			memcpy(&vertexData[i * sizeOneVtx + positionOffset], &paiMesh->mVertices[i].x, positionSize);
@@ -328,14 +323,8 @@ namespace e186
 		m_meshes[index].m_tangent_size = tangentSize;
 		m_meshes[index].m_bitangent_size = bitangentSize;
 
-
-		// make a VBO for GL_ARRAY_BUFFER data and store vertex data
+		// do not create vertex data on GPU yet
 		m_meshes[index].m_vertex_data_vbo_id = 0;
-		glGenBuffers(1, &m_meshes[index].m_vertex_data_vbo_id);
-		assert(m_meshes[index].m_vertex_data_vbo_id > 0);
-		glBindBuffer(GL_ARRAY_BUFFER, m_meshes[index].m_vertex_data_vbo_id);
-		glBufferData(GL_ARRAY_BUFFER, bufferSize, vertexData, GL_STATIC_DRAW); // GL_STATIC_DRAW ... Buffer data never changes
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		// store the indices in a vector
 		size_t indicesCount = paiMesh->mNumFaces * kNumFaceVertices;
@@ -349,23 +338,149 @@ namespace e186
 			m_meshes[index].m_indices.push_back(Face.mIndices[2]);
 		}
 
-		if (meshEditor)
-			meshEditor->EditIndices(m_meshes[index]);
-
 		// update indicesCount because meshEditor might have changed it
 		indicesCount = m_meshes[index].m_indices.size();
 
-		// make a VBO for GL_ELEMENT_ARRAY_BUFFER data and store indices data
+		// do not create vertex data on GPU yet
 		m_meshes[index].m_indices_vbo_id = 0;
-		glGenBuffers(1, &m_meshes[index].m_indices_vbo_id);
-		assert(m_meshes[index].m_indices_vbo_id > 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_meshes[index].m_indices_vbo_id);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof(GLuint), &m_meshes[index].m_indices[0], GL_STATIC_DRAW); // GL_STATIC_DRAW ... Buffer data never changes
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		m_meshes[index].m_indices_len = static_cast<GLuint>(indicesCount);
+		// TODO: What to do if the "triangulate"-option is not set during model loading?
+		m_meshes[index].m_topology = GL_TRIANGLES; // should be a sane default value
+		m_meshes[index].m_patch_size = 3;
 
 		return true;
+	}
+
+	glm::vec3 Mesh::vertex_position_at(size_t index) const
+	{
+		auto* ptr = &m_vertex_data.at(index * m_size_one_vertex + m_position_offset);
+		return *reinterpret_cast<const glm::vec3*>(ptr);
+	}
+
+	glm::vec3 Mesh::vertex_normal_at(size_t index) const
+	{
+		auto* ptr = &m_vertex_data.at(index * m_size_one_vertex + m_normal_offset);
+		return *reinterpret_cast<const glm::vec3*>(ptr);
+	}
+
+	GLuint Mesh::index_at(size_t index) const
+	{
+		return m_indices.at(index);
+	}
+
+	void Mesh::SetVertexData(
+		std::vector<uint8_t>&& vertex_data,
+		VertexAttribData vertex_data_layout,
+		size_t position_offset,
+		size_t normal_offset,
+		size_t tex_coords_offset,
+		size_t color_offset,
+		size_t bone_incides_offset,
+		size_t bone_weights_offset,
+		size_t tangent_offset,
+		size_t bitangent_offset,
+		size_t position_size,
+		size_t normal_size,
+		size_t tex_coords_size,
+		size_t color_size,
+		size_t bone_indices_size,
+		size_t bone_weights_size,
+		size_t tangent_size,
+		size_t bitangent_size)
+	{
+		m_vertex_data		  = std::move(vertex_data);
+		m_vertex_data_layout  = vertex_data_layout;
+		m_position_offset	  = position_offset;
+		m_normal_offset		  = normal_offset;
+		m_tex_coords_offset	  = tex_coords_offset;
+		m_color_offset		  = color_offset;
+		m_bone_incides_offset = bone_incides_offset;
+		m_bone_weights_offset = bone_weights_offset;
+		m_tangent_offset	  = tangent_offset;
+		m_bitangent_offset	  = bitangent_offset;
+		m_position_size		  = position_size;
+		m_normal_size		  = normal_size;
+		m_tex_coords_size	  = tex_coords_size;
+		m_color_size		  = color_size;
+		m_bone_indices_size	  = bone_indices_size;
+		m_bone_weights_size	  = bone_weights_size;
+		m_tangent_size		  = tangent_size;
+		m_bitangent_size	  = bitangent_size;
+	}
+
+	void Mesh::SetVertexData(
+		const std::vector<uint8_t>& vertex_data,
+		VertexAttribData vertex_data_layout,
+		size_t position_offset,
+		size_t normal_offset,
+		size_t tex_coords_offset,
+		size_t color_offset,
+		size_t bone_incides_offset,
+		size_t bone_weights_offset,
+		size_t tangent_offset,
+		size_t bitangent_offset,
+		size_t position_size,
+		size_t normal_size,
+		size_t tex_coords_size,
+		size_t color_size,
+		size_t bone_indices_size,
+		size_t bone_weights_size,
+		size_t tangent_size,
+		size_t bitangent_size)
+	{
+		m_vertex_data = vertex_data;
+		m_vertex_data_layout = vertex_data_layout;
+		m_position_offset = position_offset;
+		m_normal_offset = normal_offset;
+		m_tex_coords_offset = tex_coords_offset;
+		m_color_offset = color_offset;
+		m_bone_incides_offset = bone_incides_offset;
+		m_bone_weights_offset = bone_weights_offset;
+		m_tangent_offset = tangent_offset;
+		m_bitangent_offset = bitangent_offset;
+		m_position_size = position_size;
+		m_normal_size = normal_size;
+		m_tex_coords_size = tex_coords_size;
+		m_color_size = color_size;
+		m_bone_indices_size = bone_indices_size;
+		m_bone_weights_size = bone_weights_size;
+		m_tangent_size = tangent_size;
+		m_bitangent_size = bitangent_size;
+	}
+
+	void Mesh::SetIndices(std::vector<GLuint>&& indices, GLenum topology, int patch_size)
+	{
+		m_indices = std::move(indices);
+		m_topology = topology;
+		m_patch_size = patch_size;
+	}
+
+	void Mesh::SetIndices(const std::vector<GLuint>& indices, GLenum topology, int patch_size)
+	{
+		m_indices = indices;
+		m_topology = topology;
+		m_patch_size = patch_size;
+	}
+
+	void Mesh::CreateAndUploadGpuData(GLenum vertex_data_usage, GLenum indices_usage, bool force)
+	{
+		if (has_been_uploaded_to_gpu() && !force)
+		{
+			return;
+		}
+
+		// make a VBO for GL_ARRAY_BUFFER data and store vertex data
+		glGenBuffers(1, &m_vertex_data_vbo_id);
+		assert(m_vertex_data_vbo_id > 0);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertex_data_vbo_id);
+		glBufferData(GL_ARRAY_BUFFER, m_vertex_data.size(), &m_vertex_data[0], vertex_data_usage); // GL_STATIC_DRAW ... Buffer data never changes
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		// make a VBO for GL_ELEMENT_ARRAY_BUFFER data and store indices data
+		glGenBuffers(1, &m_indices_vbo_id);
+		assert(m_indices_vbo_id > 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indices_vbo_id);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_length() * sizeof(GLuint), &m_indices[0], indices_usage); // GL_STATIC_DRAW ... Buffer data never changes
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 
@@ -476,19 +591,41 @@ namespace e186
 		return vao;
 	}
 
-	VAOType Model::GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig)
-	{
-		return Mesh::GetOrCreateVAOForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
-	}
-
 	VAOType Mesh::GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader)
 	{
 		return GetOrCreateVAOForVertexAttribConfig(mesh, shader.vertex_attrib_config());
 	}
 
+	RenderConfig Mesh::GetOrCreateRenderConfigForShader(Mesh& mesh, const Shader& shader)
+	{
+		auto vao = Mesh::GetOrCreateVAOForShader(mesh, shader);
+		return RenderConfig{ vao, mesh.topology(), mesh.patch_size() };
+	}
+
+	RenderConfig Mesh::GetOrCreateRenderConfigForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig)
+	{
+		auto vao = Mesh::GetOrCreateVAOForVertexAttribConfig(mesh, vertexDataConfig);
+		return RenderConfig{ vao, mesh.topology(), mesh.patch_size() };
+	}
+
+	VAOType Model::GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig)
+	{
+		return Mesh::GetOrCreateVAOForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
+	}
+
 	VAOType Model::GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader)
 	{
 		return GetOrCreateVAOForMeshForVertexAttribConfig(mesh_index, shader.vertex_attrib_config());
+	}
+
+	RenderConfig Model::GetOrCreateRenderConfigForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig)
+	{
+		return Mesh::GetOrCreateRenderConfigForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
+	}
+
+	RenderConfig Model::GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, const Shader& shader)
+	{
+		return GetOrCreateRenderConfigForMeshForVertexAttribConfig(mesh_index, shader.vertex_attrib_config());
 	}
 
 	//void Model::RenderForVertexAttribConfig(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode) const
@@ -971,6 +1108,15 @@ namespace e186
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind VBO for index-data
 	}
 
+	void Model::CreateAndUploadGpuData(GLenum vertex_data_usage, GLenum indices_usage)
+	{
+		auto n = m_meshes.size();
+		for (auto i=0; i < n; ++i)
+		{
+			m_meshes[i].CreateAndUploadGpuData(vertex_data_usage, indices_usage);
+		}
+	}
+
 	MeshUniformSettersForShader Model::CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes)
 	{
 		MeshUniformSettersForShader retval;
@@ -984,14 +1130,14 @@ namespace e186
 		return retval;
 	}
 
-	MeshVaosForAttribConfig Model::GetOrCreateVAOs(const Shader& shader, const std::vector<MeshRef>& meshes)
+	MeshRenderData Model::GetOrCreateRenderData(const Shader& shader, const std::vector<MeshRef>& meshes)
 	{
-		MeshVaosForAttribConfig retval;
+		MeshRenderData retval;
 		retval.m_vertex_attrib_config = shader.vertex_attrib_config();
 		
 		for (Mesh& mesh : meshes)
 		{
-			retval.m_mesh_vaos.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), Mesh::GetOrCreateVAOForShader(mesh, shader)));
+			retval.m_mesh_render_configs.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), Mesh::GetOrCreateRenderConfigForShader(mesh, shader)));
 		}
 		
 		return retval;
@@ -1004,11 +1150,11 @@ namespace e186
 		unisetters.m_mesh_uniform_setters.insert(std::end(unisetters.m_mesh_uniform_setters), std::begin(unisetters_to_append.m_mesh_uniform_setters), std::end(unisetters_to_append.m_mesh_uniform_setters));
 	}
 
-	void Append(MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append)
+	void Append(MeshRenderData& vaos, const MeshRenderData& vaos_to_append)
 	{
 		assert(vaos.m_vertex_attrib_config == VertexAttribData::Nothing || vaos.m_vertex_attrib_config == vaos_to_append.m_vertex_attrib_config);
 		vaos.m_vertex_attrib_config = vaos_to_append.m_vertex_attrib_config;
-		vaos.m_mesh_vaos.insert(std::end(vaos.m_mesh_vaos), std::begin(vaos_to_append.m_mesh_vaos), std::end(vaos_to_append.m_mesh_vaos));
+		vaos.m_mesh_render_configs.insert(std::end(vaos.m_mesh_render_configs), std::begin(vaos_to_append.m_mesh_render_configs), std::end(vaos_to_append.m_mesh_render_configs));
 	}
 
 	MeshUniformSettersForShader Concatenate(const MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append)
@@ -1019,9 +1165,9 @@ namespace e186
 		return combined;
 	}
 
-	MeshVaosForAttribConfig Concatenate(const MeshVaosForAttribConfig& vaos, const MeshVaosForAttribConfig& vaos_to_append)
+	MeshRenderData Concatenate(const MeshRenderData& vaos, const MeshRenderData& vaos_to_append)
 	{
-		MeshVaosForAttribConfig combined;
+		MeshRenderData combined;
 		Append(combined, vaos);
 		Append(combined, vaos_to_append);
 		return combined;
@@ -1155,22 +1301,6 @@ namespace e186
 		return m_animators[animationIndex];
 	}
 #endif
-
-	glm::vec3 Model::GetVertexPosition(const unsigned meshIndex, const unsigned int vertexId) const
-	{
-		const auto& mesh = m_meshes.at(meshIndex);
-		const char* ptr = &mesh.m_vertex_data.at(meshIndex * mesh.m_size_one_vertex + mesh.m_position_offset);
-		const glm::vec3* v3ptr = reinterpret_cast<const glm::vec3*>(ptr);
-		return glm::vec3{ *v3ptr };
-	}
-
-	glm::vec3 Model::GetVertexNormal(const unsigned meshIndex, const unsigned int vertexId) const
-	{
-		const auto& mesh = m_meshes.at(meshIndex);
-		const char* ptr = &mesh.m_vertex_data.at(meshIndex * mesh.m_size_one_vertex + mesh.m_normal_offset);
-		const glm::vec3* v3ptr = reinterpret_cast<const glm::vec3*>(ptr);
-		return glm::vec3{ *v3ptr };
-	}
 
 
 	bool Model::GetBoneWeightsAndIndicesForMeshVertex(const aiScene* scene, const unsigned int meshIndex, const unsigned int vertexId, glm::uvec4& outBoneIndices, glm::vec4& outBoneWeights)
