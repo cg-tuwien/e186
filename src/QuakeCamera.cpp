@@ -94,7 +94,7 @@ namespace e186
 		}
 	}
 
-	void QuakeCamera::Update(double deltaTime)
+	void QuakeCamera::Update(double delta_time)
 	{
 		HandleInputOnly();
 
@@ -125,17 +125,17 @@ namespace e186
 
 		// move camera to new position
 		if (glfwGetKey(wnd, 'W'))
-			AddToCameraPositionRelative( kFrontVec4, deltaTime);
+			AddToCameraPositionRelative( kFrontVec4, delta_time);
 		if (glfwGetKey(wnd, 'S'))
-			AddToCameraPositionRelative(-kFrontVec4, deltaTime);
+			AddToCameraPositionRelative(-kFrontVec4, delta_time);
 		if (glfwGetKey(wnd, 'D'))
-			AddToCameraPositionRelative( kSideVec4, deltaTime);
+			AddToCameraPositionRelative( kSideVec4, delta_time);
 		if (glfwGetKey(wnd, 'A'))
-			AddToCameraPositionRelative(-kSideVec4, deltaTime);
+			AddToCameraPositionRelative(-kSideVec4, delta_time);
 		if (glfwGetKey(wnd, 'Q'))
-			AddToCameraPositionAbsolute(-kUpVec4, deltaTime);
+			AddToCameraPositionAbsolute(-kUpVec4, delta_time);
 		if (glfwGetKey(wnd, 'E'))
-			AddToCameraPositionAbsolute( kUpVec4, deltaTime);
+			AddToCameraPositionAbsolute( kUpVec4, delta_time);
 
 		// reset the mouse-cursor to the center of the screen
 		glfwSetCursorPos(wnd, width / 2.0, height / 2.0);

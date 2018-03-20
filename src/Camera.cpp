@@ -37,6 +37,20 @@ namespace e186
 		return glm::lookAt(GetPosition(), camTarget, GetUpVector());
 	}
 
+	void Camera::CopyFrom(const Camera& other)
+	{
+		m_projection_matrix = other.m_projection_matrix;
+		m_projection_config = other.m_projection_config;
+		m_near_plane = other.m_near_plane;
+		m_far_plane = other.m_far_plane;
+		m_fov = other.m_fov;
+		m_aspect = other.m_aspect;
+		m_left = other.m_left;
+		m_right = other.m_right;
+		m_top = other.m_top;
+		m_bottom = other.m_bottom;
+		UpdateProjectionMatrix();
+	}
 
 	void Camera::SetPerspectiveProjection(float fov, float aspect, float nearPlane, float farPlane)
 	{
