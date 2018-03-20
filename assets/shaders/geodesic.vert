@@ -15,5 +15,5 @@ out VertData
 
 void main()
 {
-	vPosition = aPosition.xyz + a + b + c + d + e + f;
+	vPosition = (aPosition + a + b + c + d + e + f).xyz;
 }
