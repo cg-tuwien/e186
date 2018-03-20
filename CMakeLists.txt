@@ -50,9 +50,6 @@ find_package(Anttweakbar REQUIRED)
 
 set(SRC_CPP
 
-    # note: instead of using the main entry points of the assignments
-    # use src/main.cpp and add scenes for assignments to the ui scene loader menu
-    #assignment1/main.cpp
     src/main.cpp
 
     src/AmbientLight.cpp
@@ -86,9 +83,7 @@ set(SRC_CPP
 	src/TexInfo.cpp
 	src/TexLoadingHelper.cpp
 	src/Transform.cpp
-	
-	assignment1/A1NormalMapping.cpp
-	
+		
 	external/src/glad.cpp
 )
 
@@ -130,9 +125,7 @@ set(SRC_H
 	include/Transform.h
 	include/VertexAttribData.h
 	include/VertexAttribLocation.h
-	
-	assignment1/A1NormalMapping.h
-	
+		
 	external/include/glad/glad.h
 )
 
