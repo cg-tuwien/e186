@@ -61,12 +61,18 @@ namespace e186
 		Shader& QueryOptionalUniformLocation(const std::string& name);
 		Shader& QueryUniformLocation(const std::string& name);
 		Shader& QueryMandatoryUniformLocation(const std::string& name);
+		Shader& QueryOptionalUniformBlockIndex(const std::string& name);
+		Shader& QueryUniformBlockIndex(const std::string& name);
+		Shader& QueryMandatoryUniformBlockIndex(const std::string& name);
 		Shader& DeclareAutoMatrix(std::string name, AutoMatrix properties);
 		Shader& Destroy();
 		bool HasUniform(const std::string& name) const;
 		GLuint GetOptionalUniformLocation(const std::string& name);
 		GLuint GetUniformLocation(const std::string& name);
 		GLuint GetMandatoryUniformLocation(const std::string& name);
+		GLuint GetOptionalUniformBlockIndex(const std::string& name);
+		GLuint GetUniformBlockIndex(const std::string& name);
+		GLuint GetMandatoryUniformBlockIndex(const std::string& name);
 		bool has_tesselation_shaders() const;
 		GLint patch_vertices() const;
 		bool has_geometry_shader() const;
@@ -130,6 +136,11 @@ namespace e186
 			glUniformMatrix4fv(location, 1, GL_FALSE, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
+		void SetUniformBlockBinding(GLuint location, GLuint block_binding) const
+		{
+			glUniformBlockBinding(m_prog_handle, location, block_binding);
+		}
+
 		void SetSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint texture_unit = 0) const
 		{
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
@@ -170,28 +181,49 @@ namespace e186
 
 
 		template <typename... Args>
-		void SetOptionalUniform(const std::string uniform_name, Args&&... args)
+		void SetOptionalUniform(const std::string& uniform_name, Args&&... args)
 		{
 			const auto loc = GetOptionalUniformLocation(uniform_name);
-			if (-1 != loc) 
+			if (-1 != loc)
 				SetUniform(loc, std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
-		void SetUniform(const std::string uniform_name, Args&&... args)
+		void SetUniform(const std::string& uniform_name, Args&&... args)
 		{
 			SetUniform(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
-		void SetMandatoryUniform(const std::string uniform_name, Args&&... args)
+		void SetMandatoryUniform(const std::string& uniform_name, Args&&... args)
 		{
 			SetUniform(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 
 		template <typename... Args>
-		void SetOptionalSampler(const std::string uniform_name, Args&&... args)
+		void SetOptionalUniformBlockBinding(const std::string& block_name, Args&&... args)
+		{
+			const auto loc = GetOptionalUniformBlockIndex(block_name);
+			if (-1 != loc)
+				SetUniformBlockBinding(loc, std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetUniformBlockBinding(const std::string& block_name, Args&&... args)
+		{
+			SetUniform(GetUniformBlockIndex(block_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetMandatoryUniformBlockBinding(const std::string& block_name, Args&&... args)
+		{
+			SetUniform(GetMandatoryUniformBlockIndex(block_name), std::forward<Args>(args)...);
+		}
+
+
+		template <typename... Args>
+		void SetOptionalSampler(const std::string& uniform_name, Args&&... args)
 		{
 			const auto loc = GetOptionalUniformLocation(uniform_name);
 			if (-1 != loc)
@@ -199,20 +231,20 @@ namespace e186
 		}
 
 		template <typename... Args>
-		void SetSampler(const std::string uniform_name, Args&&... args)
+		void SetSampler(const std::string& uniform_name, Args&&... args)
 		{
 			SetSampler(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
-		void SetMandatorySampler(const std::string uniform_name, Args&&... args)
+		void SetMandatorySampler(const std::string& uniform_name, Args&&... args)
 		{
 			SetSampler(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 
 		template <typename... Args>
-		void SetOptionalImageTexture(const std::string uniform_name, Args&&... args)
+		void SetOptionalImageTexture(const std::string& uniform_name, Args&&... args)
 		{
 			const auto loc = GetOptionalUniformLocation(uniform_name);
 			if (-1 != loc)
@@ -220,56 +252,56 @@ namespace e186
 		}
 
 		template <typename... Args>
-		void SetImageTexture(const std::string uniform_name, Args&&... args)
+		void SetImageTexture(const std::string& uniform_name, Args&&... args)
 		{
 			SetImageTexture(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
-		void SetMandatoryImageTexture(const std::string uniform_name, Args&&... args)
+		void SetMandatoryImageTexture(const std::string& uniform_name, Args&&... args)
 		{
 			SetImageTexture(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 
-		void SetOptionalLight(const std::string uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
+		void SetOptionalLight(const std::string& uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
 		{
 			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
 			if (-1 != color_loc) 
 				SetLight(color_loc, data);
 		}
-		void SetLight(const std::string uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
+		void SetLight(const std::string& uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
 		{
 			const auto color_loc = GetUniformLocation(uniform_name + color_member);
 			SetLight(color_loc, data);
 		}
-		void SetMandatoryLight(const std::string uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
+		void SetMandatoryLight(const std::string& uniform_name, const AmbientLightGpuData& data, const char* color_member = ".color")
 		{
 			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
 			SetLight(color_loc, data);
 		}
 		
-		void SetOptionalLight(const std::string uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
+		void SetOptionalLight(const std::string& uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
 		{
 			const auto dir_loc = GetOptionalUniformLocation(uniform_name + direction_member);
 			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
 			if (-1 != color_loc && -1 != dir_loc) 
 				SetLight(dir_loc, color_loc, data);
 		}
-		void SetLight(const std::string uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
+		void SetLight(const std::string& uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
 		{
 			const auto dir_loc = GetUniformLocation(uniform_name + direction_member);
 			const auto color_loc = GetUniformLocation(uniform_name + color_member);
 			SetLight(dir_loc, color_loc, data);
 		}
-		void SetMandatoryLight(const std::string uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
+		void SetMandatoryLight(const std::string& uniform_name, const DirectionalLightGpuData& data, const char* direction_member = ".direction", const char* color_member = ".color")
 		{
 			const auto dir_loc = GetMandatoryUniformLocation(uniform_name + direction_member);
 			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
 			SetLight(dir_loc, color_loc, data);
 		}
 
-		void SetOptionalLight(const std::string uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
+		void SetOptionalLight(const std::string& uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
 		{
 			const auto pos_loc = GetOptionalUniformLocation(uniform_name + position_member);
 			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
@@ -277,14 +309,14 @@ namespace e186
 			if (-1 != pos_loc && -1 != color_loc && -1 != atten_loc)
 				SetLight(pos_loc, color_loc, atten_loc, data);
 		}
-		void SetLight(const std::string uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
+		void SetLight(const std::string& uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
 		{
 			const auto pos_loc = GetUniformLocation(uniform_name + position_member);
 			const auto color_loc = GetUniformLocation(uniform_name + color_member);
 			const auto atten_loc = GetUniformLocation(uniform_name + attenuation_member);
 			SetLight(pos_loc, color_loc, atten_loc, data);
 		}
-		void SetMandatoryLight(const std::string uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
+		void SetMandatoryLight(const std::string& uniform_name, const PointLightGpuData& data, const char* position_member = ".position", const char* color_member = ".color", const char* attenuation_member = ".attenuation")
 		{
 			const auto pos_loc = GetMandatoryUniformLocation(uniform_name + position_member);
 			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
@@ -304,6 +336,7 @@ namespace e186
 		std::vector<std::string> m_compute_shader_sources;
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
 		std::unordered_map<std::string, GLuint> m_uniform_locations;
+		std::unordered_map<std::string, GLuint> m_uniform_block_indices;
 		std::vector<const char*> m_transform_feedback_varyings;
 		GLenum m_transform_feedback_buffer_mode;
 		GLint m_patch_vertices;
