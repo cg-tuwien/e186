@@ -85,7 +85,7 @@ namespace e186
 		}
 
 		// display info
-		if (m_i_pressed)
+		if (m_i_pressed && (glfwGetKey(wnd, GLFW_KEY_LEFT_CONTROL) || glfwGetKey(wnd, GLFW_KEY_RIGHT_CONTROL)))
 		{
 			log_info("QuakeCamera's position: %s", vector_to_string(GetPosition()).c_str());
 			log_info("QuakeCamera's view-dir: %s", vector_to_string(GetFrontVector()).c_str());
