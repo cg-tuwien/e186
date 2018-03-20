@@ -15,6 +15,7 @@ namespace e186
 		void Set(AmbientLight* ambient_light);
 		void Set(DirectionalLight* directional_light);
 		void Add(PointLight* point_light);
+		void Add(PointLightWrapper point_light_wrapper);
 		void Clear();
 
 		template<typename T>
@@ -77,7 +78,7 @@ namespace e186
 		Shader m_gizmo_shader;
 		DirectionalLight* m_directional_light;
 		AmbientLight* m_ambient_light;
-		std::vector<PointLight*> m_point_lights;
+		std::vector<PointLightWrapper> m_point_lights;
 		std::vector<glm::vec3> m_point_lights_orig_pos;
 		std::vector<std::tuple<LightsourceEditor*, size_t>> m_point_lights_tw_index_helper;
 		AntTweakBarHandle m_tweak_bar;
