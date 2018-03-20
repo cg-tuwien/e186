@@ -51,6 +51,7 @@
 #include "log.h"
 #include "VertexAttribLocation.h"
 #include "AutoMatrix.h"
+#include "LightCollection.h"
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
