@@ -145,6 +145,7 @@ newmtl floor
 	map_Ks textures\sponza_floor_a_spec.png
 	map_Ka textures\sponza_floor_a_diff.png
 	map_Kd textures\sponza_floor_a_diff.png
+	map_bump textures\sponza_floor_a_bump.png
 	map_Kn textures\sponza_floor_a_norm.png
 
 newmtl column_c
