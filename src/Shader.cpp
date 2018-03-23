@@ -1185,6 +1185,11 @@ namespace e186
 
 	void UnbindVAO()
 	{
-		glBindVertexArray(0);
+		glBindVertexArray(0u);
+	}
+
+	void UnbindShader()
+	{
+		glUseProgram(0u);
 	}
 }
