@@ -103,20 +103,13 @@ namespace e186
 		// Release the previously loaded mesh (if it exists)
 		Dispose();
 
-		Stopwatch stopwatch;
-
 		Assimp::Importer importer;
 		// aiProcess_LimitBoneWeights ... limits the number of bone weights to assimp's default value of 4
 		const aiScene* scene = importer.ReadFile(path.c_str(), assimpImportFlags);
-		stopwatch.Measure("after m_importer->ReadFile");
 		if (scene)
 		{
 			auto retval = InitScene(scene, path);
-			stopwatch.Measure("after InitScene");
-
 			GatherMaterialData(scene, path);
-			stopwatch.Measure("after GatherMaterialData");
-
 			return retval;
 		}
 		else
