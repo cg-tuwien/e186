@@ -147,11 +147,35 @@ namespace e186
 			glUniform1i(location, static_cast<GLint>(texture_unit));
 		}
 
+		void SetFirstSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint first_texture_unit = 0)
+		{
+			m_sampler_auto_index = first_texture_unit;
+			SetSampler(location, tex_target, tex_handle, m_sampler_auto_index);
+		}
+
+		void SetNextSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint sampler_increment = 1)
+		{
+			m_sampler_auto_index += sampler_increment;
+			SetSampler(location, tex_target, tex_handle, m_sampler_auto_index);
+		}
+
 		void SetSampler(GLuint location, const TexInfo& value, GLuint texture_unit = 0) const
 		{
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
 			value.Bind();
 			glUniform1i(location, static_cast<GLint>(texture_unit));
+		}
+
+		void SetFirstSampler(GLuint location, const TexInfo& value, GLuint first_texture_unit = 0)
+		{	
+			m_sampler_auto_index = first_texture_unit;
+			SetSampler(location, value, m_sampler_auto_index);
+		}
+
+		void SetNextSampler(GLuint location, const TexInfo& value, GLuint sampler_increment = 1)
+		{
+			m_sampler_auto_index += sampler_increment;
+			SetSampler(location, value, m_sampler_auto_index);
 		}
 			
 		void SetImageTexture(GLuint location, const TexInfo& value, GLuint unit, GLint level, GLboolean layered, GLint layer, GLenum access)
@@ -239,6 +263,46 @@ namespace e186
 		void SetMandatorySampler(const std::string& uniform_name, Args&&... args)
 		{
 			SetSampler(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetOptionalFirstSampler(const std::string& uniform_name, Args&&... args)
+		{
+			const auto loc = GetOptionalUniformLocation(uniform_name);
+			if (-1 != loc)
+				SetFirstSampler(loc, std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetFirstSampler(const std::string& uniform_name, Args&&... args)
+		{
+			SetFirstSampler(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetMandatoryFirstSampler(const std::string& uniform_name, Args&&... args)
+		{
+			SetFirstSampler(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetOptionalNextSampler(const std::string& uniform_name, Args&&... args)
+		{
+			const auto loc = GetOptionalUniformLocation(uniform_name);
+			if (-1 != loc)
+				SetNextSampler(loc, std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetNextSampler(const std::string& uniform_name, Args&&... args)
+		{
+			SetNextSampler(GetUniformLocation(uniform_name), std::forward<Args>(args)...);
+		}
+
+		template <typename... Args>
+		void SetMandatoryNextSampler(const std::string& uniform_name, Args&&... args)
+		{
+			SetNextSampler(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
 
@@ -347,6 +411,7 @@ namespace e186
 		std::array<bool, 16> m_auto_mat_do_calc;
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;
+		GLuint m_sampler_auto_index;
 
 #if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
 		std::function<void()> m_files_changed;

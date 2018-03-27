@@ -74,7 +74,8 @@ namespace e186
 			glm::mat4(1.0),	// 14 AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 			glm::mat4(1.0)	// 15 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		},
-		m_auto_mat_calcers()
+		m_auto_mat_calcers(),
+		m_sampler_auto_index(0)
 	{
 	}
 
@@ -97,7 +98,8 @@ namespace e186
 		m_auto_mats_action_config(std::move(other.m_auto_mats_action_config)),
 		m_auto_mat_do_calc(std::move(other.m_auto_mat_do_calc)),
 		m_auto_mat_action_cache(std::move(other.m_auto_mat_action_cache)),
-		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers))
+		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers)),
+		m_sampler_auto_index(std::move(other.m_sampler_auto_index))
 	{
 		other.m_prog_handle = 0;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
@@ -133,6 +135,7 @@ namespace e186
 		m_auto_mat_do_calc = std::move(other.m_auto_mat_do_calc);
 		m_auto_mat_action_cache = std::move(other.m_auto_mat_action_cache);
 		m_auto_mat_calcers = std::move(other.m_auto_mat_calcers);
+		m_sampler_auto_index = std::move(other.m_sampler_auto_index);
 
 		log_debug("Move assigning Shader with m_prog_handle[%u]", m_prog_handle);
 		return *this;
