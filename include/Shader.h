@@ -355,6 +355,7 @@ namespace e186
 
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len);
 	void RenderMesh(const Shader& shader, Mesh& mesh);
+	void RenderFullScreen(const Shader& shader);
 	void RenderMeshes(const Shader& shader, const MeshRenderData& meshes_and_their_vaos);
 	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters);
 	void UnbindVAO();

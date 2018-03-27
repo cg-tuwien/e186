@@ -6,7 +6,7 @@ namespace e186
 {
 
 	DebugTexDisplayer::DebugTexDisplayer() :
-		m_tweak_bar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("Textures"))
+		m_tweak_bar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("Debug Textures"))
 	{
 		m_texture_configs.reserve(kVecSize);
 
@@ -23,6 +23,8 @@ namespace e186
 		m_transform_mul_loc = m_shader.GetUniformLocation("transform_mul");
 		m_transform_add_loc = m_shader.GetUniformLocation("transform_add");
 		m_pvmt_matrix_loc = m_shader.GetUniformLocation("pvmtMatrix");
+
+		TwDefine(" 'Debug Textures' color='26 27 61' text=light position='232 400' ");
 	}
 
 	DebugTexDisplayer::~DebugTexDisplayer()

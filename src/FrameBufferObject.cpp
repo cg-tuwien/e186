@@ -51,6 +51,8 @@ namespace e186
 #pragma region RenderTexture
 
 	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height) :
+		m_viewport_x(0),
+		m_viewport_y(0),
 		m_width(width),
 		m_height(height),
 		m_fbo_id(0),
@@ -63,6 +65,8 @@ namespace e186
 
 	FrameBufferObject::FrameBufferObject(FrameBufferObject&& other) noexcept :
 	m_width(other.m_width),
+		m_viewport_x(other.m_viewport_x),
+		m_viewport_y(other.m_viewport_y),
 		m_height(other.m_height),
 		m_fbo_id(other.m_fbo_id),
 		m_color_attachments(std::move(other.m_color_attachments)),
@@ -82,6 +86,8 @@ namespace e186
 
 	FrameBufferObject& FrameBufferObject::operator=(FrameBufferObject&& other) noexcept 
 	{
+		m_viewport_x = other.m_viewport_x;
+		m_viewport_y = other.m_viewport_y;
 		m_width = other.m_width;
 		m_height = other.m_height;
 		m_fbo_id = other.m_fbo_id;
@@ -191,7 +197,7 @@ namespace e186
 
 	FrameBufferObject& FrameBufferObject::SetViewport()
 	{
-		glViewport(0, 0, m_width, m_height);
+		glViewport(m_viewport_x, m_viewport_y, m_width, m_height);
 		return *this;
 	}
 

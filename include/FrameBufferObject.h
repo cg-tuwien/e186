@@ -33,6 +33,7 @@ namespace e186
 
 	class FrameBufferObject
 	{
+		GLint m_viewport_x, m_viewport_y;
 		GLsizei m_width, m_height;
 		GLuint m_fbo_id;
 
@@ -57,17 +58,15 @@ namespace e186
 
 		static GLenum target();
 
-		GLsizei width() const {
-			return m_width;
-		}
-
-		GLsizei height() const {
-			return m_height;
-		}
-
-		GLuint handle() const {
-			return m_fbo_id;
-		}
+		GLint viewport_x() const { return m_viewport_x; }
+		GLint viewport_y() const { return m_viewport_y; }
+		GLsizei width() const { return m_width; }
+		GLsizei height() const { return m_height; }
+		GLuint handle() const { return m_fbo_id; }
+		void set_viewport_x(GLint value) { m_viewport_x = value; }
+		void set_viewport_y(GLint value) { m_viewport_y = value; }
+		void set_width(GLsizei value) { m_width = value; }
+		void set_height(GLsizei value) { m_height = value; }
 
 		const TexInfo* FindAttachedTexture(GLenum attachment) const;
 

@@ -1125,6 +1125,11 @@ namespace e186
 		Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
 	}
 
+	void RenderFullScreen(const Shader& shader)
+	{
+		RenderMesh(shader, Model::GetFullScreenQuadMesh());
+	}
+
 	void RenderMeshes(const Shader& shader, const MeshRenderData& mesh_render_data)
 	{
 		// If the following assert fails, you are probably trying to render using the wrong shader!
