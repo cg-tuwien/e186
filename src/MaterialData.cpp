@@ -33,15 +33,15 @@ namespace e186
 		switch (aimm)
 		{
 		case aiTextureMapMode_Wrap:
-			return TexParams_Repeat;
+			return TexParams::Repeat;
 		case aiTextureMapMode_Clamp:
-			return TexParams_ClampToEdge;
+			return TexParams::ClampToEdge;
 		case aiTextureMapMode_Decal:
-			return TexParams_ClampToEdge;
+			return TexParams::ClampToEdge;
 		case aiTextureMapMode_Mirror:
-			return TexParams_MirroredRepeat;
+			return TexParams::MirroredRepeat;
 		default:
-			return TexParams_Repeat;
+			return TexParams::Repeat;
 		}
 	}
 
@@ -113,7 +113,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_diffuse_tex = tex;
 		}
 
@@ -121,7 +121,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_specular_tex = tex;
 		}
 
@@ -129,7 +129,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_ambient_tex = tex;
 		}
 
@@ -137,7 +137,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_emissive_tex = tex;
 		}
 
@@ -145,7 +145,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_height_tex = tex;
 		}
 
@@ -153,7 +153,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_normals_tex = tex;
 		}
 
@@ -161,7 +161,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_shininess_tex = tex;
 		}
 
@@ -169,7 +169,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_opacity_tex = tex;
 		}
 
@@ -185,7 +185,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_reflection_tex = tex;
 		}
 
@@ -193,7 +193,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams_GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
 			m_lightmap_tex = tex;
 		}
 	}
@@ -496,19 +496,19 @@ namespace e186
 		// Upload white texture only if we have used it!
 		if (white_tex.use_count() > 1)
 		{
-			white_tex->Generate1pxTexture(255, 255, 255).Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
+			white_tex->Generate1pxTexture(255, 255, 255).Upload().SetTextureParameters(TexParams::NearestFiltering | TexParams::ClampToEdge);
 		}
 
 		// Upload black texture only if we have used it!
 		if (black_tex.use_count() > 1)
 		{
-			black_tex->Generate1pxTexture(0, 0, 0).Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
+			black_tex->Generate1pxTexture(0, 0, 0).Upload().SetTextureParameters(TexParams::NearestFiltering | TexParams::ClampToEdge);
 		}
 
 		// Upload straight-up-normal texture only if we have used it!
 		if (straight_up_normal_tex.use_count() > 1)
 		{
-			straight_up_normal_tex->Generate1pxTexture(127, 127, 255).Upload().SetTextureParameters(TexParams_NearestFiltering | TexParams_ClampToEdge);
+			straight_up_normal_tex->Generate1pxTexture(127, 127, 255).Upload().SetTextureParameters(TexParams::NearestFiltering | TexParams::ClampToEdge);
 		}
 
 		return[n = setter_funcs.size(), setters = std::move(setter_funcs)](const Shader& shdr, const MaterialData& mat)

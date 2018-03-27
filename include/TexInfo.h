@@ -1,23 +1,54 @@
 #pragma once
+#include "ShaderType.h"
 
 namespace e186
 {
-	enum TexParams : unsigned int
+	enum struct TexParams : uint32_t
 	{
-		TexParams_GenerateMipMaps			= 0x00000001,
-		TexParams_NearestFiltering			= 0x00000002,
-		TexParams_LinearFiltering			= 0x00000004,
-		TexParams_BilinearFiltering			= 0x00000008,
-		TexParams_TrilinearFiltering		= 0x00000010,
-		TexParams_AnisotropicFiltering2x	= 0x00000020,
-		TexParams_AnisotropicFiltering4x	= 0x00000040,
-		TexParams_AnisotropicFiltering8x	= 0x00000080,
-		TexParams_AnisotropicFiltering16x	= 0x00000100,
-		TexParams_AnisotropicFilteringMax   = 0x00000200,
-		TexParams_ClampToEdge				= 0x00001000,
-		TexParams_Repeat					= 0x00002000,
-		TexParams_MirroredRepeat			= 0x00004000,
+		None					= 0x00000000,
+		GenerateMipMaps			= 0x00000001,
+		NearestFiltering		= 0x00000002,
+		LinearFiltering			= 0x00000004,
+		BilinearFiltering		= 0x00000008,
+		TrilinearFiltering		= 0x00000010,
+		AnisotropicFiltering2x	= 0x00000020,
+		AnisotropicFiltering4x	= 0x00000040,
+		AnisotropicFiltering8x	= 0x00000080,
+		AnisotropicFiltering16x	= 0x00000100,
+		AnisotropicFilteringMax = 0x00000200,
+		ClampToEdge				= 0x00001000,
+		Repeat					= 0x00002000,
+		MirroredRepeat			= 0x00004000,
 	};
+
+	inline TexParams operator| (TexParams a, TexParams b)
+	{
+		typedef std::underlying_type<TexParams>::type EnumType;
+		return static_cast<TexParams>(static_cast<EnumType>(a) | static_cast<EnumType>(b));
+	}
+
+	inline TexParams operator& (TexParams a, TexParams b)
+	{
+		typedef std::underlying_type<TexParams>::type EnumType;
+		return static_cast<TexParams>(static_cast<EnumType>(a) & static_cast<EnumType>(b));
+	}
+
+	inline TexParams& operator |= (TexParams& a, TexParams b)
+	{
+		return a = a | b;
+	}
+
+	inline TexParams& operator &= (TexParams& a, TexParams b)
+	{
+		return a = a & b;
+	}
+
+	inline TexParams operator ~ (const TexParams a)
+	{
+		typedef std::underlying_type<TexParams>::type EnumType;
+		return static_cast<TexParams>(~static_cast<EnumType>(a));
+	}
+
 
 	class TexInfo
 	{
@@ -53,7 +84,7 @@ namespace e186
 		GLenum data_type() const;
 
 		/// Will also bind the texture unconditionally
-		TexInfo& SetTextureParameters(unsigned int parameters);
+		TexInfo& SetTextureParameters(TexParams parameters);
 
 		/// Ensure that the texture is bound before calling this method!
 		TexInfo& GenerateMipMaps();
