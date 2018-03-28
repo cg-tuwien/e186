@@ -23,6 +23,8 @@ namespace e186
 			GLint m_offset_y;
 			GLenum m_texture_target;
 			GLuint m_gl_handle;
+			glm::vec4 m_transform_mul;
+			glm::vec4 m_transform_add;
 		};
 
 	private:
@@ -31,7 +33,8 @@ namespace e186
 		std::unique_ptr<Model> m_quad;
 		Shader m_shader;
 		GLuint m_sampler_loc;
-		GLuint m_color_loc;
+		GLuint m_transform_mul_loc;
+		GLuint m_transform_add_loc;
 		GLuint m_pvmt_matrix_loc;
 
 		DbgTexConfig* Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name);

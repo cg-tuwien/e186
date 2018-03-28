@@ -72,56 +72,89 @@ namespace e186
 	std::unique_ptr<Model> Model::LoadFromFile(const std::string& path, const glm::mat4& transform_matrix, const unsigned int model_loader_flags)
 	{
 		std::unique_ptr<Model> model = std::make_unique<Model>(transform_matrix);
-		if (!model->Load(path, model_loader_flags))
+		if (!model->LoadFromFile(path, model_loader_flags))
 		{
-			log_error("Model::Load failed for file[%s] with flags[%x]", path.c_str(), model_loader_flags);
+			log_error("Model::LoadFromFile failed for file[%s] with flags[%x]", path.c_str(), model_loader_flags);
 			// smartpointer will be deleted automatically when it goes out of scope
 			return std::unique_ptr<Model>(nullptr);
 		}
 		return model;
 	}
 
-	bool Model::Load(const std::string& path, const unsigned int modelLoaderFlags)
+	std::unique_ptr<Model> Model::LoadFromMemory(const std::string& memory, const glm::mat4& transform_matrix, const unsigned int model_loader_flags)
 	{
-		unsigned int assimpImportFlags = 0;
+		std::unique_ptr<Model> model = std::make_unique<Model>(transform_matrix);
+		if (!model->LoadFromMemory(memory, model_loader_flags))
+		{
+			log_error("Model::LoadFromMemory failed for memorysize[%llu] with flags[%x]", memory.size(), model_loader_flags);
+			// smartpointer will be deleted automatically when it goes out of scope
+			return std::unique_ptr<Model>(nullptr);
+		}
+		return model;
+	}
+
+	unsigned int Model::CompileAssimpImportFlags(const unsigned int modelLoaderFlags)
+	{
+		unsigned int flags_for_assimp_importer = 0;
 		// process importer-flags
 		if (modelLoaderFlags & MOLF_flipUVs)
-			assimpImportFlags |= aiProcess_FlipUVs;
+			flags_for_assimp_importer |= aiProcess_FlipUVs;
 		if ((modelLoaderFlags & MOLF_smoothNormals) && (modelLoaderFlags & MOLF_faceNormals))
 			log_warning("MOLF_smoothNormals and MOLF_faceNormals are mutually exclusive, ignoring MOLF_faceNormals");
 		if (modelLoaderFlags & MOLF_smoothNormals)
-			assimpImportFlags |= aiProcess_GenSmoothNormals;
+			flags_for_assimp_importer |= aiProcess_GenSmoothNormals;
 		else if (modelLoaderFlags & MOLF_faceNormals)
-			assimpImportFlags |= aiProcess_GenNormals;
+			flags_for_assimp_importer |= aiProcess_GenNormals;
 		if (modelLoaderFlags & MOLF_triangulate)
-			assimpImportFlags |= aiProcess_Triangulate;
+			flags_for_assimp_importer |= aiProcess_Triangulate;
+		// aiProcess_LimitBoneWeights ... limits the number of bone weights to assimp's default value of 4
 		if (modelLoaderFlags & MOLF_limitBoneWeights)
-			assimpImportFlags |= aiProcess_LimitBoneWeights;
+			flags_for_assimp_importer |= aiProcess_LimitBoneWeights;
 		if (modelLoaderFlags & MOLF_calcTangentSpace)
-			assimpImportFlags |= aiProcess_CalcTangentSpace;
+			flags_for_assimp_importer |= aiProcess_CalcTangentSpace;
+		return flags_for_assimp_importer;
+	}
 
+	std::unique_ptr<Model> Model::g_full_screen_quad;
+
+	bool Model::LoadFromFile(const std::string& path, const unsigned int modelLoaderFlags)
+	{
 		// Release the previously loaded mesh (if it exists)
 		Dispose();
-
-		Stopwatch stopwatch;
-
+		// Create an importer and load from file (only this overload can load additional textures from the file system)
 		Assimp::Importer importer;
-		// aiProcess_LimitBoneWeights ... limits the number of bone weights to assimp's default value of 4
-		const aiScene* scene = importer.ReadFile(path.c_str(), assimpImportFlags);
-		stopwatch.Measure("after m_importer->ReadFile");
+		const auto assimp_importer_flags = CompileAssimpImportFlags(modelLoaderFlags);
+		const aiScene* scene = importer.ReadFile(path.c_str(), assimp_importer_flags);
+		return PostLoadProcessing(importer, scene, &path);
+	}
+
+	bool Model::LoadFromMemory(const std::string& data, const unsigned int modelLoaderFlags)
+	{
+		// Release the previously loaded mesh (if it exists)
+		Dispose();
+		// Create an importer and load from file (can't load additional textures in this case)
+		Assimp::Importer importer;
+		const auto assimp_importer_flags = CompileAssimpImportFlags(modelLoaderFlags);
+		const aiScene* scene = importer.ReadFileFromMemory(data.c_str(), data.size(), assimp_importer_flags);
+		return PostLoadProcessing(importer, scene, nullptr);
+	}
+
+	bool Model::PostLoadProcessing(Assimp::Importer& importer, const aiScene* scene, const std::string* file_path_or_null)
+	{
 		if (scene)
 		{
-			auto retval = InitScene(scene, path);
-			stopwatch.Measure("after InitScene");
+			auto retval = InitScene(scene);
 
-			GatherMaterialData(scene, path);
-			stopwatch.Measure("after GatherMaterialData");
+			if (nullptr != file_path_or_null)
+			{
+				GatherMaterialData(scene, *file_path_or_null);
+			}
 
 			return retval;
 		}
 		else
 		{
-			log_error("Failed parsing mesh '%s': '%s'", path.c_str(), importer.GetErrorString());
+			log_error("Failed parsing mesh '%s': '%s'", nullptr != file_path_or_null ? file_path_or_null->c_str() : "", importer.GetErrorString());
 			Dispose();
 			return false;
 		}
@@ -140,7 +173,7 @@ namespace e186
 	}
 
 
-	bool Model::InitScene(const aiScene* scene, const std::string& path)
+	bool Model::InitScene(const aiScene* scene)
 	{
 		m_meshes.resize(scene->mNumMeshes);
 
@@ -1341,6 +1374,29 @@ namespace e186
 			return true;
 		}
 		return false;
+	}
+
+
+	Mesh& Model::GetFullScreenQuadMesh()
+	{
+		if (!g_full_screen_quad)
+		{
+			g_full_screen_quad = Model::LoadFromMemory(std::string(R"QUADMODEL(
+# a xy-quad from [0,0] to [1,1] with z-coordinates at zero
+v -1.0 -1.0 0.0
+v 1.0 -1.0 0.0
+v 1.0 1.0 0.0
+v -1.0 1.0 0.0
+vt 0.0 0.0 0.0
+vt 1.0 0.0 0.0
+vt 1.0 1.0 0.0
+vt 0.0 1.0 0.0
+f 1/1 2/2 3/3
+f 3/3 4/4 1/1
+)QUADMODEL"), glm::mat4(1.0f));
+			g_full_screen_quad->CreateAndUploadGpuData();
+		}
+		return g_full_screen_quad->mesh_at(0);
 	}
 
 }

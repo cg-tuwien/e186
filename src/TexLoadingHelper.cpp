@@ -6,7 +6,7 @@ namespace e186
 {
 	TexLoadingHelper::TexLoadingHelper(std::string model_path)
 		: m_base_dir(utils::ExtractBasePath(model_path)),
-		m_general_tex_params(TexParams_AnisotropicFilteringMax)
+		m_general_tex_params(TexParams::AnisotropicFilteringMax)
 	{
 
 	}
@@ -21,12 +21,12 @@ namespace e186
 		m_general_tex_params &= ~to_remove;
 	}
 
-	unsigned int TexLoadingHelper::general_tex_params() const
+	TexParams TexLoadingHelper::general_tex_params() const
 	{
 		return m_general_tex_params;
 	}
 
-	std::shared_ptr<Tex2D> TexLoadingHelper::GetOrLoadTex(std::string sub_path, unsigned int texture_parameters)
+	std::shared_ptr<Tex2D> TexLoadingHelper::GetOrLoadTex(std::string sub_path, TexParams texture_parameters)
 	{
 		std::string complete_path;
 		assert(sub_path.length() > 1);

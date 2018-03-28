@@ -119,16 +119,16 @@ namespace e186
 	}
 
 
-	TexInfo& TexInfo::SetTextureParameters(unsigned int parameters)
+	TexInfo& TexInfo::SetTextureParameters(TexParams parameters)
 	{
 		Bind();
 
-		if (TexParams_MirroredRepeat & parameters)
+		if ((TexParams::MirroredRepeat & parameters) != TexParams::None)
 		{
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 		}
-		else if (TexParams_Repeat & parameters)
+		else if ((TexParams::Repeat & parameters) != TexParams::None)
 		{
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -139,7 +139,7 @@ namespace e186
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		}
 
-		if (TexParams_NearestFiltering & parameters)
+		if ((TexParams::NearestFiltering & parameters) != TexParams::None)
 		{	
 			glTexParameteri(m_texture_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		}
@@ -148,44 +148,44 @@ namespace e186
 			glTexParameteri(m_texture_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		}
 
-		if (TexParams_GenerateMipMaps & parameters)
+		if ((TexParams::GenerateMipMaps & parameters) != TexParams::None)
 		{
-			if (TexParams_TrilinearFiltering & parameters)
+			if ((TexParams::TrilinearFiltering & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			}
-			else if (TexParams_AnisotropicFiltering2x & parameters)
+			else if ((TexParams::AnisotropicFiltering2x & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // not sure if okay
 				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 2.0f);
 			}
-			else if (TexParams_AnisotropicFiltering4x & parameters)
+			else if ((TexParams::AnisotropicFiltering4x & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // not sure if okay
 				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 4.0f);
 			}
-			else if (TexParams_AnisotropicFiltering8x & parameters)
+			else if ((TexParams::AnisotropicFiltering8x & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // not sure if okay
 				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 8.0f);
 			}
-			else if (TexParams_AnisotropicFiltering16x & parameters)
+			else if ((TexParams::AnisotropicFiltering16x & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // not sure if okay
 				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, 16.0f);
 			}
-			else if (TexParams_AnisotropicFilteringMax & parameters)
+			else if ((TexParams::AnisotropicFilteringMax & parameters) != TexParams::None)
 			{
 				GLfloat max_anis = 0.0f;
 				glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_anis);
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // not sure if okay
 				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, max_anis);
 			}
-			else if (TexParams_BilinearFiltering & parameters)
+			else if ((TexParams::BilinearFiltering & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 			}
-			else if (TexParams_LinearFiltering & parameters)
+			else if ((TexParams::LinearFiltering & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			}
@@ -196,7 +196,7 @@ namespace e186
 		}
 		else
 		{
-			if (TexParams_NearestFiltering & parameters)
+			if ((TexParams::NearestFiltering & parameters) != TexParams::None)
 			{
 				glTexParameteri(m_texture_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			}

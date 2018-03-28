@@ -2,42 +2,11 @@
 
 namespace e186
 {
-#pragma region RenderTextureRenderBufferConfig
-
-	FboRenderBufferConfig::FboRenderBufferConfig(GLenum internalFormat, GLenum depthAttachment, GLenum stencilAttachment) :
-		m_internal_format(internalFormat),
-		m_depth_attachment(depthAttachment),
-		m_stencil_attachment(stencilAttachment)
-	{
-	}
-
-	GLint FboRenderBufferConfig::internal_format() const
-	{
-		return m_internal_format;
-	}
-
-	GLenum FboRenderBufferConfig::depth_attachment() const
-	{
-		return m_depth_attachment;
-	}
-
-	GLenum FboRenderBufferConfig::stencil_attachment() const
-	{
-		return m_stencil_attachment;
-	}
-
-	FboRenderBufferConfig FboRenderBufferConfig::kPresetNone			(0,							0,									0);
-	FboRenderBufferConfig FboRenderBufferConfig::kPresetDepthStencil(GL_DEPTH_STENCIL,			GL_DEPTH_STENCIL_ATTACHMENT,		0);
-	FboRenderBufferConfig FboRenderBufferConfig::kPresetDepth16		(GL_DEPTH_COMPONENT16,		GL_DEPTH_ATTACHMENT,				0);
-
-#pragma endregion
-
-
 #pragma region RenderTextureColorConfig
 
 	FboAttachmentConfig::FboAttachmentConfig(GLint internalFormat, GLint imageFormat, GLenum type, GLint border) :
 		m_internal_format(internalFormat),
-		m_image_format(imageFormat),
+		m_format(imageFormat),
 		m_data_type(type),
 		m_border(border)
 	{
@@ -48,9 +17,9 @@ namespace e186
 		return m_internal_format;
 	}
 
-	GLint FboAttachmentConfig::image_format() const
+	GLint FboAttachmentConfig::format() const
 	{
-		return m_image_format;
+		return m_format;
 	}
 
 	GLenum FboAttachmentConfig::data_type() const
@@ -63,20 +32,27 @@ namespace e186
 		return m_border;
 	}
 
-	FboAttachmentConfig FboAttachmentConfig::kPresetNone	(0, 0, 0);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGB		(GL_RGB,		GL_RGB,			GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA	(GL_RGBA,		GL_RGBA,		GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGB16F	(GL_RGB16F,		GL_RGB,			GL_HALF_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA16F	(GL_RGBA16F,	GL_RGBA,		GL_HALF_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGB32F	(GL_RGB32F,		GL_RGB,			GL_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA32F	(GL_RGBA32F,	GL_RGBA,		GL_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf(GL_RGBA,		GL_RGBA,		GL_HALF_FLOAT);
-
+	FboAttachmentConfig FboAttachmentConfig::kPresetNone			(0, 0, 0);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGB				(GL_RGB,				GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA			(GL_RGBA,				GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGB16F			(GL_RGB16F,				GL_RGB,				GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA16F			(GL_RGBA16F,			GL_RGBA,			GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGB32F			(GL_RGB32F,				GL_RGB,				GL_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA32F			(GL_RGBA32F,			GL_RGBA,			GL_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf		(GL_RGBA,				GL_RGBA,			GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGB			(GL_SRGB,				GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGBA			(GL_SRGB_ALPHA,			GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepthStencil24_8(GL_DEPTH_STENCIL,		GL_DEPTH_STENCIL,	GL_UNSIGNED_INT_24_8);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepth32F		(GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepth24			(GL_DEPTH_COMPONENT24,	GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepth16			(GL_DEPTH_COMPONENT16,	GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 #pragma endregion
 
 #pragma region RenderTexture
 
 	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height) :
+		m_viewport_x(0),
+		m_viewport_y(0),
 		m_width(width),
 		m_height(height),
 		m_fbo_id(0),
@@ -88,9 +64,12 @@ namespace e186
 	}
 
 	FrameBufferObject::FrameBufferObject(FrameBufferObject&& other) noexcept :
-		m_width(other.m_width),
+	m_width(other.m_width),
+		m_viewport_x(other.m_viewport_x),
+		m_viewport_y(other.m_viewport_y),
 		m_height(other.m_height),
 		m_fbo_id(other.m_fbo_id),
+		m_color_attachments(std::move(other.m_color_attachments)),
 		m_tex_attachments(std::move(other.m_tex_attachments)),
 		m_depth_buffer_format(other.m_depth_buffer_format),
 		m_depth_buffer_handle(other.m_depth_buffer_handle),
@@ -107,9 +86,12 @@ namespace e186
 
 	FrameBufferObject& FrameBufferObject::operator=(FrameBufferObject&& other) noexcept 
 	{
+		m_viewport_x = other.m_viewport_x;
+		m_viewport_y = other.m_viewport_y;
 		m_width = other.m_width;
 		m_height = other.m_height;
 		m_fbo_id = other.m_fbo_id;
+		m_color_attachments = std::move(other.m_color_attachments);
 		m_tex_attachments = std::move(other.m_tex_attachments);
 		m_depth_buffer_format = other.m_depth_buffer_format;
 		m_depth_buffer_handle = other.m_depth_buffer_handle;
@@ -145,17 +127,12 @@ namespace e186
 		return GL_FRAMEBUFFER;
 	}
 
-	const TexInfo& FrameBufferObject::GetAttachedTexture(GLenum attachment) const
-	{
-		return m_tex_attachments.at(attachment);
-	}
-
 	const TexInfo* FrameBufferObject::FindAttachedTexture(GLenum attachment) const
 	{
 		auto result = m_tex_attachments.find(attachment);
 		if (result != m_tex_attachments.end()) 
 		{
-			return &result->second;
+			return result->second.get();
 		}
 		else 
 		{
@@ -179,8 +156,7 @@ namespace e186
 	{
 		glBindFramebuffer(target(), 0);
 
-		// Enabling SRGB is the default, since the stuff rendered to the screen should be SRGB
-		glEnable(GL_FRAMEBUFFER_SRGB);
+		// TODO: Do something with SRGB? Or don't?
 
 		return *this;
 	}
@@ -192,6 +168,17 @@ namespace e186
 			glClearColor(m_clear_color.r, m_clear_color.g, m_clear_color.b, m_clear_color.a);
 		}
 		glClear(clearFlags);
+		return *this;
+	}
+	
+	FrameBufferObject& FrameBufferObject::ClearAllColorBuffers()
+	{
+		DrawIntoColorBuffersInAttachOrder();
+		GLint n = static_cast<GLint>(m_color_attachments.size());
+		for (GLint i = 0; i < n; ++i)
+		{
+			glClearBufferfv(GL_COLOR, i, glm::value_ptr(m_clear_color));
+		}
 		return *this;
 	}
 
@@ -210,7 +197,7 @@ namespace e186
 
 	FrameBufferObject& FrameBufferObject::SetViewport()
 	{
-		glViewport(0, 0, m_width, m_height);
+		glViewport(m_viewport_x, m_viewport_y, m_width, m_height);
 		return *this;
 	}
 
@@ -220,45 +207,66 @@ namespace e186
 		return *this;
 	}
 		
-	void FrameBufferObject::AttachTexture(const FboAttachmentConfig& config, GLenum attachment, unsigned int params)
+	void FrameBufferObject::AttachTexture(const FboAttachmentConfig& config, std::vector<GLenum> attachments, TexParams params)
 	{
+		assert(attachments.size() > 0);
 		Bind();
 
 		GLuint texHandle;
 		glGenTextures(1, &texHandle);
 		assert(0 != texHandle);
 
-		TexInfo ti(GL_TEXTURE_2D, texHandle, config.internal_format(), config.image_format(), config.data_type(), config.border());
-		ti.SetTextureParameters(params);
+		auto ti = std::make_shared<TexInfo>(GL_TEXTURE_2D, texHandle, config.internal_format(), config.format(), config.data_type(), config.border());
+		ti->SetTextureParameters(params);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, config.internal_format(), m_width, m_height, config.border(), config.image_format(), config.data_type(), nullptr);
-		ti.GenerateMipMaps(); // /!\ Allocate the mipmaps /!\
+		glTexImage2D(GL_TEXTURE_2D, 0, config.internal_format(), m_width, m_height, config.border(), config.format(), config.data_type(), nullptr);
+		if ((params & TexParams::GenerateMipMaps) != TexParams::None)
+		{
+			ti->GenerateMipMaps(); // Allocate memory for the mipmaps
+		}
 
 		// attach texture to the FBO
-		glFramebufferTexture2D(target(), attachment, ti.target(), ti.handle(), 0);
+		for (int i = 0; i < attachments.size(); ++i)
+		{
+			glFramebufferTexture2D(target(), attachments[i], ti->target(), ti->handle(), 0);
+			check_gl_error(std::string("AttachTexture after glFramebufferTexture2D [" + std::to_string(i) + "]").c_str());
+		}
 
-		check_gl_error("AttachTexture after glFramebufferTexture2D and unbind");
 
-		ti.Unbind();
+		ti->Unbind();
 		Unbind();
 			
 		// we've gotten this far... so, store the data
-		m_tex_attachments.insert({ attachment, std::move(ti) });
+		for (int i = 0; i < attachments.size(); ++i)
+		{
+			auto att = attachments[i];
+			m_tex_attachments.insert({ att, ti });
+			if (att >= GL_COLOR_ATTACHMENT0 && att <= GL_COLOR_ATTACHMENT31)
+			{
+				m_color_attachments.push_back(att);
+			}
+		}
 	}
 
-	FrameBufferObject& FrameBufferObject::AttachColorComponent(FboAttachmentConfig config, GLenum attachment, unsigned int params)
+	FrameBufferObject& FrameBufferObject::AttachComponent(
+		FboAttachmentConfig config,
+		GLenum attachment,
+		TexParams params)
 	{
-		AttachTexture(config, attachment, params);
+		AttachTexture(config, { attachment }, params);
 		return *this;
 	}
 
-	FrameBufferObject& FrameBufferObject::AttachDepthComponent(FboAttachmentConfig config, GLenum attachment, unsigned int params)
+	FrameBufferObject& FrameBufferObject::AttachComponent(
+		FboAttachmentConfig config,
+		std::vector<GLenum> attachments,
+		TexParams params)
 	{
-		AttachTexture(config, attachment, params);
+		AttachTexture(config, std::move(attachments), params);
 		return *this;
 	}
 
-	FrameBufferObject& FrameBufferObject::AttachRenderBuffer(FboRenderBufferConfig config)
+	FrameBufferObject& FrameBufferObject::AttachRenderBuffer(FboAttachmentConfig config)
 	{
 		Bind();
 
@@ -270,11 +278,14 @@ namespace e186
 		glBindRenderbuffer(GL_RENDERBUFFER, 0); // unbind since we're done setting it's SetTextureParameters
 
 		// attach depth component to the FBO
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, config.depth_attachment(), GL_RENDERBUFFER, rbHandle);
-		// ...and maybe also the stencil component
-		if (config.stencil_attachment() > 0)
+		if (config.format() == GL_DEPTH_COMPONENT || config.format() == GL_DEPTH_STENCIL)
 		{
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, config.stencil_attachment(), GL_RENDERBUFFER, rbHandle);
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbHandle);	
+		}
+		// ...and maybe also the stencil component
+		if (config.format() == GL_DEPTH_STENCIL)
+		{
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbHandle);
 		}
 			
 		Unbind();
@@ -284,6 +295,16 @@ namespace e186
 
 		check_gl_error("AttachRenderBuffer after glFramebufferRenderbuffer and unbind");
 		return *this;
+	}
+
+	const std::vector<GLenum>& FrameBufferObject::GetAllColorBuffers() const
+	{
+		return m_color_attachments;
+	}
+
+	void FrameBufferObject::DrawIntoColorBuffersInAttachOrder() const
+	{
+		glDrawBuffers(static_cast<GLsizei>(m_color_attachments.size()), &m_color_attachments[0]);
 	}
 
 	bool FrameBufferObject::status()

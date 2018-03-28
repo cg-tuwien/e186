@@ -256,14 +256,20 @@ namespace e186
 		Model& operator=(Model&& other) noexcept;
 		~Model();
 
+	private:
+		static std::unique_ptr<Model> g_full_screen_quad;
 	public:
 		static std::unique_ptr<Model> LoadFromFile(const std::string& path, const glm::mat4& transform_matrix, const unsigned int model_loader_flags = MOLF_default);
+		static std::unique_ptr<Model> LoadFromMemory(const std::string& memory, const glm::mat4& transform_matrix, const unsigned int model_loader_flags = MOLF_default);
 
 	private:
-		bool Load(const std::string& path, const unsigned int modelLoaderFlags = MOLF_default);
+		unsigned static int CompileAssimpImportFlags(const unsigned int modelLoaderFlags);
+		bool LoadFromFile(const std::string& path, const unsigned int modelLoaderFlags = MOLF_default);
+		bool LoadFromMemory(const std::string& data, const unsigned int modelLoaderFlags = MOLF_default);
+		bool PostLoadProcessing(Assimp::Importer& importer, const aiScene* scene, const std::string* file_path_or_null);
 
 		void Dispose();
-		bool InitScene(const aiScene* scene, const std::string& path);
+		bool InitScene(const aiScene* scene);
 		bool InitMesh(const int index, const aiMesh* paiMesh);
 		void InitTransformationMatrices(const aiNode* pNode, const aiMatrix4x4& accTrans);
 
@@ -365,6 +371,8 @@ namespace e186
 #endif
 
 		static bool GetBoneWeightsAndIndicesForMeshVertex(const aiScene* scene, const unsigned int meshIndex, const unsigned int vertexId, glm::uvec4& outBoneIndices, glm::vec4& outBoneWeights);
+
+		static Mesh& GetFullScreenQuadMesh();
 	};
 
 }

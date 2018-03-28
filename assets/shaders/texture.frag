@@ -2,7 +2,8 @@
 
 // -------------- uniforms -----------------
 uniform sampler2D sampler;
-uniform vec4 color;
+uniform vec4 transform_mul = vec4(1, 1, 1, 1);
+uniform vec4 transform_add = vec4(0, 0, 0, 0);
 
 // ---------------- varyings ---------------------
 in vec2 varTexCoords;
@@ -12,6 +13,6 @@ out vec4 fragColor;
 
 void main()
 {
-	vec3 texCol = texture(sampler, varTexCoords).xyz;
-    fragColor = vec4(texCol, 1.0) * color;
+	vec4 texCol = texture(sampler, varTexCoords);
+    fragColor = texCol * transform_mul + transform_add;
 }
