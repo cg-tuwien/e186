@@ -196,6 +196,14 @@ namespace e186
 			SetUniform(attenuation_loc, data.m_attenuation);
 		}
 
+		void SetLight(GLuint position_loc, GLuint direction_loc, GLuint color_loc, GLuint attenuation_loc, const SpotLightGpuData& data)
+		{
+			SetUniform(position_loc, data.m_position_and_cos_outer_angle_half);
+			SetUniform(direction_loc, data.m_direction_and_cos_inner_angle_half);
+			SetUniform(color_loc, data.m_light_color_and_falloff);
+			SetUniform(attenuation_loc, data.m_attenuation);
+		}
+
 		void SetLight(GLuint direction_loc, GLuint color_loc, const DirectionalLightGpuData& data)
 		{
 			SetUniform(direction_loc, data.m_light_dir_vs);
@@ -385,6 +393,35 @@ namespace e186
 			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
 			const auto atten_loc = GetMandatoryUniformLocation(uniform_name + attenuation_member);
 			SetLight(pos_loc, color_loc, atten_loc, data);
+		}
+
+		void SetOptionalLight(const std::string& uniform_name, const SpotLightGpuData& data, const char* position_member = ".position_and_cos_outer_angle_half", const char* direction_member = ".direction_and_cos_inner_angle_half",
+			const char* color_member = ".light_color_and_falloff", const char* attenuation_member = ".attenuation")
+		{
+			const auto pos_loc = GetOptionalUniformLocation(uniform_name + position_member);
+			const auto dir_loc = GetOptionalUniformLocation(uniform_name + direction_member);
+			const auto color_loc = GetOptionalUniformLocation(uniform_name + color_member);
+			const auto atten_loc = GetOptionalUniformLocation(uniform_name + attenuation_member);
+			if (-1 != pos_loc && -1 != dir_loc && -1 != color_loc && -1 != atten_loc)
+				SetLight(pos_loc, dir_loc, color_loc, atten_loc, data);
+		}
+		void SetLight(const std::string& uniform_name, const SpotLightGpuData& data, const char* position_member = ".position_and_cos_outer_angle_half", const char* direction_member = ".direction_and_cos_inner_angle_half",
+			const char* color_member = ".light_color_and_falloff", const char* attenuation_member = ".attenuation")
+		{
+			const auto pos_loc = GetUniformLocation(uniform_name + position_member);
+			const auto dir_loc = GetUniformLocation(uniform_name + direction_member);
+			const auto color_loc = GetUniformLocation(uniform_name + color_member);
+			const auto atten_loc = GetUniformLocation(uniform_name + attenuation_member);
+			SetLight(pos_loc, dir_loc, color_loc, atten_loc, data);
+		}
+		void SetMandatoryLight(const std::string& uniform_name, const SpotLightGpuData& data, const char* position_member = ".position_and_cos_outer_angle_half", const char* direction_member = ".direction_and_cos_inner_angle_half",
+			const char* color_member = ".light_color_and_falloff", const char* attenuation_member = ".attenuation")
+		{
+			const auto pos_loc = GetMandatoryUniformLocation(uniform_name + position_member);
+			const auto dir_loc = GetMandatoryUniformLocation(uniform_name + direction_member);
+			const auto color_loc = GetMandatoryUniformLocation(uniform_name + color_member);
+			const auto atten_loc = GetMandatoryUniformLocation(uniform_name + attenuation_member);
+			SetLight(pos_loc, dir_loc, color_loc, atten_loc, data);
 		}
 
 

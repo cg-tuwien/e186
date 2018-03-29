@@ -276,6 +276,9 @@
     <ClInclude Include="..\include\Edge.h">
       <Filter>Header Files\geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\SpotLight.h">
+      <Filter>Header Files\lightsources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
@@ -394,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Vertex.cpp">
       <Filter>Source Files\geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\SpotLight.cpp">
+      <Filter>Source Files\lightsources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

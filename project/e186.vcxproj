@@ -49,6 +49,7 @@
     <ClInclude Include="..\include\Shader.h" />
     <ClInclude Include="..\include\e186targetver.h" />
     <ClInclude Include="..\include\ShaderType.h" />
+    <ClInclude Include="..\include\SpotLight.h" />
     <ClInclude Include="..\include\Stopwatch.h" />
     <ClInclude Include="..\include\string_utils.h" />
     <ClInclude Include="..\include\Tex2D.h" />
@@ -95,6 +96,7 @@
     <ClCompile Include="..\src\SampleSceneTessIco.cpp" />
     <ClCompile Include="..\src\SceneSelectorScene.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />
+    <ClCompile Include="..\src\SpotLight.cpp" />
     <ClCompile Include="..\src\Stopwatch.cpp" />
     <ClCompile Include="..\src\string_utils.cpp" />
     <ClCompile Include="..\src\Tex2D.cpp" />

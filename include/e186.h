@@ -55,6 +55,7 @@
 #include "AmbientLight.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
+#include "SpotLight.h"
 #include "ShaderType.h"
 #include "Shader.h"
 #include "MaterialData.h"
