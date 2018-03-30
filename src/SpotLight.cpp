@@ -7,7 +7,7 @@ namespace e186
 		: m_position(position),
 		m_direction(direction),
 		m_light_color(color),
-		m_attenuation(1.0f, 0.1f, 0.01f, 0.001f),
+		m_attenuation(1.0f, 0.1f, 0.01f, 0.0f),
 		m_outer_angle(glm::half_pi<float>()),
 		m_inner_angle(0.0f),
 		m_falloff(1.0f),
