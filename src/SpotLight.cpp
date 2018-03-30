@@ -1,8 +1,5 @@
 #include "SpotLight.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 namespace e186
 {
 
@@ -11,7 +8,7 @@ namespace e186
 		m_direction(direction),
 		m_light_color(color),
 		m_attenuation(1.0f, 0.1f, 0.01f, 0.001f),
-		m_outer_angle(float(M_PI_2)),
+		m_outer_angle(glm::half_pi<float>()),
 		m_inner_angle(0.0f),
 		m_falloff(1.0f),
 		m_enabled{ true }
