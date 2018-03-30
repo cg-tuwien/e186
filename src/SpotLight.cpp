@@ -5,7 +5,7 @@ namespace e186
 
 	SpotLight::SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction)
 		: m_position(position),
-		m_direction(direction),
+		m_direction(glm::normalize(direction)),
 		m_light_color(color),
 		m_attenuation(1.0f, 0.1f, 0.01f, 0.0f),
 		m_outer_angle(glm::half_pi<float>()),
@@ -19,7 +19,7 @@ namespace e186
 		float const_atten, float lin_atten, float quad_atten, float cub_atten,
 		float outer_angle, float inner_angle, float falloff)
 		: m_position(position),
-		m_direction(direction),
+		m_direction(glm::normalize(direction)),
 		m_light_color(color),
 		m_attenuation(const_atten, lin_atten, quad_atten, cub_atten),
 		m_outer_angle(outer_angle),
@@ -32,7 +32,7 @@ namespace e186
 	SpotLight::SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction,
 		const glm::vec4& attenuation, float outer_angle, float inner_angle, float falloff)
 		: m_position(position),
-		m_direction(direction),
+		m_direction(glm::normalize(direction)),
 		m_light_color(color),
 		m_attenuation(attenuation),
 		m_outer_angle(outer_angle),
@@ -67,7 +67,7 @@ namespace e186
 
 	void SpotLight::set_direction(glm::vec3 direction)
 	{
-		m_direction = std::move(direction);
+		m_direction = std::move(glm::normalize(direction));
 	}
 
 	void SpotLight::set_light_color(glm::vec3 color)
