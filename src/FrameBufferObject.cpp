@@ -140,6 +140,18 @@ namespace e186
 		}
 	}
 
+	FrameBufferObject& FrameBufferObject::BindForReading()
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo_id);
+		return *this;
+	}
+
+	FrameBufferObject& FrameBufferObject::BindForWriting()
+	{
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo_id);
+		return *this;
+	}
+
 	FrameBufferObject& FrameBufferObject::Bind()
 	{
 		glBindFramebuffer(target(), m_fbo_id);
@@ -280,7 +292,7 @@ namespace e186
 		// attach depth component to the FBO
 		if (config.format() == GL_DEPTH_COMPONENT || config.format() == GL_DEPTH_STENCIL)
 		{
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbHandle);	
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbHandle);
 		}
 		// ...and maybe also the stencil component
 		if (config.format() == GL_DEPTH_STENCIL)
