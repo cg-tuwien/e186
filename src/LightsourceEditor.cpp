@@ -347,6 +347,8 @@ namespace e186
 		const auto groupAssignment = " group='Ambient Light' ";
 		TwAddVarCB(m_tweak_bar, "Amb. enabled", TW_TYPE_BOOLCPP, SetAmbientEnabledCallback, GetAmbientEnabledCallback, ambient_light, groupAssignment);
 		TwAddVarCB(m_tweak_bar, "Amb. light-col", TW_TYPE_COLOR3F, SetAmbientLightColorCallback, GetAmbientLightColorCallback, ambient_light, groupAssignment);
+		int opened = 0;
+		TwSetParam(m_tweak_bar, "Ambient Light", "opened", TW_PARAM_INT32, 1, &opened);
 	}
 
 	void LightsourceEditor::Set(DirectionalLight* directional_light)
@@ -356,6 +358,8 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, "Dir. enabled", TW_TYPE_BOOLCPP, SetDLEnabledCallback, GetDLEnabledCallback, directional_light, groupAssignment);
 		TwAddVarCB(m_tweak_bar, "Dir. direction", TW_TYPE_DIR3F, SetDLDirectionCallback, GetDLDirectionCallback, directional_light, groupAssignment);
 		TwAddVarCB(m_tweak_bar, "Dir. light-col", TW_TYPE_COLOR3F, SetDLLightColorCallback, GetDLLightColorCallback, directional_light, groupAssignment);
+		int opened = 0;
+		TwSetParam(m_tweak_bar, "Directional Light", "opened", TW_PARAM_INT32, 1, &opened);
 	}
 
 	void LightsourceEditor::Add(PointLight* point_light)
@@ -391,6 +395,11 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, (name + " linear-att").c_str(), TW_TYPE_FLOAT, SetLinearAttenuationCallback, GetLinearAttenuationCallback, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " quadr-att").c_str(), TW_TYPE_FLOAT, SetQuadraticAttenuationCallback, GetQuadraticAttenuationCallback, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " cubic-att").c_str(), TW_TYPE_FLOAT, SetCubicAttenuationCallback, GetCubicAttenuationCallback, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
+		int opened = 0;
+		auto plGroup = "Point Lights";
+		TwSetParam(m_tweak_bar, name.c_str(), "opened", TW_PARAM_INT32,   1, &opened);
+		TwSetParam(m_tweak_bar, name.c_str(), "group",  TW_PARAM_CSTRING, 1, plGroup);
+		TwSetParam(m_tweak_bar, plGroup     , "opened", TW_PARAM_INT32,   1, &opened);
 	}
 
 	void LightsourceEditor::Clear()
