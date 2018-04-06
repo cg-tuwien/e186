@@ -74,10 +74,10 @@ namespace e186
 		return glm::abs(a.x - b.x) < FU_EPSILON && glm::abs(a.y - b.y) < FU_EPSILON && glm::abs(a.z - b.z) < FU_EPSILON;
 	}
 
-	glm::mat4 rotate_one_vector_to_another(glm::vec3 s, glm::vec3 t)
+	glm::mat4 rotate_vector_a_to_vector_b(glm::vec3 a, glm::vec3 b)
 	{
-		glm::vec3 v = glm::cross(s, t);
-		float e = glm::dot(s, t);
+		glm::vec3 v = glm::cross(a, b);
+		float e = glm::dot(a, b);
 		float h = 1.0f / (1.0f + e);
 		glm::mat4 R(e + h * v.x * v.x, h * v.x * v.y - v.z, h * v.x * v.z + v.y, 0.0f,
 			h * v.x * v.y + v.z, e + h * v.y * v.y, h * v.y * v.z - v.x, 0.0f,

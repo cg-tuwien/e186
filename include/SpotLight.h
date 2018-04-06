@@ -76,18 +76,33 @@ namespace e186
 	{
 	public:
 		SpotLightWrapper(SpotLight& light, LightCollection<SpotLight, SpotLightGpuData, SpotLightWrapper>* collection, int light_index = -1)
-			: m_light{ light }, m_collection{ collection }, m_light_index{ light_index } {};
+			: m_light{ light }, m_collection{ collection }, m_light_index{ light_index } {}
+		SpotLightWrapper(const SpotLightWrapper& other) noexcept = default;
+		SpotLightWrapper(SpotLightWrapper&& other) noexcept = default;
+		SpotLightWrapper& operator=(const SpotLightWrapper& other) noexcept = default;
+		SpotLightWrapper& operator=(SpotLightWrapper&& other) noexcept = default;
+		~SpotLightWrapper() {}
+
 		glm::vec3 position() const { return m_light.position(); }
+		glm::vec3 direction() const { return m_light.direction(); }
 		const glm::vec3& light_color() const { return m_light.light_color(); }
 		glm::vec4 attenuation() const { return m_light.attenuation(); }
 		float const_attenuation() const { return m_light.attenuation().x; }
 		float linear_attenuation() const { return m_light.attenuation().y; }
 		float quadratic_attenuation() const { return m_light.attenuation().z; }
 		float cubic_attenuation() const { return m_light.attenuation().w; }
+		float outer_angle() const { return m_light.outer_angle(); }
+		float inner_angle() const { return m_light.inner_angle(); }
+		float falloff() const { return m_light.falloff(); }
 		bool enabled() const { return m_light.enabled(); }
 		void set_position(glm::vec3 position)
 		{
-			m_light.set_position(std::move(position)); 
+			m_light.set_position(std::move(position));
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_direction(glm::vec3 direction)
+		{
+			m_light.set_direction(std::move(direction));
 			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
 		}
 		void set_light_color(glm::vec3 color)
@@ -121,6 +136,21 @@ namespace e186
 		void set_enabled(bool is_enabled)
 		{
 			m_light.set_enabled(is_enabled); 
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_outer_angle(float outer_angle)
+		{
+			m_light.set_outer_angle(outer_angle);
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_inner_angle(float inner_angle)
+		{
+			m_light.set_inner_angle(inner_angle);
+			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
+		}
+		void set_falloff(float falloff)
+		{
+			m_light.set_falloff(falloff);
 			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
 		}
 	private:

@@ -58,8 +58,8 @@ namespace e186
 
 	bool same_as(const glm::dvec3& a, const glm::dvec3& b);
 
-	/// Creates rotation matrix for rotating vector s to vector t
-	/// Vectors s, and t must be normalized (I guess)
+	/// Creates rotation matrix for rotating vector a to vector b
+	/// Vectors a, and b must be normalized (I guess)
 	/// [See Real-Time Rendering (Akenine Möller et. al) chapter 4.3.2]
-	glm::mat4 rotate_one_vector_to_another(glm::vec3 s, glm::vec3 t);
+	glm::mat4 rotate_vector_a_to_vector_b(glm::vec3 a, glm::vec3 b);
 }

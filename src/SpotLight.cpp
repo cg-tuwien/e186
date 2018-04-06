@@ -103,11 +103,19 @@ namespace e186
 	void SpotLight::set_outer_angle(float outer_angle)
 	{
 		m_outer_angle = outer_angle;
+		if (m_inner_angle > m_outer_angle)
+		{
+			m_inner_angle = m_outer_angle;
+		}
 	}
 
 	void SpotLight::set_inner_angle(float inner_angle)
 	{
 		m_inner_angle = inner_angle;
+		if (m_inner_angle > m_outer_angle)
+		{
+			m_outer_angle = m_inner_angle;
+		}
 	}
 
 	void SpotLight::set_falloff(float falloff)
@@ -138,8 +146,8 @@ namespace e186
 	{
 		if (m_enabled)
 		{
-			target.m_position_and_cos_outer_angle_half = glm::vec4(m_position, cos(m_outer_angle / 2.0f));
-			target.m_direction_and_cos_inner_angle_half = glm::vec4(m_direction, cos(m_inner_angle / 2.0f));
+			target.m_position_and_cos_outer_angle_half = glm::vec4(m_position, glm::cos(m_outer_angle / 2.0f));
+			target.m_direction_and_cos_inner_angle_half = glm::vec4(m_direction, glm::cos(m_inner_angle / 2.0f));
 			target.m_light_color_and_falloff = glm::vec4(m_light_color, m_falloff);
 			target.m_attenuation = m_attenuation;
 		}
@@ -157,8 +165,8 @@ namespace e186
 		if (m_enabled)
 		{
 			target.m_position_and_cos_outer_angle_half = mat * glm::vec4(m_position, 1.0f);
-			target.m_position_and_cos_outer_angle_half.w = cos(m_outer_angle / 2.0f);
-			target.m_direction_and_cos_inner_angle_half = glm::vec4(glm::mat3(mat) * m_direction, cos(m_inner_angle / 2.0f));
+			target.m_position_and_cos_outer_angle_half.w = glm::cos(m_outer_angle / 2.0f);
+			target.m_direction_and_cos_inner_angle_half = glm::vec4(glm::mat3(mat) * m_direction, glm::cos(m_inner_angle / 2.0f));
 			target.m_light_color_and_falloff = glm::vec4(m_light_color, m_falloff);
 			target.m_attenuation = m_attenuation;
 		}

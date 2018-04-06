@@ -60,7 +60,13 @@ namespace e186
 	{
 	public:
 		PointLightWrapper(PointLight& light, LightCollection<PointLight, PointLightGpuData, PointLightWrapper>* collection, int light_index = -1)
-			: m_light{ light }, m_collection{ collection }, m_light_index{ light_index } {};
+			: m_light{ light }, m_collection{ collection }, m_light_index{ light_index } {}
+		PointLightWrapper(const PointLightWrapper& other) noexcept = default;
+		PointLightWrapper(PointLightWrapper&& other) noexcept = default;
+		PointLightWrapper& operator=(const PointLightWrapper& other) noexcept = default;
+		PointLightWrapper& operator=(PointLightWrapper&& other) noexcept = default;
+		~PointLightWrapper() {}
+
 		glm::vec3 position() const { return m_light.position(); }
 		const glm::vec3& light_color() const { return m_light.light_color(); }
 		glm::vec4 attenuation() const { return m_light.attenuation(); }
