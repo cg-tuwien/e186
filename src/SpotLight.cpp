@@ -2,6 +2,7 @@
 
 namespace e186
 {
+	const float SpotLight::k_max_outer_angle = glm::pi<float>() - 0.4f;
 
 	SpotLight::SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction)
 		: m_position(position),
@@ -103,19 +104,14 @@ namespace e186
 	void SpotLight::set_outer_angle(float outer_angle)
 	{
 		m_outer_angle = outer_angle;
-		if (m_inner_angle > m_outer_angle)
-		{
-			m_inner_angle = m_outer_angle;
-		}
+		m_outer_angle = glm::clamp(m_outer_angle, 0.0f, k_max_outer_angle);
+		m_inner_angle = glm::min(m_inner_angle, m_outer_angle);
 	}
 
 	void SpotLight::set_inner_angle(float inner_angle)
 	{
 		m_inner_angle = inner_angle;
-		if (m_inner_angle > m_outer_angle)
-		{
-			m_outer_angle = m_inner_angle;
-		}
+		m_inner_angle = glm::clamp(m_inner_angle, 0.0f, m_outer_angle);
 	}
 
 	void SpotLight::set_falloff(float falloff)

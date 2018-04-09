@@ -849,7 +849,7 @@ namespace e186
 				auto d = m_gizmo_param;
 				auto s = m_gizmo_scale / (a[0] + a[1] * d + a[2] * d * d + a[3] * d * d * d);
 
-				auto angle_scale = sptl.outer_angle() / 0.707106781f / 2.0f; // TODO: This scaling is not correct
+				auto angle_scale = glm::tan(sptl.outer_angle() / 2.0f);
 
 				auto translation = glm::translate(sptl.position()); // m_point_lights[i].get().transform().GetModelMatrix();
 				auto rotation = rotate_vector_a_to_vector_b(glm::vec3(0, 0, 1), sptl.direction());

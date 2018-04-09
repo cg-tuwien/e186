@@ -13,6 +13,8 @@ namespace e186
 	class SpotLight
 	{
 	public:
+		static const float k_max_outer_angle;
+
 		SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction);
 		SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction,
 			const glm::vec4& attenuation, float outer_angle, float inner_angle, float falloff);
