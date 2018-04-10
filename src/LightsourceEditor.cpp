@@ -782,7 +782,7 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, (name + " cubic-att").c_str(), TW_TYPE_FLOAT, SetAtt3SlCB, GetAtt3SlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " inner angle").c_str(), TW_TYPE_FLOAT, SetInnerAngleSlCB, GetInnerAngleSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " outer angle").c_str(), TW_TYPE_FLOAT, SetOuterAngleSlCB, GetOuterAngleSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarCB(m_tweak_bar, (name + " outer angle").c_str(), TW_TYPE_FLOAT, SetFalloffSlCB, GetFalloffSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
+		TwAddVarCB(m_tweak_bar, (name + " falloff").c_str(), TW_TYPE_FLOAT, SetFalloffSlCB, GetFalloffSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		int opened = 0;
 		auto slGroup = "Spot Lights";
 		TwSetParam(m_tweak_bar, name.c_str(), "opened", TW_PARAM_INT32, 1, &opened);
