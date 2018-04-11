@@ -371,9 +371,6 @@ namespace e186
 			m_meshes[index].m_indices.push_back(Face.mIndices[2]);
 		}
 
-		// update indicesCount because meshEditor might have changed it
-		indicesCount = m_meshes[index].m_indices.size();
-
 		// do not create vertex data on GPU yet
 		m_meshes[index].m_indices_vbo_id = 0;
 		// TODO: What to do if the "triangulate"-option is not set during model loading?

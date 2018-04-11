@@ -113,7 +113,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps, true);
 			m_diffuse_tex = tex;
 		}
 
@@ -129,7 +129,7 @@ namespace e186
 			if (texMapping != aiTextureMapping_UV) {
 				log_warning("Unsupported texture mapping mode[%u] for texture[%s]", static_cast<unsigned int>(texMapping), strVal.C_Str());
 			}
-			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps);
+			auto tex = tlh.GetOrLoadTex(strVal.data, tlh.general_tex_params() | ai_mapping_mode_to_tex_params(texMapMode) | TexParams::GenerateMipMaps, true);
 			m_ambient_tex = tex;
 		}
 
