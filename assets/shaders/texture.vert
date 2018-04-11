@@ -10,5 +10,5 @@ out vec2 varTexCoords;
 void main()
 {
 	varTexCoords = vertexTexCoord;
-    gl_Position = pvmtMatrix * vertexPosition;
+	gl_Position = pvmtMatrix * vertexPosition;
 }

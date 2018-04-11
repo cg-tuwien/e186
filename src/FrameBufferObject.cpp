@@ -255,7 +255,8 @@ namespace e186
 			}
 		}
 		else // multisample texture
-		{	
+		{
+			ti->Bind();
 			glTexImage2DMultisample(
 				GL_TEXTURE_2D_MULTISAMPLE, 
 				static_cast<GLsizei>(num_samples), 
