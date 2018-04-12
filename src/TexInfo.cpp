@@ -119,7 +119,7 @@ namespace e186
 	}
 
 
-	TexInfo& TexInfo::SetTextureParameters(TexParams parameters)
+	TexInfo& TexInfo::BindAndSetTextureParameters(TexParams parameters)
 	{
 		Bind();
 

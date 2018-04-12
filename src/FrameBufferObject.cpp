@@ -237,7 +237,7 @@ namespace e186
 
 		if (!is_multisample)
 		{
-			ti->SetTextureParameters(params);
+			ti->BindAndSetTextureParameters(params);
 
 			glTexImage2D(
 				GL_TEXTURE_2D, 

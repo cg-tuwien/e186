@@ -84,7 +84,7 @@ namespace e186
 		GLenum data_type() const;
 
 		/// Will also bind the texture unconditionally
-		TexInfo& SetTextureParameters(TexParams parameters);
+		TexInfo& BindAndSetTextureParameters(TexParams parameters);
 
 		/// Ensure that the texture is bound before calling this method!
 		TexInfo& GenerateMipMaps();
