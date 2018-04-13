@@ -30,14 +30,21 @@ namespace e186
 	private:
 		AntTweakBarHandle m_tweak_bar;
 		std::vector<DbgTexConfig> m_texture_configs;
+		std::vector<DbgTexConfig> m_texture_configs_multisample;
 		std::unique_ptr<Model> m_quad;
 		Shader m_shader;
+		Shader m_shader_multisample;
 		GLuint m_sampler_loc;
 		GLuint m_transform_mul_loc;
 		GLuint m_transform_add_loc;
 		GLuint m_pvmt_matrix_loc;
+		GLuint m_sampler_loc_multisample;
+		GLuint m_transform_mul_loc_multisample;
+		GLuint m_transform_add_loc_multisample;
+		GLuint m_pvmt_matrix_loc_multisample;
 
 		DbgTexConfig* Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name);
+		static void RenderConfigs(Shader& shader, std::vector<DbgTexConfig>& configs, const int wnd_height, const glm::mat4& pM, Mesh& quad_mesh, GLuint sampler_loc, GLuint transform_mul_loc, GLuint transform_add_loc, GLuint pvmt_matrix_loc);
 
 	public:
 		DebugTexDisplayer();
