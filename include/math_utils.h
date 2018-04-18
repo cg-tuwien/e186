@@ -2,21 +2,6 @@
 
 namespace e186
 {
-	static const double FU_EPSILON = 0.00001;
-	static const double FU_QUARTER_PI = 0.78539816339744830961566084581988;
-	static const double FU_HALF_PI = 1.5707963267948966192313216916398;
-	static const double FU_PI = 3.1415926535897932384626433832795;
-	static const double FU_TWO_PI = 6.283185307179586476925286766559;
-	static const double FU_RAD_TO_DEG = 180.0 / FU_PI;
-	static const double FU_DEG_TO_RAD = FU_PI / 180.0;
-	static const float FU_EPSILON_F = 0.00001f;
-	static const float FU_QUARTER_PI_F = 0.78539816339744830961566084581988f;
-	static const float FU_HALF_PI_F = 1.5707963267948966192313216916398f;
-	static const float FU_PI_F = 3.1415926535897932384626433832795f;
-	static const float FU_TWO_PI_F = 6.283185307179586476925286766559f;
-	static const float FU_RAD_TO_DEG_F = 180.0f / FU_PI_F;
-	static const float FU_DEG_TO_RAD_F = FU_PI_F / 180.0F;
-
 	/// Helper method to get up-down and left-right rotation angles from a given direction
 	glm::vec2 get_angles_from_direction_yaw_pitch(const glm::vec3& direction);
 
@@ -54,6 +39,10 @@ namespace e186
 
 	bool points_in_same_direction(const glm::dvec3& a, const glm::dvec3& b);
 
+	bool almost_same_as(const glm::dvec2& a, const glm::dvec2& b, const double epsilon = 0.00001);
+
+	bool almost_same_as(const glm::dvec3& a, const glm::dvec3& b, const double epsilon = 0.00001);
+	
 	bool same_as(const glm::dvec2& a, const glm::dvec2& b);
 
 	bool same_as(const glm::dvec3& a, const glm::dvec3& b);

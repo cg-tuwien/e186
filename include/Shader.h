@@ -244,13 +244,13 @@ namespace e186
 		template <typename... Args>
 		void SetUniformBlockBinding(const std::string& block_name, Args&&... args)
 		{
-			SetUniform(GetUniformBlockIndex(block_name), std::forward<Args>(args)...);
+			SetUniformBlockBinding(GetUniformBlockIndex(block_name), std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
 		void SetMandatoryUniformBlockBinding(const std::string& block_name, Args&&... args)
 		{
-			SetUniform(GetMandatoryUniformBlockIndex(block_name), std::forward<Args>(args)...);
+			SetUniformBlockBinding(GetMandatoryUniformBlockIndex(block_name), std::forward<Args>(args)...);
 		}
 
 

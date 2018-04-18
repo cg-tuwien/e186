@@ -8,7 +8,7 @@ namespace e186
 		glm::vec3 floorProjection(direction.x, 0.0f, direction.z);
 		float directionLength = glm::length(floorProjection);
 		float updownAngle = glm::atan(direction.y, directionLength);	
-		float leftrightAngle = -glm::atan(direction.x, -direction.z);	
+		float leftrightAngle = -glm::atan(direction.x, -direction.z);
 		return glm::vec2(leftrightAngle, updownAngle);
 	}
 
@@ -28,7 +28,7 @@ namespace e186
 
 	bool solve_system_of_equations(const glm::dmat3& A, const glm::dvec3& c, glm::dvec3& outX)
 	{
-		if (glm::abs(glm::determinant(A)) < FU_EPSILON)
+		if (glm::abs(glm::determinant(A)) < glm::epsilon<double>())
 		{
 			return false;
 		}
@@ -40,7 +40,7 @@ namespace e186
 
 	bool solve_system_of_equations(const glm::dmat2& A, const glm::dvec2& c, glm::dvec2& outX)
 	{
-		if (glm::abs(glm::determinant(A)) < FU_EPSILON)
+		if (glm::abs(glm::determinant(A)) < glm::epsilon<double>())
 		{
 			return false;
 		}
@@ -62,16 +62,25 @@ namespace e186
 		return glm::dot(a, b) > 0.0f;
 	}
 
+	bool almost_same_as(const glm::dvec2& a, const glm::dvec2& b, const double epsilon)
+	{
+		return glm::abs(a.x - b.x) < epsilon && glm::abs(a.y - b.y) < epsilon;
+	}
+
+	bool almost_same_as(const glm::dvec3& a, const glm::dvec3& b, const double epsilon)
+	{
+		return glm::abs(a.x - b.x) < epsilon && glm::abs(a.y - b.y) < epsilon && glm::abs(a.z - b.z) < epsilon;
+	}
 
 	bool same_as(const glm::dvec2& a, const glm::dvec2& b)
 	{
-		return glm::abs(a.x - b.x) < FU_EPSILON && glm::abs(a.y - b.y) < FU_EPSILON;
+		return almost_same_as(a, b, glm::epsilon<double>());
 	}
 
 
 	bool same_as(const glm::dvec3& a, const glm::dvec3& b)
 	{
-		return glm::abs(a.x - b.x) < FU_EPSILON && glm::abs(a.y - b.y) < FU_EPSILON && glm::abs(a.z - b.z) < FU_EPSILON;
+		return almost_same_as(a, b, glm::epsilon<double>());
 	}
 
 	glm::mat4 rotate_vector_a_to_vector_b(glm::vec3 a, glm::vec3 b)
