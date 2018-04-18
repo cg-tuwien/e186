@@ -625,8 +625,10 @@ namespace e186
 		m_spot_lights_tw_index_helper(),
 		m_tweak_bar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("Lightsources")),
 		m_transparency(.3f),
-		m_gizmo_scale(8.0f),
-		m_gizmo_param(3.0f),
+		m_gizmo_scale_ptl(8.0f),
+		m_gizmo_scale_sptl(0.7f),
+		m_gizmo_param_ptl(3.0f),
+		m_gizmo_param_sptl(1.5f),
 		m_uniform_position_offset_point_light(0.0f, 0.0f, 0.0f),
 		m_uniform_position_offset_spot_light(0.0f, 0.0f, 0.0f),
 		m_uniform_direction_offset_spot_light(0.0f, 0.0f, 0.0f)
@@ -672,8 +674,10 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, "All spot lights: cub-atten", TW_TYPE_FLOAT, SetAllAtt3SlCB, GetAllAtt3SlCB, this, " min=0.0 step=0.01 ");
 		TwAddSeparator(m_tweak_bar, nullptr, nullptr);
 		TwAddVarRW(m_tweak_bar, "Gizmo Transparency", TW_TYPE_FLOAT, &m_transparency, " min=0.01 max=1.0 step=0.01 ");
-		TwAddVarRW(m_tweak_bar, "Gizmo Scale", TW_TYPE_FLOAT, &m_gizmo_scale, " min=0.0 max=100.0 step=0.1 ");
-		TwAddVarRW(m_tweak_bar, "Gizmo Param", TW_TYPE_FLOAT, &m_gizmo_param, " min=0.0 max=100.0 step=0.1 ");
+		TwAddVarRW(m_tweak_bar, "PL Gizmo Scale", TW_TYPE_FLOAT, &m_gizmo_scale_ptl, " min=0.0 max=100.0 step=0.1 ");
+		TwAddVarRW(m_tweak_bar, "PL Gizmo Param", TW_TYPE_FLOAT, &m_gizmo_param_ptl, " min=0.0 max=100.0 step=0.1 ");
+		TwAddVarRW(m_tweak_bar, "SL Gizmo Scale", TW_TYPE_FLOAT, &m_gizmo_scale_sptl, " min=0.0 max=100.0 step=0.1 ");
+		TwAddVarRW(m_tweak_bar, "SL Gizmo Param", TW_TYPE_FLOAT, &m_gizmo_param_sptl, " min=0.0 max=100.0 step=0.1 ");
 		TwAddSeparator(m_tweak_bar, nullptr, nullptr);
 	}
 
@@ -824,8 +828,8 @@ namespace e186
 					continue;
 
 				auto a = ptlt.attenuation();
-				auto d = m_gizmo_param;
-				auto s = m_gizmo_scale / (a[0] + a[1] * d + a[2] * d * d + a[3] * d * d * d);
+				auto d = m_gizmo_param_ptl;
+				auto s = m_gizmo_scale_ptl / (a[0] + a[1] * d + a[2] * d * d + a[3] * d * d * d);
 
 				auto translation = glm::translate(ptlt.position()); // m_point_lights[i].get().transform().GetModelMatrix();
 				auto scale = glm::scale(glm::vec3(s, s, s));
@@ -846,8 +850,8 @@ namespace e186
 					continue;
 
 				auto a = sptl.attenuation();
-				auto d = m_gizmo_param;
-				auto s = m_gizmo_scale / (a[0] + a[1] * d + a[2] * d * d + a[3] * d * d * d);
+				auto d = m_gizmo_param_sptl;
+				auto s = m_gizmo_scale_sptl / (a[0] + a[1] * d + a[2] * d * d + a[3] * d * d * d);
 
 				auto angle_scale = glm::tan(sptl.outer_angle() / 2.0f);
 

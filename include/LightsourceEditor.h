@@ -130,8 +130,8 @@ namespace e186
 		std::vector<std::tuple<LightsourceEditor*, size_t>> m_spot_lights_tw_index_helper;
 		AntTweakBarHandle m_tweak_bar;
 		float m_transparency;
-		float m_gizmo_scale;
-		float m_gizmo_param;
+		float m_gizmo_scale_ptl, m_gizmo_scale_sptl;
+		float m_gizmo_param_ptl, m_gizmo_param_sptl;
 		glm::vec3 m_uniform_position_offset_point_light;
 		glm::vec3 m_uniform_position_offset_spot_light;
 		glm::vec3 m_uniform_direction_offset_spot_light;
