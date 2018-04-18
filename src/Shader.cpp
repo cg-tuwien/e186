@@ -462,6 +462,11 @@ namespace e186
 		return AddGeometryShaderSource(LoadFromFile(path), append_newline);
 	}
 
+	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, bool append_newline)
+	{
+		return AddFragmentShaderSource(LoadFromFile(path), append_newline);
+	}
+
 	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline)
 	{
 		return AddFragmentShaderSource(LoadFromFile(path), outputs, append_newline);

@@ -19,7 +19,7 @@ namespace e186
 		m_shader
 			.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
 			.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
-			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag", { std::make_tuple(0, "fragColor") })
+			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag")
 			.Build();
 
 		m_sampler_loc = m_shader.GetUniformLocation("sampler");
@@ -31,7 +31,7 @@ namespace e186
 			.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
 			.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
 			.AddFragmentShaderSource("#define MULTISAMPLE")
-			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag", { std::make_tuple(0, "fragColor") })
+			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag")
 			.Build();
 
 		m_sampler_loc_multisample = m_shader_multisample.GetUniformLocation("sampler");

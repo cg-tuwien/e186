@@ -50,6 +50,7 @@ namespace e186
 		Shader& AddTessellationControlShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddTessellationEvaluationShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddGeometryShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddFragmentShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
 		Shader& AddComputeShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode);

@@ -11,7 +11,7 @@ uniform vec4 transform_add = vec4(0, 0, 0, 0);
 in vec2 varTexCoords;
 
 // ------------- output-color of fragment ------------
-out vec4 fragColor;
+layout (location = 0) out vec4 fragColor;
 
 void main()
 {
