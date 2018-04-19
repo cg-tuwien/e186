@@ -117,7 +117,7 @@ namespace e186
 		// accumulate values and create rotation-matrix
 		m_accumulated_mouse_movement.x += m_rotation_speed * static_cast<float>(mouseMoved.x);
 		m_accumulated_mouse_movement.y += m_rotation_speed * static_cast<float>(mouseMoved.y);
-		m_accumulated_mouse_movement.y = glm::clamp(m_accumulated_mouse_movement.y, -FU_HALF_PI_F, FU_HALF_PI_F);
+		m_accumulated_mouse_movement.y = glm::clamp(m_accumulated_mouse_movement.y, -glm::half_pi<float>(), glm::half_pi<float>());
 		glm::mat4 cameraRotation = glm::rotate(m_accumulated_mouse_movement.x, kUnitVec3Y) * glm::rotate(m_accumulated_mouse_movement.y, kUnitVec3X);
 
 		// set the rotation

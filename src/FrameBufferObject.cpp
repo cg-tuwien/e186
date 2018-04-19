@@ -4,37 +4,36 @@ namespace e186
 {
 #pragma region RenderTextureColorConfig
 
-	FboAttachmentConfig::FboAttachmentConfig(GLint internalFormat, GLint imageFormat, GLenum type, GLint border) :
+	FboAttachmentConfig::FboAttachmentConfig(GLint internalFormat, GLint imageFormat, GLenum type, GLint border, uint32_t num_samples) :
 		m_internal_format(internalFormat),
 		m_format(imageFormat),
 		m_data_type(type),
-		m_border(border)
+		m_border(border),
+		m_num_samples(num_samples)
 	{
 	}
 
-	GLint FboAttachmentConfig::internal_format() const
-	{
-		return m_internal_format;
-	}
+	GLint FboAttachmentConfig::internal_format() const { return m_internal_format; }
+	GLint FboAttachmentConfig::format() const { return m_format; }
+	GLenum FboAttachmentConfig::data_type() const { return m_data_type; }
+	GLint FboAttachmentConfig::border() const { return m_border; }
+	uint32_t FboAttachmentConfig::num_samples() const { return m_num_samples; }
 
-	GLint FboAttachmentConfig::format() const
-	{
-		return m_format;
-	}
-
-	GLenum FboAttachmentConfig::data_type() const
-	{
-		return m_data_type;
-	}
-
-	GLint FboAttachmentConfig::border() const
-	{
-		return m_border;
-	}
+	void FboAttachmentConfig::set_internal_format(GLint value) { m_internal_format = value; }
+	void FboAttachmentConfig::set_format(GLint value) { m_format = value; }
+	void FboAttachmentConfig::set_data_type(GLenum value) { m_data_type = value; }
+	void FboAttachmentConfig::set_border(GLint value) { m_border = value; }
+	void FboAttachmentConfig::set_num_samples(uint32_t value) { m_num_samples = value; }
+	FboAttachmentConfig& FboAttachmentConfig::modify_internal_format(GLint value) { set_internal_format(value); return *this; }
+	FboAttachmentConfig& FboAttachmentConfig::modify_format(GLint value) { set_format(value); return *this; }
+	FboAttachmentConfig& FboAttachmentConfig::modify_data_type(GLenum value) { set_data_type(value); return *this; }
+	FboAttachmentConfig& FboAttachmentConfig::modify_border(GLint value) { set_border(value); return *this; }
+	FboAttachmentConfig& FboAttachmentConfig::modify_num_samples(uint32_t value) { set_num_samples(value); return *this; }
 
 	FboAttachmentConfig FboAttachmentConfig::kPresetNone			(0, 0, 0);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGB				(GL_RGB,				GL_RGB,				GL_UNSIGNED_BYTE);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA			(GL_RGBA,				GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA8			(GL_RGBA8,				GL_RGBA,			GL_UNSIGNED_BYTE);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGB16F			(GL_RGB16F,				GL_RGB,				GL_HALF_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA16F			(GL_RGBA16F,			GL_RGBA,			GL_HALF_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGB32F			(GL_RGB32F,				GL_RGB,				GL_FLOAT);
@@ -140,6 +139,18 @@ namespace e186
 		}
 	}
 
+	FrameBufferObject& FrameBufferObject::BindForReading()
+	{
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo_id);
+		return *this;
+	}
+
+	FrameBufferObject& FrameBufferObject::BindForWriting()
+	{
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo_id);
+		return *this;
+	}
+
 	FrameBufferObject& FrameBufferObject::Bind()
 	{
 		glBindFramebuffer(target(), m_fbo_id);
@@ -216,13 +227,43 @@ namespace e186
 		glGenTextures(1, &texHandle);
 		assert(0 != texHandle);
 
-		auto ti = std::make_shared<TexInfo>(GL_TEXTURE_2D, texHandle, config.internal_format(), config.format(), config.data_type(), config.border());
-		ti->SetTextureParameters(params);
+		auto num_samples = config.num_samples();
+		auto is_multisample = num_samples > 1;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, config.internal_format(), m_width, m_height, config.border(), config.format(), config.data_type(), nullptr);
-		if ((params & TexParams::GenerateMipMaps) != TexParams::None)
+		auto ti = !is_multisample
+			? std::make_shared<TexInfo>(GL_TEXTURE_2D, texHandle, config.internal_format(), config.format(), config.data_type(), config.border())
+			: std::make_shared<TexInfo>(GL_TEXTURE_2D_MULTISAMPLE, texHandle, config.internal_format(), config.format(), config.data_type(), config.border());
+		check_gl_error("AttachTexture after creating TexInfo");
+
+		if (!is_multisample)
 		{
-			ti->GenerateMipMaps(); // Allocate memory for the mipmaps
+			ti->BindAndSetTextureParameters(params);
+
+			glTexImage2D(
+				GL_TEXTURE_2D, 
+				0, 
+				config.internal_format(), 
+				m_width, m_height, 
+				config.border(), 
+				config.format(), 
+				config.data_type(), 
+				nullptr);
+
+			if ((params & TexParams::GenerateMipMaps) != TexParams::None)
+			{
+				ti->GenerateMipMaps(); // Allocate memory for the mipmaps
+			}
+		}
+		else // multisample texture
+		{
+			ti->Bind();
+			glTexImage2DMultisample(
+				GL_TEXTURE_2D_MULTISAMPLE, 
+				static_cast<GLsizei>(num_samples), 
+				config.internal_format(), 
+				m_width, m_height, 
+				false);
+			check_gl_error("AttachTexture after glTexImage2DMultisample");
 		}
 
 		// attach texture to the FBO
@@ -231,7 +272,6 @@ namespace e186
 			glFramebufferTexture2D(target(), attachments[i], ti->target(), ti->handle(), 0);
 			check_gl_error(std::string("AttachTexture after glFramebufferTexture2D [" + std::to_string(i) + "]").c_str());
 		}
-
 
 		ti->Unbind();
 		Unbind();
@@ -280,7 +320,7 @@ namespace e186
 		// attach depth component to the FBO
 		if (config.format() == GL_DEPTH_COMPONENT || config.format() == GL_DEPTH_STENCIL)
 		{
-			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbHandle);	
+			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbHandle);
 		}
 		// ...and maybe also the stencil component
 		if (config.format() == GL_DEPTH_STENCIL)

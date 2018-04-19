@@ -8,7 +8,7 @@ namespace e186
 	{
 	public:
 		TexLoadingHelper(std::string model_path);
-		std::shared_ptr<Tex2D> GetOrLoadTex(std::string sub_path, TexParams texture_parameters);
+		std::shared_ptr<Tex2D> GetOrLoadTex(std::string sub_path, TexParams texture_parameters, bool srgb = false);
 		void AddTexParams(TexParams to_add);
 		void RemoveTexParams(TexParams to_remove);
 		TexParams general_tex_params() const;

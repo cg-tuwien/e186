@@ -462,6 +462,11 @@ namespace e186
 		return AddGeometryShaderSource(LoadFromFile(path), append_newline);
 	}
 
+	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, bool append_newline)
+	{
+		return AddFragmentShaderSource(LoadFromFile(path), append_newline);
+	}
+
 	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline)
 	{
 		return AddFragmentShaderSource(LoadFromFile(path), outputs, append_newline);
@@ -859,7 +864,7 @@ namespace e186
 		}
 
 		glUseProgram(m_prog_handle);
-		auto loc = glGetUniformLocation(m_prog_handle, name.c_str());
+		const auto loc = glGetUniformLocation(m_prog_handle, name.c_str());
 		m_uniform_locations[name] = loc;
 		return *this;
 	}
@@ -892,7 +897,7 @@ namespace e186
 		}
 
 		glUseProgram(m_prog_handle);
-		auto loc = glGetUniformBlockIndex(m_prog_handle, name.c_str());
+		const auto loc = glGetUniformBlockIndex(m_prog_handle, name.c_str());
 		m_uniform_block_indices[name] = loc;
 		return *this;
 	}
@@ -936,7 +941,7 @@ namespace e186
 		}
 
 		GLsizei count = 0;
-		GLuint attachedShaders[8]; // fragment, vertex, geometry, hull, domai || compute => max. 5 aligned to 8
+		GLuint attachedShaders[8]; // fragment, vertex, geometry, hull, domain || compute => max. 5 aligned to 8
 		glGetAttachedShaders(m_prog_handle, 8, &count, attachedShaders);
 
 		// also delete the attached shaders
@@ -956,7 +961,7 @@ namespace e186
 		return m_uniform_locations.find(name) != m_uniform_locations.end();
 	}
 
-	GLuint Shader::GetOptionalUniformLocation(const std::string& name)
+	GLint Shader::GetOptionalUniformLocation(const std::string& name)
 	{
 		const auto loc = m_uniform_locations.find(name);
 		if (loc == m_uniform_locations.end())
@@ -967,7 +972,7 @@ namespace e186
 		return loc->second;
 	}
 
-	GLuint Shader::GetUniformLocation(const std::string& name)
+	GLint Shader::GetUniformLocation(const std::string& name)
 	{
 		const auto loc = m_uniform_locations.find(name);
 		if (loc == m_uniform_locations.end())
@@ -978,7 +983,7 @@ namespace e186
 		return loc->second;
 	}
 
-	GLuint Shader::GetMandatoryUniformLocation(const std::string& name)
+	GLint Shader::GetMandatoryUniformLocation(const std::string& name)
 	{
 		const auto loc = m_uniform_locations.find(name);
 		if (loc == m_uniform_locations.end())

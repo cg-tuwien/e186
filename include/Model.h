@@ -24,6 +24,7 @@ namespace e186
 
 	enum ModelLoaderFlags
 	{
+		MOLF_none = 0x00000000,
 		// Assimp flags
 		MOLF_triangulate = 0x000001,
 		MOLF_smoothNormals = 0x000002,

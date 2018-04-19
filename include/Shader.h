@@ -53,6 +53,7 @@ namespace e186
 		Shader& AddTessellationControlShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddTessellationEvaluationShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddGeometryShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddFragmentShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
 		Shader& AddComputeShaderSourceFromFile(std::string path, bool append_newline = true);
 		Shader& SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode);
@@ -69,9 +70,9 @@ namespace e186
 		Shader& DeclareAutoMatrix(std::string name, AutoMatrix properties);
 		Shader& Destroy();
 		bool HasUniform(const std::string& name) const;
-		GLuint GetOptionalUniformLocation(const std::string& name);
-		GLuint GetUniformLocation(const std::string& name);
-		GLuint GetMandatoryUniformLocation(const std::string& name);
+		GLint GetOptionalUniformLocation(const std::string& name);
+		GLint GetUniformLocation(const std::string& name);
+		GLint GetMandatoryUniformLocation(const std::string& name);
 		GLuint GetOptionalUniformBlockIndex(const std::string& name);
 		GLuint GetUniformBlockIndex(const std::string& name);
 		GLuint GetMandatoryUniformBlockIndex(const std::string& name);
@@ -88,118 +89,118 @@ namespace e186
 			glUseProgram(m_prog_handle);
 		}
 
-		void SetUniform(GLuint location, const glm::vec4& value) const
+		void SetUniform(GLint location, const glm::vec4& value) const
 		{
 			glUniform4fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
-		void SetUniform(GLuint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
+		void SetUniform(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) const
 		{
 			glUniform4f(location, x, y, z, w);
 		}
 
-		void SetUniform(GLuint location, const glm::vec3& value) const
+		void SetUniform(GLint location, const glm::vec3& value) const
 		{
 			glUniform3fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
-		void SetUniform(GLuint location, GLfloat x, GLfloat y, GLfloat z) const
+		void SetUniform(GLint location, GLfloat x, GLfloat y, GLfloat z) const
 		{
 			glUniform3f(location, x, y, z);
 		}
 
-		void SetUniform(GLuint location, GLfloat value) const
+		void SetUniform(GLint location, GLfloat value) const
 		{
 			glUniform1f(location, value);
 		}
 
-		void SetUniform(GLuint location, GLint value) const
+		void SetUniform(GLint location, GLint value) const
 		{
 			glUniform1i(location, value);
 		}
 
-		void SetUniform(GLuint location, const glm::vec2& value) const
+		void SetUniform(GLint location, const glm::vec2& value) const
 		{
 			glUniform2fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
-		void SetUniform(GLuint location, GLfloat x, GLfloat y) const
+		void SetUniform(GLint location, GLfloat x, GLfloat y) const
 		{
 			glUniform2f(location, x, y);
 		}
 
-		void SetUniform(GLuint location, const glm::mat3& value) const
+		void SetUniform(GLint location, const glm::mat3& value) const
 		{
 			glUniformMatrix3fv(location, 1, GL_FALSE, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
-		void SetUniform(GLuint location, const glm::mat4& value) const
+		void SetUniform(GLint location, const glm::mat4& value) const
 		{
 			glUniformMatrix4fv(location, 1, GL_FALSE, static_cast<const GLfloat*>(glm::value_ptr(value)));
 		}
 
-		void SetUniformBlockBinding(GLuint location, GLuint block_binding) const
+		void SetUniformBlockBinding(GLint location, GLuint block_binding) const
 		{
 			glUniformBlockBinding(m_prog_handle, location, block_binding);
 		}
 
-		void SetSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint texture_unit = 0) const
+		void SetSampler(GLint location, GLenum tex_target, GLuint tex_handle, uint32_t texture_unit = 0) const
 		{
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
 			glBindTexture(tex_target, tex_handle);
 			glUniform1i(location, static_cast<GLint>(texture_unit));
 		}
 
-		void SetFirstSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint first_texture_unit = 0)
+		void SetFirstSampler(GLint location, GLenum tex_target, GLuint tex_handle, uint32_t first_texture_unit = 0)
 		{
 			m_sampler_auto_index = first_texture_unit;
 			SetSampler(location, tex_target, tex_handle, m_sampler_auto_index);
 		}
 
-		void SetNextSampler(GLuint location, GLenum tex_target, GLuint tex_handle, GLuint sampler_increment = 1)
+		void SetNextSampler(GLint location, GLenum tex_target, GLuint tex_handle, uint32_t sampler_increment = 1)
 		{
 			m_sampler_auto_index += sampler_increment;
 			SetSampler(location, tex_target, tex_handle, m_sampler_auto_index);
 		}
 
-		void SetSampler(GLuint location, const TexInfo& value, GLuint texture_unit = 0) const
+		void SetSampler(GLint location, const TexInfo& value, uint32_t texture_unit = 0) const
 		{
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
 			value.Bind();
 			glUniform1i(location, static_cast<GLint>(texture_unit));
 		}
 
-		void SetFirstSampler(GLuint location, const TexInfo& value, GLuint first_texture_unit = 0)
+		void SetFirstSampler(GLint location, const TexInfo& value, uint32_t first_texture_unit = 0)
 		{	
 			m_sampler_auto_index = first_texture_unit;
 			SetSampler(location, value, m_sampler_auto_index);
 		}
 
-		void SetNextSampler(GLuint location, const TexInfo& value, GLuint sampler_increment = 1)
+		void SetNextSampler(GLint location, const TexInfo& value, uint32_t sampler_increment = 1)
 		{
 			m_sampler_auto_index += sampler_increment;
 			SetSampler(location, value, m_sampler_auto_index);
 		}
 			
-		void SetImageTexture(GLuint location, const TexInfo& value, GLuint unit, GLint level, GLboolean layered, GLint layer, GLenum access)
+		void SetImageTexture(GLint location, const TexInfo& value, GLuint unit, GLint level, GLboolean layered, GLint layer, GLenum access)
 		{
 			glBindImageTexture(unit, value.handle(), level, layered, layer, access, value.internal_format());
 			glUniform1i(location, static_cast<GLint>(unit));
 		}
 
-		void SetLight(GLuint color_loc, const AmbientLightGpuData& data)
+		void SetLight(GLint color_loc, const AmbientLightGpuData& data)
 		{
 			SetUniform(color_loc, data.m_light_color);
 		}
 
-		void SetLight(GLuint position_loc, GLuint color_loc, GLuint attenuation_loc, const PointLightGpuData& data)
+		void SetLight(GLint position_loc, GLuint color_loc, GLuint attenuation_loc, const PointLightGpuData& data)
 		{
 			SetUniform(position_loc, data.m_position);
 			SetUniform(color_loc, data.m_light_color);
 			SetUniform(attenuation_loc, data.m_attenuation);
 		}
 
-		void SetLight(GLuint position_loc, GLuint direction_loc, GLuint color_loc, GLuint attenuation_loc, const SpotLightGpuData& data)
+		void SetLight(GLint position_loc, GLuint direction_loc, GLuint color_loc, GLuint attenuation_loc, const SpotLightGpuData& data)
 		{
 			SetUniform(position_loc, data.m_position_and_cos_outer_angle_half);
 			SetUniform(direction_loc, data.m_direction_and_cos_inner_angle_half);
@@ -207,7 +208,7 @@ namespace e186
 			SetUniform(attenuation_loc, data.m_attenuation);
 		}
 
-		void SetLight(GLuint direction_loc, GLuint color_loc, const DirectionalLightGpuData& data)
+		void SetLight(GLint direction_loc, GLuint color_loc, const DirectionalLightGpuData& data)
 		{
 			SetUniform(direction_loc, data.m_light_dir_vs);
 			SetUniform(color_loc, data.m_light_color);
@@ -246,13 +247,13 @@ namespace e186
 		template <typename... Args>
 		void SetUniformBlockBinding(const std::string& block_name, Args&&... args)
 		{
-			SetUniform(GetUniformBlockIndex(block_name), std::forward<Args>(args)...);
+			SetUniformBlockBinding(GetUniformBlockIndex(block_name), std::forward<Args>(args)...);
 		}
 
 		template <typename... Args>
 		void SetMandatoryUniformBlockBinding(const std::string& block_name, Args&&... args)
 		{
-			SetUniform(GetMandatoryUniformBlockIndex(block_name), std::forward<Args>(args)...);
+			SetUniformBlockBinding(GetMandatoryUniformBlockIndex(block_name), std::forward<Args>(args)...);
 		}
 
 
@@ -276,12 +277,22 @@ namespace e186
 			SetSampler(GetMandatoryUniformLocation(uniform_name), std::forward<Args>(args)...);
 		}
 
-		template <typename... Args>
-		void SetOptionalFirstSampler(const std::string& uniform_name, Args&&... args)
+		void SetOptionalFirstSampler(const std::string& uniform_name, GLenum tex_target, GLuint tex_handle, uint32_t first_texture_unit = 0)
 		{
 			const auto loc = GetOptionalUniformLocation(uniform_name);
 			if (-1 != loc)
-				SetFirstSampler(loc, std::forward<Args>(args)...);
+				SetFirstSampler(loc, tex_target, tex_handle, first_texture_unit);
+			else 
+				m_sampler_auto_index = first_texture_unit;
+		}
+
+		void SetOptionalFirstSampler(const std::string& uniform_name, const TexInfo& value, uint32_t first_texture_unit = 0)
+		{
+			const auto loc = GetOptionalUniformLocation(uniform_name);
+			if (-1 != loc)
+				SetFirstSampler(loc, value, first_texture_unit);
+			else
+				m_sampler_auto_index = first_texture_unit;
 		}
 
 		template <typename... Args>
@@ -438,7 +449,7 @@ namespace e186
 		std::vector<std::string> m_fragment_shader_sources;
 		std::vector<std::string> m_compute_shader_sources;
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
-		std::unordered_map<std::string, GLuint> m_uniform_locations;
+		std::unordered_map<std::string, GLint> m_uniform_locations;
 		std::unordered_map<std::string, GLuint> m_uniform_block_indices;
 		std::vector<const char*> m_transform_feedback_varyings;
 		GLenum m_transform_feedback_buffer_mode;
@@ -451,7 +462,7 @@ namespace e186
 		std::array<bool, 16> m_auto_mat_do_calc;
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;
-		GLuint m_sampler_auto_index;
+		uint32_t m_sampler_auto_index;
 
 #if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
 		std::function<void()> m_files_changed;

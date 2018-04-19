@@ -26,7 +26,7 @@ namespace e186
 		return m_general_tex_params;
 	}
 
-	std::shared_ptr<Tex2D> TexLoadingHelper::GetOrLoadTex(std::string sub_path, TexParams texture_parameters)
+	std::shared_ptr<Tex2D> TexLoadingHelper::GetOrLoadTex(std::string sub_path, TexParams texture_parameters, bool srgb)
 	{
 		std::string complete_path;
 		assert(sub_path.length() > 1);
@@ -45,7 +45,10 @@ namespace e186
 		else
 		{
 			auto tex = std::make_shared<Tex2D>();
-			tex->FromFile(complete_path).UploadSRGBIfPossible().SetTextureParameters(texture_parameters).GenerateMipMaps();
+			if (srgb)
+				tex->FromFile(complete_path).UploadSRGBIfPossible().BindAndSetTextureParameters(texture_parameters).GenerateMipMaps();
+			else
+				tex->FromFile(complete_path).Upload().BindAndSetTextureParameters(texture_parameters).GenerateMipMaps();
 			m_tex_cache[complete_path] = tex;
 			return tex;
 		}

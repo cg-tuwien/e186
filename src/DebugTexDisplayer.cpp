@@ -9,20 +9,35 @@ namespace e186
 		m_tweak_bar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("Debug Textures"))
 	{
 		m_texture_configs.reserve(kVecSize);
+		m_texture_configs_multisample.reserve(kVecSize);
 
 		m_quad = Model::LoadFromFile("assets/models/quad01.obj", glm::mat4(1.0f), MOLF_default);
 		assert(m_quad);
 		m_quad->CreateAndUploadGpuData();
 		m_quad->GenerateVAOsWithVertexAttribConfig(VertexAttribData::Position | VertexAttribData::Tex2D);
 
-		m_shader.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
-				.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag", { std::make_tuple(0, "fragColor") })
-				.Build();
+		m_shader
+			.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
+			.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
+			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag")
+			.Build();
 
 		m_sampler_loc = m_shader.GetUniformLocation("sampler");
 		m_transform_mul_loc = m_shader.GetUniformLocation("transform_mul");
 		m_transform_add_loc = m_shader.GetUniformLocation("transform_add");
 		m_pvmt_matrix_loc = m_shader.GetUniformLocation("pvmtMatrix");
+
+		m_shader_multisample
+			.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
+			.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
+			.AddFragmentShaderSource("#define MULTISAMPLE")
+			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag")
+			.Build();
+
+		m_sampler_loc_multisample = m_shader_multisample.GetUniformLocation("sampler");
+		m_transform_mul_loc_multisample = m_shader_multisample.GetUniformLocation("transform_mul");
+		m_transform_add_loc_multisample = m_shader_multisample.GetUniformLocation("transform_add");
+		m_pvmt_matrix_loc_multisample = m_shader_multisample.GetUniformLocation("pvmtMatrix");
 
 		TwDefine(" 'Debug Textures' color='26 27 61' text=light position='232 400' ");
 	}
@@ -33,14 +48,26 @@ namespace e186
 
 	DebugTexDisplayer::DbgTexConfig* DebugTexDisplayer::Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name)
 	{
-		auto n = m_texture_configs.size();
+		size_t n;
+		std::vector<DbgTexConfig>* vectr;
+		if (texTarget == GL_TEXTURE_2D_MULTISAMPLE)
+		{
+			n = m_texture_configs_multisample.size();
+			vectr = &m_texture_configs_multisample;
+		}
+		else
+		{
+			n = m_texture_configs.size();
+			vectr = &m_texture_configs;
+		}
+		
 		if (n >= kVecSize)
 		{
 			log_error("Max. number of debug textures reached");
 			return nullptr;
 		}
 
-		m_texture_configs.emplace_back(DebugTexDisplayer::DbgTexConfig{
+		vectr->emplace_back(DebugTexDisplayer::DbgTexConfig{
 			true,	   // bool m_enabled;
 			false,	   // bool m_border;
 			width,	   // GLsizei m_width;
@@ -55,7 +82,7 @@ namespace e186
 			glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)  // float m_transform_add;
 		});
 
-		auto& element = m_texture_configs.back();
+		auto& element = vectr->back();
 		auto num = "Tex #" + std::to_string(n);
 		auto groupAssignment = " group='" + name + "' ";
 		TwAddVarRW(m_tweak_bar, (num + " enbld").c_str(), TW_TYPE_BOOLCPP, &element.m_enabled, groupAssignment.c_str());
@@ -89,33 +116,21 @@ namespace e186
 		return Add(data.width(), data.height(), texInfo->target(), texInfo->handle(), std::move(name));
 	}
 
-	void DebugTexDisplayer::Render()
+	void DebugTexDisplayer::RenderConfigs(Shader& shader, std::vector<DbgTexConfig>& configs, const int wnd_height, const glm::mat4& pM, Mesh& quad_mesh, GLuint sampler_loc, GLuint transform_mul_loc, GLuint transform_add_loc, GLuint pvmt_matrix_loc)
 	{
-		const auto wnd_width = Engine::current()->window_width();
-		const auto wnd_height = Engine::current()->window_height();
-		
-		Camera orthoCam; 
-		orthoCam.SetOrthogonalProjection(0.0f, static_cast<float>(wnd_width), 0.0f, static_cast<float>(wnd_height), 0.0f, 100.0f);
-		auto pM = orthoCam.projection_matrix();
-
-		glDisable(GL_DEPTH_TEST);
-		glDepthMask(GL_FALSE);
-
-		m_shader.Use();
+		shader.Use();
 		glActiveTexture(GL_TEXTURE0);
-		glUniform1i(m_sampler_loc, 0); // 0 => GL_TEXTURE0
+		glUniform1i(sampler_loc, 0); // 0 => GL_TEXTURE0
 
-		auto& quad_mesh = m_quad->mesh_at(0);
-
-		for (auto& tc : m_texture_configs)
+		for (auto& tc : configs)
 		{
 			if (!tc.m_enabled)
 				continue;
 
 			glBindTexture(tc.m_texture_target, tc.m_gl_handle);
 
-			m_shader.SetUniform(m_transform_mul_loc, tc.m_transform_mul);
-			m_shader.SetUniform(m_transform_add_loc, tc.m_transform_add);
+			shader.SetUniform(transform_mul_loc, tc.m_transform_mul);
+			shader.SetUniform(transform_add_loc, tc.m_transform_add);
 
 			float sc_w, sc_h;
 			if (tc.m_scale_relative_to_window_height)
@@ -132,25 +147,67 @@ namespace e186
 			if (tc.m_border)
 			{
 				// make it black
-				m_shader.SetUniform(m_transform_mul_loc, glm::vec4(0.f, 0.f, 0.f, 0.f));
-				m_shader.SetUniform(m_transform_add_loc, glm::vec4(0.f, 0.f, 0.f, 0.f));
+				shader.SetUniform(transform_mul_loc, glm::vec4(0.f, 0.f, 0.f, 0.f));
+				shader.SetUniform(transform_add_loc, glm::vec4(0.f, 0.f, 0.f, 0.f));
 
 				glm::mat4 screenMb = pM
 					* glm::translate(glm::vec3(tc.m_offset_x - 1.0f, tc.m_offset_y - 1.0f, 0.0f))
 					* glm::scale(glm::vec3(sc_w + 2.0f, sc_h + 2.0f, 0.0f));
-				m_shader.SetUniform(m_pvmt_matrix_loc, screenMb);
-				RenderMesh(m_shader, quad_mesh);
+				shader.SetUniform(pvmt_matrix_loc, screenMb);
+				RenderMesh(shader, quad_mesh);
 
 				// change back to actual colors
-				m_shader.SetUniform(m_transform_mul_loc, tc.m_transform_mul);
-				m_shader.SetUniform(m_transform_add_loc, tc.m_transform_add);
+				shader.SetUniform(transform_mul_loc, tc.m_transform_mul);
+				shader.SetUniform(transform_add_loc, tc.m_transform_add);
 			}
 
 			glm::mat4 screenM = pM
 				* glm::translate(glm::vec3(tc.m_offset_x, tc.m_offset_y, 0.0f))
 				* glm::scale(glm::vec3(sc_w, sc_h, 0.0f));
-			m_shader.SetUniform(m_pvmt_matrix_loc, screenM);
-			RenderMesh(m_shader, quad_mesh);
+			shader.SetUniform(pvmt_matrix_loc, screenM);
+			RenderMesh(shader, quad_mesh);
+		}
+	}
+
+	void DebugTexDisplayer::Render()
+	{
+		const auto wnd_width = Engine::current()->window_width();
+		const auto wnd_height = Engine::current()->window_height();
+		
+		Camera orthoCam; 
+		orthoCam.SetOrthogonalProjection(0.0f, static_cast<float>(wnd_width), 0.0f, static_cast<float>(wnd_height), 0.0f, 100.0f);
+		auto pM = orthoCam.projection_matrix();
+
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+
+		auto& quad_mesh = m_quad->mesh_at(0);
+
+		if (m_texture_configs.size() > 0)
+		{	
+			RenderConfigs(
+				m_shader, 
+				m_texture_configs, 
+				wnd_height, 
+				pM, 
+				quad_mesh,
+				m_sampler_loc,
+				m_transform_mul_loc,
+				m_transform_add_loc,
+				m_pvmt_matrix_loc);
+		}
+		if (m_texture_configs_multisample.size() > 0)
+		{
+			RenderConfigs(
+				m_shader_multisample,
+				m_texture_configs_multisample,
+				wnd_height,
+				pM,
+				quad_mesh,
+				m_sampler_loc_multisample,
+				m_transform_mul_loc_multisample,
+				m_transform_add_loc_multisample,
+				m_pvmt_matrix_loc_multisample);
 		}
 
 		glDepthMask(GL_TRUE);

@@ -8,16 +8,29 @@ namespace e186
 		GLint m_format;
 		GLenum m_data_type;
 		GLint m_border;
+		uint32_t m_num_samples;
 	public:
-		FboAttachmentConfig(GLint internalFormat, GLint imageFormat, GLenum type, GLint border = 0);
+		FboAttachmentConfig(GLint internalFormat, GLint imageFormat, GLenum type, GLint border = 0, uint32_t num_samples = 1u);
 		GLint internal_format() const;
 		GLint format() const;
 		GLenum data_type() const;
 		GLint border() const;
+		uint32_t num_samples() const;
+		void set_internal_format(GLint value);
+		void set_format(GLint value);
+		void set_data_type(GLenum value);
+		void set_border(GLint value);
+		void set_num_samples(uint32_t value);
+		FboAttachmentConfig& modify_internal_format(GLint value);
+		FboAttachmentConfig& modify_format(GLint value);
+		FboAttachmentConfig& modify_data_type(GLenum value);
+		FboAttachmentConfig& modify_border(GLint value);
+		FboAttachmentConfig& modify_num_samples(uint32_t value);
 
 		static FboAttachmentConfig kPresetNone;
 		static FboAttachmentConfig kPresetRGB;
 		static FboAttachmentConfig kPresetRGBA;
+		static FboAttachmentConfig kPresetRGBA8;
 		static FboAttachmentConfig kPresetRGB16F;
 		static FboAttachmentConfig kPresetRGBA16F;
 		static FboAttachmentConfig kPresetRGB32F;
@@ -70,6 +83,8 @@ namespace e186
 
 		const TexInfo* FindAttachedTexture(GLenum attachment) const;
 
+		FrameBufferObject& BindForReading();
+		FrameBufferObject& BindForWriting();
 		FrameBufferObject& Bind();
 		FrameBufferObject& Unbind();
 		FrameBufferObject& Clear(GLbitfield clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 

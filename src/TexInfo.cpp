@@ -119,7 +119,7 @@ namespace e186
 	}
 
 
-	TexInfo& TexInfo::SetTextureParameters(TexParams parameters)
+	TexInfo& TexInfo::BindAndSetTextureParameters(TexParams parameters)
 	{
 		Bind();
 
@@ -133,7 +133,7 @@ namespace e186
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		}
-		else // default is clamp to edge
+		else if ((TexParams::ClampToEdge & parameters) != TexParams::None)
 		{
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
