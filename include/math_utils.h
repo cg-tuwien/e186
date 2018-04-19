@@ -51,4 +51,16 @@ namespace e186
 	/// Vectors a, and b must be normalized (I guess)
 	/// [See Real-Time Rendering (Akenine Möller et. al) chapter 4.3.2]
 	glm::mat4 rotate_vector_a_to_vector_b(glm::vec3 a, glm::vec3 b);
+
+	///<summary>Solve an equation of the form a * x^2 + b * x + c = 0</summary>
+	///Checks if a given equation can be solved with real numbers.
+	///If a real solution exists, true is returned.
+	///The solutions are written into the output parameters, if specified.
+	///<param name="constant_coeff">the constant coefficient c</param>
+	///<param name="linear_coeff">the linear coefficient b</param>
+	///<param name="quadratic_coeff">the quadratic coefficient a</param>
+	///<param name="larger_solution">writes the larger solution into this output parameter (optional)</param>
+	///<param name="smaller_solution">writes the smaller solution into this output parameter (optional)</param>
+	///<returns>true if a real solution can be found, otherwise false</returns>
+	bool solve_quadratic_equation(float constant_coeff, float linear_coeff, float quadratic_coeff, float* larger_solution = 0, float* smaller_solution = 0);
 }

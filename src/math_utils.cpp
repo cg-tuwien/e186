@@ -94,4 +94,29 @@ namespace e186
 			0.0f, 0.0f, 0.0f, 1.0f);
 		return glm::transpose(R);
 	}
+
+	bool solve_quadratic_equation(float constant_coeff, float linear_coeff, float quadratic_coeff, float* larger_solution, float* smaller_solution)
+	{
+		if (quadratic_coeff == 0.0f)
+		{
+			if (linear_coeff == 0.0f)
+				return false;
+			
+			float solution = -constant_coeff / linear_coeff;
+			if (larger_solution) *larger_solution = solution;
+			if (smaller_solution) *smaller_solution = solution;
+			return true;
+		}
+
+		float beta = linear_coeff / 2.0f;
+		float discriminant = beta * beta - quadratic_coeff * constant_coeff;
+		if (discriminant < 0.0f)
+			return false;
+
+		float root = glm::sqrt(discriminant);
+		float s = glm::sign(quadratic_coeff);
+		if (larger_solution) *larger_solution = (-beta + root * s) / quadratic_coeff;
+		if (smaller_solution) *smaller_solution = (-beta - root * s) / quadratic_coeff;
+		return true;
+	}
 }
