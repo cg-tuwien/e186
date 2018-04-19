@@ -53,99 +53,110 @@ set(SRC_CPP
     src/main.cpp
 
     src/AmbientLight.cpp
-	src/Animator.cpp
-	src/AntTweakBarManager.cpp
-	src/Camera.cpp
-	src/Context.cpp
-	src/DebugTexDisplayer.cpp
-	src/DirectionalLight.cpp
-	src/Engine.cpp
-	src/ExceptionWithCallstack.cpp
-	src/FixedSimulationTimer.cpp
-	src/FrameBufferObject.cpp
-	src/LightsourceEditor.cpp
-	src/log.cpp
-	src/MaterialData.cpp
-	src/math_utils.cpp
-	src/MaxFpsTimer.cpp
-	src/Model.cpp
-	src/ModelExplorerScene.cpp
-	src/PointLight.cpp
-	src/QuakeCamera.cpp
-	src/SampleSceneTessIco.cpp
-	src/SceneSelectorScene.cpp
-	src/Shader.cpp
-	src/Stopwatch.cpp
-	src/string_utils.cpp
-	src/Tex2D.cpp
-	src/Tex3D.cpp
-	src/TexData.cpp
-	src/TexInfo.cpp
-	src/TexLoadingHelper.cpp
-	src/Transform.cpp
+    src/Animator.cpp
+    src/AntTweakBarManager.cpp
+    src/Camera.cpp
+    src/Context.cpp
+    src/DebugTexDisplayer.cpp
+    src/DirectionalLight.cpp
+    src/Edge.cpp
+    src/Engine.cpp
+    src/ExceptionWithCallstack.cpp
+    src/FixedSimulationTimer.cpp
+    src/FrameBufferObject.cpp
+    src/LightsourceEditor.cpp
+    src/log.cpp
+    src/MaterialData.cpp
+    src/math_utils.cpp
+    src/MaxFpsTimer.cpp
+    src/Model.cpp
+    src/ModelExplorerScene.cpp
+    src/PointLight.cpp
+    src/QuakeCamera.cpp
+    src/SampleSceneTessIco.cpp
+    src/SceneSelectorScene.cpp
+    src/Shader.cpp
+    src/SpotLight.cpp
+    src/Stopwatch.cpp
+    src/string_utils.cpp
+    src/Tex2D.cpp
+    src/Tex3D.cpp
+    src/TexData.cpp
+    src/TexInfo.cpp
+    src/TexLoadingHelper.cpp
+    src/Transform.cpp
+    src/Vertex.cpp
 		
 	external/src/glad.cpp
 )
 
 set(SRC_H
-	include/AmbientLight.h
-	include/Animator.h
-	include/AntTweakBarManager.h
-	include/AutoMatrix.h
-	include/Camera.h
-	include/Context.h
-	include/DebugTexDisplayer.h
-	include/DirectionalLight.h
-	include/Engine.h
-	include/ExceptionWithCallstack.h
-	include/FixedSimulationTimer.h
-	include/FrameBufferObject.h
-	include/IScene.h
-	include/LightsourceEditor.h
-	include/log.h
-	include/MaterialData.h
-	include/MaterialUniformLocation.h
-	include/math_utils.h
-	include/MaxFpsTimer.h
-	include/Model.h
-	include/ModelExplorerScene.h
-	include/PointLight.h
-	include/QuakeCamera.h
-	include/SampleSceneTessIco.h
-	include/SceneSelectorScene.h
-	include/Shader.h
-	include/ShaderType.h
-	include/Stopwatch.h
-	include/string_utils.h
-	include/Tex2D.h
-	include/Tex3D.h
-	include/TexData.h
-	include/TexInfo.h
-	include/TexLoadingHelper.h
-	include/Transform.h
-	include/VertexAttribData.h
-	include/VertexAttribLocation.h
+
+    include/AmbientLight.h
+    include/Animator.h
+    include/AntTweakBarManager.h
+    include/AutoMatrix.h
+    include/Camera.h
+    include/Context.h
+    include/DebugTexDisplayer.h
+    include/DirectionalLight.h
+    include/Edge.h
+    include/Engine.h
+    include/ExceptionWithCallstack.h
+    include/FixedSimulationTimer.h
+    include/FrameBufferObject.h
+    include/IScene.h
+    include/LightCollection.h
+    include/LightsourceEditor.h
+    include/log.h
+    include/MaterialData.h
+    include/MaterialUniformLocation.h
+    include/math_utils.h
+    include/MaxFpsTimer.h
+    include/Model.h
+    include/ModelExplorerScene.h
+    include/PointLight.h
+    include/QuakeCamera.h
+    include/RenderConfig.h
+    include/SampleSceneTessIco.h
+    include/SceneSelectorScene.h
+    include/Shader.h
+    include/ShaderType.h
+    include/SpotLight.h
+    include/Stopwatch.h
+    include/string_utils.h
+    include/Tex2D.h
+    include/Tex3D.h
+    include/TexData.h
+    include/TexInfo.h
+    include/TexLoadingHelper.h
+    include/Transform.h
+    include/Vertex.h
+    include/VertexAttribData.h
+    include/VertexAttribLocation.h
 		
 	external/include/glad/glad.h
 )
 
 # relative path to shader files
 set(SRC_SHADERS
+
     assets/shaders/blinnphong.frag
-	assets/shaders/blinnphong.vert
+    assets/shaders/blinnphong.vert
     assets/shaders/blinnphong_nm.frag
-	assets/shaders/blinnphong_nm.vert
-	assets/shaders/geodesic.frag
-	assets/shaders/geodesic.geom
-	assets/shaders/geodesic.tesc
-	assets/shaders/geodesic.tese
-	assets/shaders/geodesic.vert
-	assets/shaders/terrain.frag
-	assets/shaders/terrain.vert
-	assets/shaders/texture.frag
-	assets/shaders/texture.vert
-	assets/shaders/translucent_gizmo.frag
-	assets/shaders/translucent_gizmo.vert
+    assets/shaders/blinnphong_nm.vert
+    assets/shaders/geodesic.frag
+    assets/shaders/geodesic.geom
+    assets/shaders/geodesic.tesc
+    assets/shaders/geodesic.tese
+    assets/shaders/geodesic.vert
+    assets/shaders/terrain.frag
+    assets/shaders/terrain.vert
+    assets/shaders/texture.frag
+    assets/shaders/texture.vert
+    assets/shaders/translucent_gizmo.frag
+    assets/shaders/translucent_gizmo.vert
+
 )
 
 # adds an executable target with given name to be built from the source files listed afterwards
