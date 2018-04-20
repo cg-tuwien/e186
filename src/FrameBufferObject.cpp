@@ -139,18 +139,6 @@ namespace e186
 		}
 	}
 
-	FrameBufferObject& FrameBufferObject::BindForReading()
-	{
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo_id);
-		return *this;
-	}
-
-	FrameBufferObject& FrameBufferObject::BindForWriting()
-	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo_id);
-		return *this;
-	}
-
 	FrameBufferObject& FrameBufferObject::Bind()
 	{
 		glBindFramebuffer(target(), m_fbo_id);

@@ -95,28 +95,35 @@ namespace e186
 		return glm::transpose(R);
 	}
 
-	bool solve_quadratic_equation(float constant_coeff, float linear_coeff, float quadratic_coeff, float* larger_solution, float* smaller_solution)
+	std::optional<float> solve_linear_equation(float constant_coeff, float linear_coeff)
+	{
+		if (linear_coeff == 0.0f)
+			return std::nullopt;
+
+		float solution = -constant_coeff / linear_coeff;
+		return solution;
+	}
+
+	std::optional<std::tuple<float, float>> solve_quadratic_equation(float constant_coeff, float linear_coeff, float quadratic_coeff)
 	{
 		if (quadratic_coeff == 0.0f)
 		{
-			if (linear_coeff == 0.0f)
-				return false;
-			
-			float solution = -constant_coeff / linear_coeff;
-			if (larger_solution) *larger_solution = solution;
-			if (smaller_solution) *smaller_solution = solution;
-			return true;
+			if (auto lin_result = solve_linear_equation(constant_coeff, linear_coeff))
+				return std::make_tuple(*lin_result, *lin_result);
+			else
+				return std::nullopt;
 		}
 
 		float beta = linear_coeff / 2.0f;
 		float discriminant = beta * beta - quadratic_coeff * constant_coeff;
 		if (discriminant < 0.0f)
-			return false;
+			return std::nullopt;
 
 		float root = glm::sqrt(discriminant);
 		float s = glm::sign(quadratic_coeff);
-		if (larger_solution) *larger_solution = (-beta + root * s) / quadratic_coeff;
-		if (smaller_solution) *smaller_solution = (-beta - root * s) / quadratic_coeff;
-		return true;
+		return std::make_tuple(
+			(-beta + root * s) / quadratic_coeff,
+			(-beta - root * s) / quadratic_coeff
+		);
 	}
 }

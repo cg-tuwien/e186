@@ -83,8 +83,6 @@ namespace e186
 
 		const TexInfo* FindAttachedTexture(GLenum attachment) const;
 
-		FrameBufferObject& BindForReading();
-		FrameBufferObject& BindForWriting();
 		FrameBufferObject& Bind();
 		FrameBufferObject& Unbind();
 		FrameBufferObject& Clear(GLbitfield clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
