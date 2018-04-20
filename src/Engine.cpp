@@ -12,7 +12,7 @@ namespace e186
 		m_main_wnd_height(0),
 		m_main_wnd_aspectRatio(0),
 		m_render_tweak_bars(false),
-		m_renderTime(0),
+		m_render_time(0),
 		m_root_scene_generator_func([]() { return nullptr; }),
 		m_next_is_root(false),
 		m_current_is_root(false),
@@ -364,13 +364,13 @@ namespace e186
 		ProcessEvents();
 		WorkOffPendingActions();
 		glFinish();
-		m_renderTimerStart = static_cast<unsigned int>(glfwGetTime() * 1000.0);
+		m_render_timer_start = glfwGetTime();
 	}
 
 	void Engine::EndFrame()
 	{
 		glFinish();
-		m_renderTime = static_cast<unsigned int>(glfwGetTime() * 1000.0) - m_renderTimerStart;
+		m_render_time = glfwGetTime() - m_render_timer_start;
 
 		if (m_render_tweak_bars)
 		{
@@ -460,9 +460,26 @@ namespace e186
 		return m_render_tweak_bars;
 	}
 
-	const unsigned int * Engine::renderTime()
+	double Engine::render_time() const
 	{
-		return &m_renderTime;
+		return m_render_time;
+	}
+
+	double Engine::render_time_ms() const
+	{
+		return m_render_time * 1000.0;
+	}
+
+	void TW_CALL Engine::GetRenderTimeCB(void *value, void *clientData)
+	{
+		auto* eng = reinterpret_cast<Engine*>(clientData);
+		*reinterpret_cast<double*>(value) = eng->render_time();
+	}
+
+	void TW_CALL Engine::GetRenderTimeMsCB(void *value, void *clientData)
+	{
+		auto* eng = reinterpret_cast<Engine*>(clientData);
+		*reinterpret_cast<double*>(value) = eng->render_time_ms();
 	}
 
 	void Engine::StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func)

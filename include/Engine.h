@@ -85,7 +85,7 @@ namespace e186
 		int m_main_wnd_height;
 		float m_main_wnd_aspectRatio;
 		bool m_render_tweak_bars;
-		unsigned int m_renderTime, m_renderTimerStart;
+		double m_render_time, m_render_timer_start;
 
 		std::unique_ptr<IScene> m_current_scene;
 		std::unique_ptr<IScene> m_next_scene;
@@ -225,7 +225,10 @@ namespace e186
 		 */
 		bool render_tweak_bars() const;
 
-		const unsigned int* renderTime();
+		double render_time() const;
+		double render_time_ms() const;
+		static void TW_CALL GetRenderTimeCB(void *value, void *clientData);
+		static void TW_CALL GetRenderTimeMsCB(void *value, void *clientData);
 
 	public:
 		static void StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func);
