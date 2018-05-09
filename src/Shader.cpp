@@ -1130,7 +1130,21 @@ namespace e186
 
 	void RenderMesh(const Shader& shader, Mesh& mesh)
 	{
-		Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
+		//Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
+		auto rnd_cfg = Mesh::GetOrCreateRenderConfigForShader(mesh, shader);
+		GLenum mode = shader.kind_of_primitives();
+		if (GL_PATCHES == mode)
+		{
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+		}
+		else
+		{
+			mode = rnd_cfg.m_render_mode;
+		}
+		glBindVertexArray(rnd_cfg.m_vao_handle);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vertex_data_vbo_id);      // TODO: WTF WTF WTF????
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices_vbo_id);  //   otherwise: Exception thrown at 0x0000000053C91A02 (nvoglv64.dll) in application.exe: 0xC0000005: Access violation reading location 0x0000000000000000.
+		glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void RenderFullScreen(const Shader& shader)
