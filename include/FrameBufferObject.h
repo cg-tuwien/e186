@@ -50,22 +50,11 @@ namespace e186
 
 	class FrameBufferObject
 	{
-		GLint m_viewport_x, m_viewport_y;
-		GLsizei m_width, m_height;
-		GLuint m_fbo_id;
-
-		std::vector<GLenum> m_color_attachments;
-		std::unordered_map<GLenum, std::shared_ptr<TexInfo>> m_tex_attachments;
-			
-		GLenum m_depth_buffer_format;
-		GLuint m_depth_buffer_handle;
-			
-		glm::vec4 m_clear_color;
-
-		void GenerateFbo();
-		void AttachTexture(const FboAttachmentConfig& config, std::vector<GLenum> attachments, TexParams params);
-
+		friend class Engine;
+		static FrameBufferObject* g_default_framebuffer;
 	public:
+		static FrameBufferObject& default_framebuffer();
+
 		FrameBufferObject(GLsizei width, GLsizei height);
 		FrameBufferObject(const FrameBufferObject& other) = delete;
 		FrameBufferObject& operator=(const FrameBufferObject& other) = delete;
@@ -118,5 +107,29 @@ namespace e186
 		static bool status();
 
 		void Destroy();
+
+	private:
+		FrameBufferObject(GLsizei width, GLsizei height, bool do_generate);
+
+		GLint m_viewport_x, m_viewport_y;
+		GLsizei m_width, m_height;
+		GLuint m_fbo_id;
+
+		std::vector<GLenum> m_color_attachments;
+		std::unordered_map<GLenum, std::shared_ptr<TexInfo>> m_tex_attachments;
+
+		GLenum m_depth_buffer_format;
+		GLuint m_depth_buffer_handle;
+
+		glm::vec4 m_clear_color;
+
+		void GenerateFbo();
+		void AttachTexture(const FboAttachmentConfig& config, std::vector<GLenum> attachments, TexParams params);
 	};
+
+	void Blit(GLuint source, GLuint target, Rect source_rect, Rect target_rect, GLbitfield mask, GLenum filter = GL_NEAREST, GLenum color_buffer_source = 0);
+	void BlitColor(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST, GLenum color_buffer_source = GL_COLOR_ATTACHMENT0);
+	void BlitDepth(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST);
+	void BlitStencil(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST);
+	void BlitMultiple(const FrameBufferObject& source, const FrameBufferObject& target, bool blit_color, bool blit_depth, bool blit_stencil, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST, GLenum color_buffer_source = 0);
 }

@@ -43,6 +43,7 @@
     <ClInclude Include="..\include\ModelExplorerScene.h" />
     <ClInclude Include="..\include\PointLight.h" />
     <ClInclude Include="..\include\QuakeCamera.h" />
+    <ClInclude Include="..\include\Rect.h" />
     <ClInclude Include="..\include\RenderConfig.h" />
     <ClInclude Include="..\include\SampleSceneTessIco.h" />
     <ClInclude Include="..\include\SceneSelectorScene.h" />
@@ -93,6 +94,7 @@
     <ClCompile Include="..\src\ModelExplorerScene.cpp" />
     <ClCompile Include="..\src\PointLight.cpp" />
     <ClCompile Include="..\src\QuakeCamera.cpp" />
+    <ClCompile Include="..\src\Rect.cpp" />
     <ClCompile Include="..\src\SampleSceneTessIco.cpp" />
     <ClCompile Include="..\src\SceneSelectorScene.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />

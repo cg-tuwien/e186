@@ -2,6 +2,16 @@
 
 namespace e186
 {
+	GLsizei Tex2D::CalculateMipMapLevelCount(GLsizei width, GLsizei height)
+	{
+		return glm::max(glm::log2(width), glm::log2(height)) + 1;
+	}
+
+	GLsizei Tex2D::CalculateMipMapLevelCount(glm::tvec2<GLsizei> size)
+	{
+		return CalculateMipMapLevelCount(size.x, size.y);
+	}
+
 	Tex2D::Tex2D() :
 		TexData(GL_TEXTURE_2D),
 		m_width(0),
@@ -73,6 +83,11 @@ namespace e186
 	int Tex2D::color_channels() const
 	{
 		return m_color_channels;
+	}
+
+	GLsizei Tex2D::mipmap_level_count() const
+	{
+		return CalculateMipMapLevelCount(width(), height());
 	}
 
 	Tex2D& Tex2D::Generate1pxTexture(uint8_t color_r, uint8_t color_g, uint8_t color_b, GLint image_format)
@@ -204,8 +219,8 @@ namespace e186
 	}
 
 	Tex2D& Tex2D::Upload(GLint internal_format,				///< format to store the image in
-							GLint border,						///< border-size in px
-							GLint level)						///< mipmapping level
+						 GLint border,						///< border-size in px
+						 GLint level)						///< mipmapping level
 	{
 		if (-1 == internal_format)
 		{
@@ -231,9 +246,37 @@ namespace e186
 		return *this;
 	}
 
+	Tex2D& Tex2D::CreateStorage(glm::tvec2<GLsizei> size,			///< storage size width x height
+								GLint internal_format,				///< format to store the image in
+								GLint levels)						///< number of mipmapping levels
+	{
+		if (-1 == levels)
+		{
+			levels = CalculateMipMapLevelCount(size);
+		}
+
+		GLuint gl_texID;
+		//generate an OpenGL texture ID for this texture
+		glGenTextures(1, &gl_texID);
+		assert(gl_texID != 0);
+		//bind to the new texture ID
+		glBindTexture(GL_TEXTURE_2D, gl_texID);
+
+		glTexStorage2D(GL_TEXTURE_2D, levels, internal_format, size.x, size.y);
+
+		m_width = size.x;
+		m_height = size.y;
+		m_internal_format = internal_format;
+		m_image_format = -1;
+		m_border = -1;
+		m_data_type = 0;
+		m_gl_handle = gl_texID;
+		return *this;
+	}
+
 	Tex2D& Tex2D::UploadSRGBIfPossible(GLint internal_format,				///< format to store the image in
-										GLint border,						///< border-size in px
-										GLint level)
+									   GLint border,						///< border-size in px
+									   GLint level)
 	{
 		if (-1 == internal_format)
 		{
@@ -273,6 +316,13 @@ namespace e186
 	Tex2D& Tex2D::DestroyOnline()
 	{
 		TexData::DestroyOnline();
+		return *this;
+	}
+
+	Tex2D& Tex2D::Destroy()
+	{
+		DestroyOnline();
+		DestroyOffline();
 		return *this;
 	}
 }

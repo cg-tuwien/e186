@@ -560,6 +560,8 @@ namespace e186
 			// (has to be static, so that it gets destructed last)
 			static e186::Engine app(wnd);
 			e186::Engine::g_current = &app;
+			static e186::FrameBufferObject default_framebuffer(g_current->window_width(), g_current->window_height(), false);
+			e186::FrameBufferObject::g_default_framebuffer = &default_framebuffer;
 
 			// Set the root scene generation function, if we have one
 			if (root_scene_gen_func)

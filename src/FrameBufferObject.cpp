@@ -51,9 +51,14 @@ namespace e186
 	FboAttachmentConfig FboAttachmentConfig::kPresetDepth16			(GL_DEPTH_COMPONENT16,		GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 #pragma endregion
 
-#pragma region RenderTexture
+	FrameBufferObject* FrameBufferObject::g_default_framebuffer(nullptr);
+	FrameBufferObject& FrameBufferObject::default_framebuffer() { return *g_default_framebuffer; }
 
-	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height) :
+	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height) : FrameBufferObject(width, height, true)
+	{
+	}
+
+	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height, bool do_generate) :
 		m_viewport_x(0),
 		m_viewport_y(0),
 		m_width(width),
@@ -63,7 +68,10 @@ namespace e186
 		m_depth_buffer_handle(0),
 		m_clear_color(.153f, .275f, .349f, 1.0f)
 	{
-		GenerateFbo();
+		if (do_generate)
+		{
+			GenerateFbo();
+		}
 	}
 
 	FrameBufferObject::FrameBufferObject(FrameBufferObject&& other) noexcept :
@@ -371,5 +379,89 @@ namespace e186
 		m_fbo_id = 0;
 	}
 
-#pragma endregion
+	void Blit(GLuint source, GLuint target, Rect source_rect, Rect target_rect, GLbitfield mask, GLenum filter, GLenum color_buffer_source)
+	{
+#ifdef OPENGL_V4_5
+		if (0 != color_buffer_source)
+		{
+			glNamedFramebufferReadBuffer(source, color_buffer_source);
+		}
+		glBlitNamedFramebuffer(source, target,
+			source_rect.x(), source_rect.y(), source_rect.width(), source_rect.height(),
+			target_rect.x(), target_rect.y(), target_rect.width(), target_rect.height(),
+			mask, filter);
+#else 
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
+		if (0 != color_buffer_source)
+		{
+			glReadBuffer(color_buffer_source);
+		}
+		glBlitFramebuffer(
+			source_rect.x(), source_rect.y(), source_rect.width(), source_rect.height(),
+			target_rect.x(), target_rect.y(), target_rect.width(), target_rect.height(),
+			mask, filter);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+	}
+
+	void BlitColor(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect, Rect target_rect, GLenum filter, GLenum color_buffer_source)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		Blit(source.handle(), target.handle(), source_rect, target_rect, GL_COLOR_BUFFER_BIT, filter, color_buffer_source);
+	}
+
+	void BlitDepth(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect, Rect target_rect, GLenum filter)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		Blit(source.handle(), target.handle(), source_rect, target_rect, GL_DEPTH_BUFFER_BIT, filter);
+	}
+
+	void BlitStencil(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect, Rect target_rect, GLenum filter)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		Blit(source.handle(), target.handle(), source_rect, target_rect, GL_STENCIL_BUFFER_BIT, filter);
+	}
+
+	void BlitMultiple(const FrameBufferObject& source, const FrameBufferObject& target, bool blit_color, bool blit_depth, bool blit_stencil, Rect source_rect, Rect target_rect, GLenum filter, GLenum color_buffer_source)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		GLbitfield mask = 0
+			| (blit_color ? GL_COLOR_BUFFER_BIT : 0)
+			| (blit_depth ? GL_DEPTH_BUFFER_BIT : 0)
+			| (blit_stencil ? GL_STENCIL_BUFFER_BIT : 0);
+		Blit(source.handle(), target.handle(), source_rect, target_rect, mask, filter, color_buffer_source);
+	}
+
+
+
 }
