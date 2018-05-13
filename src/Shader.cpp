@@ -1027,16 +1027,6 @@ namespace e186
 		return loc->second;
 	}
 
-	Shader::operator GLuint() const
-	{
-		return m_prog_handle;
-	}
-
-	GLuint Shader::handle() const
-	{
-		return m_prog_handle;
-	}
-
 	std::string Shader::version_string()
 	{
 		auto version = std::string("#version ") + std::to_string(Context::current()->gl_major_version() * 100 + Context::current()->gl_minor_version() * 10);

@@ -105,7 +105,7 @@ namespace e186
 			*	If the fbo's status is GL_FRAMEBUFFER_COMPLETE, this method returns true; false otherwise.
 			*	Make sure that the fbo is bound before calling this method.
 			*/
-		static bool status();
+		static bool ready_for_action();
 
 		void Destroy();
 

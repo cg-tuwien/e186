@@ -351,7 +351,7 @@ namespace e186
 		glDrawBuffers(static_cast<GLsizei>(m_color_attachments.size()), &m_color_attachments[0]);
 	}
 
-	bool FrameBufferObject::status()
+	bool FrameBufferObject::ready_for_action()
 	{
 		auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		bool isGood = GL_FRAMEBUFFER_COMPLETE == status;

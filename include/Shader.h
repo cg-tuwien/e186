@@ -31,9 +31,10 @@ namespace e186
 		Shader& operator=(const Shader& other) = delete;
 		Shader& operator=(Shader&& other) noexcept;
 		~Shader();
-
-		explicit operator GLuint() const;
-		GLuint handle() const;
+		
+		explicit operator GLuint() const { return m_prog_handle; }
+		GLuint handle() const { return m_prog_handle; }
+		bool ready_for_action() const { return 0 != handle(); }
 
 		static std::string version_string();
 
