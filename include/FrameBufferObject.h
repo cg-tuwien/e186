@@ -56,6 +56,7 @@ namespace e186
 		static FrameBufferObject& default_framebuffer();
 
 		FrameBufferObject(GLsizei width, GLsizei height);
+		FrameBufferObject(glm::tvec2<GLsizei> size);
 		FrameBufferObject(const FrameBufferObject& other) = delete;
 		FrameBufferObject& operator=(const FrameBufferObject& other) = delete;
 		FrameBufferObject(FrameBufferObject&& other) noexcept;

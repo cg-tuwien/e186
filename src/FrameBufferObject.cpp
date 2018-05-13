@@ -58,6 +58,10 @@ namespace e186
 	{
 	}
 
+	FrameBufferObject::FrameBufferObject(glm::tvec2<GLsizei> size) : FrameBufferObject(size.x, size.y)
+	{
+	}
+
 	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height, bool do_generate) :
 		m_viewport_x(0),
 		m_viewport_y(0),
