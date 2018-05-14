@@ -763,9 +763,10 @@ namespace e186
 				CheckErrorAndPrintInfoLog((std::string("Shader::Build after output location for ") + name).c_str(), "Could not bind fragment data location");
 			}
 		}
-		else
+
+		if (0 == m_shaderHandles[0] && 0 == m_shaderHandles[5])
 		{
-			log_warning("Shader Handle for fragment shader is 0");
+			log_error("Both, the shader handle for the vertex shader and for the compute shader are 0");
 		}
 
 		// Don't define attribute locations - set them im shader files using layout (location = 0)
