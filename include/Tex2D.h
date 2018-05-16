@@ -13,6 +13,15 @@ namespace e186
 			ForceHDR
 		};
 
+		struct Tex2DInfo
+		{
+			bool m_is_hdr;
+			uint8_t m_min_valueb;
+			uint8_t m_max_valueb;
+			float m_min_valuef;
+			float m_max_valuef;
+		};
+
 		static GLsizei CalculateMipMapLevelCount(GLsizei width, GLsizei height);
 		static GLsizei CalculateMipMapLevelCount(glm::tvec2<GLsizei> size);
 
@@ -32,6 +41,8 @@ namespace e186
 
 		Tex2D& Generate1pxTexture(uint8_t color_r, uint8_t color_g, uint8_t color_b, GLint image_format = GL_RGB);
 		Tex2D& FromFile(const std::string& path, DynamicRange precision = DynamicRange::Auto);
+		Tex2D& TransformValues(uint8_t mul, uint8_t add);
+		Tex2D& TransformValues(float mul, float add);
 		Tex2D& Flip();
 		Tex2D& Upload(GLint internal_format = -1, GLint border = 0, GLint level = 0);
 		Tex2D& UploadSRGBIfPossible(GLint internal_format = -1, GLint border = 0, GLint level = 0);
@@ -39,6 +50,8 @@ namespace e186
 		Tex2D& DestroyOffline();
 		Tex2D& DestroyOnline();
 		Tex2D& Destroy();
+
+		Tex2DInfo GetInfo();
 
 	private:
 		GLsizei m_width, m_height, m_color_channels;

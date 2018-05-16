@@ -175,6 +175,42 @@ namespace e186
 		return *this;
 	}
 
+	Tex2D& Tex2D::TransformValues(uint8_t mul, uint8_t add)
+	{
+		if (std::holds_alternative<uint8_t*>(m_data))
+		{
+			auto* data = std::get<uint8_t*>(m_data);
+			auto n = m_width * m_height * m_color_channels;
+			for (auto i = 0; i < n; ++i)
+			{
+				data[i] = data[i] * mul + add;
+			}
+		}
+		else
+		{
+			log_warning("Will not transform Tex2D's float values with uint8_t");
+		}
+		return *this;
+	}
+
+	Tex2D& Tex2D::TransformValues(float mul, float add)
+	{
+		if (std::holds_alternative<float*>(m_data))
+		{
+			auto* data = std::get<float*>(m_data);
+			auto n = m_width * m_height * m_color_channels;
+			for (auto i=0; i < n; ++i)
+			{
+				data[i] = data[i] * mul + add;
+			}
+		}
+		else
+		{
+			log_warning("Can not transform Tex2D's uint8_t values with float");
+		}
+		return *this;
+	}
+
 	Tex2D& Tex2D::Flip()
 	{
 		if (m_data.index() == std::variant_npos)
@@ -338,5 +374,41 @@ namespace e186
 		DestroyOnline();
 		DestroyOffline();
 		return *this;
+	}
+
+	Tex2D::Tex2DInfo Tex2D::GetInfo()
+	{
+		Tex2DInfo result;
+		if (std::holds_alternative<float*>(m_data))
+		{
+			auto* data = std::get<float*>(m_data);
+			result.m_is_hdr = true;
+			result.m_min_valueb = 0;
+			result.m_max_valueb = 0;
+			result.m_min_valuef = data[0];
+			result.m_max_valuef = data[0];
+			const auto n = m_width * m_height * m_color_channels;
+			for (int i = 0; i < n; ++i)
+			{
+				if (data[i] < result.m_min_valuef) result.m_min_valuef = data[i];
+				if (data[i] > result.m_max_valuef) result.m_max_valuef = data[i];
+			}
+		}
+		else
+		{
+			auto* data = std::get<uint8_t*>(m_data);
+			result.m_is_hdr = false;
+			result.m_min_valueb = data[0];
+			result.m_max_valueb = data[0];
+			result.m_min_valuef = 0.0f;
+			result.m_max_valuef = 0.0f;
+			const auto n = m_width * m_height * m_color_channels;
+			for (int i = 0; i < n; ++i)
+			{
+				if (data[i] < result.m_min_valueb) result.m_min_valueb = data[i];
+				if (data[i] > result.m_max_valueb) result.m_max_valueb = data[i];
+			}
+		}
+		return result;
 	}
 }
