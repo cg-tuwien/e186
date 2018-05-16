@@ -106,8 +106,22 @@ namespace e186
 		return *this;
 	}
 
-	Tex2D& Tex2D::FromFile(const std::string& path, bool isHDR)
+	Tex2D& Tex2D::FromFile(const std::string& path, DynamicRange precision)
 	{
+		bool isHDR = false;
+		switch (precision)
+		{
+		case DynamicRange::Auto:
+			isHDR = stbi_is_hdr(path.c_str());
+			break;
+		case DynamicRange::ForceLDR:
+			isHDR = false;
+			break;
+		case DynamicRange::ForceHDR:
+			isHDR = true;
+			break;
+		}
+
 		int x, y, n;
 		stbi_set_flip_vertically_on_load(true);
 		if (isHDR)
