@@ -35,6 +35,10 @@ namespace e186
 		explicit operator GLuint() const { return m_prog_handle; }
 		GLuint handle() const { return m_prog_handle; }
 		bool ready_for_action() const { return 0 != handle(); }
+		bool is_compute_shader() const { return 0 != m_shaderHandles[5]; }
+		GLint work_group_size_x() const { return m_work_group_sizes[0]; }
+		GLint work_group_size_y() const { return m_work_group_sizes[1]; }
+		GLint work_group_size_z() const { return m_work_group_sizes[2]; }
 
 		static std::string version_string();
 
@@ -491,6 +495,7 @@ namespace e186
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;
 		uint32_t m_sampler_auto_index;
+		std::array<GLint, 3> m_work_group_sizes;
 
 #if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
 		std::function<void()> m_files_changed;
@@ -504,4 +509,8 @@ namespace e186
 	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters);
 	void UnbindVAO();
 	void UnbindShader();
+	void Compute(const Shader& shader);
+	void Compute(const Shader& shader, GLsizei width);
+	void Compute(const Shader& shader, GLsizei width, GLsizei height);
+	void Compute(const Shader& shader, GLsizei width, GLsizei height, GLsizei depth);
 }

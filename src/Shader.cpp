@@ -796,6 +796,11 @@ namespace e186
 		PrepareAutoMatActionConfigs();
 		CreateAutoMatCalcers();
 
+		if (is_compute_shader())
+		{
+			glGetProgramiv(progHandle, GL_COMPUTE_WORK_GROUP_SIZE, &m_work_group_sizes[0]);
+		}
+
 #if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
 		m_files_changed = [this]()
 		{
@@ -1209,5 +1214,41 @@ namespace e186
 	void UnbindShader()
 	{
 		glUseProgram(0u);
+	}
+
+	void Compute(const Shader& shader)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_x() == 1);
+		assert(shader.work_group_size_y() == 1);
+		assert(shader.work_group_size_z() == 1);
+		glDispatchCompute(1, 1, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_y() == 1);
+		assert(shader.work_group_size_z() == 1);
+		const auto num_groups_x = (width + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		glDispatchCompute(num_groups_x, 1, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width, GLsizei height)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_z() == 1);
+		const auto num_groups_x = (width + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		const auto num_groups_y = (height + shader.work_group_size_y() - 1) / shader.work_group_size_y();
+		glDispatchCompute(num_groups_x, num_groups_y, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width, GLsizei height, GLsizei depth)
+	{
+		assert(shader.is_compute_shader());
+		const auto num_groups_x = (width  + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		const auto num_groups_y = (height + shader.work_group_size_y() - 1) / shader.work_group_size_y();
+		const auto num_groups_z = (depth  + shader.work_group_size_z() - 1) / shader.work_group_size_z();
+		glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
 	}
 }
