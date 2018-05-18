@@ -47,6 +47,7 @@ namespace e186
 		Tex2D& Upload(GLint internal_format = -1, GLint border = 0, GLint level = 0);
 		Tex2D& UploadSRGBIfPossible(GLint internal_format = -1, GLint border = 0, GLint level = 0);
 		Tex2D& CreateStorage(glm::tvec2<GLsizei> size, GLint internal_format, GLint levels = -1);
+		Tex2D& CreateView(glm::tvec2<GLsizei> size, const TexInfo& origtexture, GLint internal_format, GLint minlevel = 0, GLint numlevels = 1);
 		Tex2D& DestroyOffline();
 		Tex2D& DestroyOnline();
 		Tex2D& Destroy();

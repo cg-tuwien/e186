@@ -324,6 +324,25 @@ namespace e186
 		return *this;
 	}
 
+	Tex2D& Tex2D::CreateView(glm::tvec2<GLsizei> size, const TexInfo& origtexture, GLint internal_format, GLint minlevel, GLint numlevels)
+	{
+		GLuint gl_texID;
+		//generate an OpenGL texture ID for this texture
+		glGenTextures(1, &gl_texID);
+		assert(gl_texID != 0);
+
+		glTextureView(gl_texID, GL_TEXTURE_2D, origtexture.handle(), internal_format, minlevel, numlevels, 0, 1);
+
+		m_width = size.x;
+		m_height = size.y;
+		m_internal_format = internal_format;
+		m_image_format = -1;
+		m_border = -1;
+		m_data_type = 0;
+		m_gl_handle = gl_texID;
+		return *this;
+	}
+
 	Tex2D& Tex2D::UploadSRGBIfPossible(GLint internal_format,				///< format to store the image in
 									   GLint border,						///< border-size in px
 									   GLint level)

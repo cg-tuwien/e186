@@ -42,10 +42,12 @@ namespace e186
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA32F			(GL_RGBA32F,				GL_RGBA,			GL_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf		(GL_RGBA,					GL_RGBA,			GL_HALF_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetSRGB			(GL_SRGB,					GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGB8			(GL_SRGB8,					GL_RGB,				GL_UNSIGNED_BYTE);
 	FboAttachmentConfig FboAttachmentConfig::kPresetCompressedSRGB	(GL_COMPRESSED_SRGB,		GL_RGB,				GL_UNSIGNED_BYTE);
 	FboAttachmentConfig FboAttachmentConfig::kPresetSRGBA			(GL_SRGB_ALPHA,				GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGBA8			(GL_SRGB8_ALPHA8,			GL_RGBA,			GL_UNSIGNED_BYTE);
 	FboAttachmentConfig FboAttachmentConfig::kPresetCompressedSRGBA	(GL_COMPRESSED_SRGB_ALPHA,	GL_RGBA,			GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetDepthStencil24_8(GL_DEPTH_STENCIL,			GL_DEPTH_STENCIL,	GL_UNSIGNED_INT_24_8);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepthStencil24_8(GL_DEPTH24_STENCIL8,		GL_DEPTH_STENCIL,	GL_UNSIGNED_INT_24_8);
 	FboAttachmentConfig FboAttachmentConfig::kPresetDepth32F		(GL_DEPTH_COMPONENT32F,		GL_DEPTH_COMPONENT, GL_FLOAT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetDepth24			(GL_DEPTH_COMPONENT24,		GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 	FboAttachmentConfig FboAttachmentConfig::kPresetDepth16			(GL_DEPTH_COMPONENT16,		GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
@@ -243,15 +245,7 @@ namespace e186
 		{
 			ti->BindAndSetTextureParameters(params);
 
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				0, 
-				config.internal_format(), 
-				m_width, m_height, 
-				config.border(), 
-				config.format(), 
-				config.data_type(), 
-				nullptr);
+			glTexStorage2D(GL_TEXTURE_2D, 1, config.internal_format(), m_width, m_height);
 
 			if ((params & TexParams::GenerateMipMaps) != TexParams::None)
 			{

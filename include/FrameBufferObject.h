@@ -39,8 +39,10 @@ namespace e186
 		static FboAttachmentConfig kPresetRGBA32F;
 		static FboAttachmentConfig kPresetRGBAhalf;
 		static FboAttachmentConfig kPresetSRGB;
+		static FboAttachmentConfig kPresetSRGB8;
 		static FboAttachmentConfig kPresetCompressedSRGB;
 		static FboAttachmentConfig kPresetSRGBA;
+		static FboAttachmentConfig kPresetSRGBA8;
 		static FboAttachmentConfig kPresetCompressedSRGBA;
 		static FboAttachmentConfig kPresetDepthStencil24_8;
 		static FboAttachmentConfig kPresetDepth32F;
