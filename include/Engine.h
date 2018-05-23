@@ -55,7 +55,7 @@ namespace e186
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>> m_stored_char_callbacks;
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>*> m_char_callbacks;
 
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		std::vector<std::string> m_files_to_update;
 		std::vector<std::tuple<std::vector<std::string>, std::function<void()>*>> m_file_update_callbacks;
 
@@ -92,13 +92,11 @@ namespace e186
 		bool m_next_is_root;
 		bool m_current_is_root;
 		std::function<std::unique_ptr<IScene>()> m_root_scene_generator_func;
-
-		AntTweakBarManager m_ant_tweak_bar_manager;
-
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		FW::FileWatcher m_file_watcher;
 		UpdateListener m_update_listener;
 #endif
+		AntTweakBarManager m_ant_tweak_bar_manager;
 
 		void SetRootSceneAsNextScene();
 

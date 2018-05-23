@@ -16,10 +16,11 @@ namespace e186
 		m_root_scene_generator_func([]() { return nullptr; }),
 		m_next_is_root(false),
 		m_current_is_root(false),
-		m_ant_tweak_bar_manager()
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
-		, m_update_listener(this)
+#if defined(_DEBUG)
+		m_file_watcher(),
+		m_update_listener(this),
 #endif
+		m_ant_tweak_bar_manager()
 	{
 		glfwGetFramebufferSize(m_mainWindow, &m_main_wnd_width, &m_main_wnd_height);
 		m_main_wnd_aspectRatio = static_cast<float>(m_main_wnd_width) / static_cast<float>(m_main_wnd_height);
@@ -358,7 +359,7 @@ namespace e186
 	void Engine::BeginFrame()
 	{
 		WorkOffPendingActions();
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		m_file_watcher.update();
 #endif
 		ProcessEvents();
@@ -594,7 +595,7 @@ namespace e186
 		}
 	}
 
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 	Engine::UpdateListener::UpdateListener(Engine* engine) 
 		: m_engine{ engine }
 	{

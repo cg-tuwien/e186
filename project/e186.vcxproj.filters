@@ -279,6 +279,9 @@
     <ClInclude Include="..\include\SpotLight.h">
       <Filter>Header Files\lightsources</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\ShaderSourceInfo.h">
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">

@@ -57,6 +57,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "ShaderType.h"
+#include "ShaderSourceInfo.h"
 #include "Shader.h"
 #include "MaterialData.h"
 #include "Model.h"

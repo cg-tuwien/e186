@@ -48,6 +48,7 @@
     <ClInclude Include="..\include\SceneSelectorScene.h" />
     <ClInclude Include="..\include\Shader.h" />
     <ClInclude Include="..\include\e186targetver.h" />
+    <ClInclude Include="..\include\ShaderSourceInfo.h" />
     <ClInclude Include="..\include\ShaderType.h" />
     <ClInclude Include="..\include\SpotLight.h" />
     <ClInclude Include="..\include\Stopwatch.h" />

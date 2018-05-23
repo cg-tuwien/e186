@@ -22,7 +22,13 @@ namespace e186
 		void PrepareAutoMatActionConfigs();
 		void CreateAutoMatCalcers();
 		//static std::vector<const GLchar*> GetAsCStrs(const std::vector<std::string>& string_array);
-		static std::string ConcatSources(const std::vector<std::string>& sources);
+		static std::string ConcatSources(const std::vector<std::tuple<std::string, ShaderSourceInfo>>& sources);
+
+		void CopyConfigFrom(const Shader& other);
+#if defined(_DEBUG)
+		void SetUpNotificationsForAllFiles(const std::vector<std::tuple<std::string, ShaderSourceInfo>>& sources);
+#endif
+		static void StoreShaderSource(std::vector<std::tuple<std::string, ShaderSourceInfo>>& shader_sources, std::string shader_source, ShaderSourceInfo options);
 
 	public:
 		Shader();
@@ -37,22 +43,22 @@ namespace e186
 
 		static std::string version_string();
 
-		Shader& AddVertexShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddTessellationControlShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddTessellationEvaluationShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddGeometryShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddFragmentShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
+		Shader& AddVertexShaderSource(std::string shader_source, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddTessellationControlShaderSource(std::string shader_source, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddTessellationEvaluationShaderSource(std::string shader_source, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddGeometryShaderSource(std::string shader_source, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddFragmentShaderSource(std::string shader_source, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
 		Shader& AddFragmentShaderOutput(std::vector<std::tuple<GLuint, const GLchar*>> outputs);
-		Shader& AddComputeShaderSource(std::string shader_source, bool append_newline = true);
-		Shader& AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, bool append_newline = true);
-		Shader& AddVertexShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddTessellationControlShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddTessellationEvaluationShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddGeometryShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddFragmentShaderSourceFromFile(std::string path, bool append_newline = true);
-		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline = true);
-		Shader& AddComputeShaderSourceFromFile(std::string path, bool append_newline = true);
+		Shader& AddComputeShaderSource(std::string shader_source, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddVertexShaderSourceFromFile(std::string path, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddTessellationControlShaderSourceFromFile(std::string path, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddTessellationEvaluationShaderSourceFromFile(std::string path, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddGeometryShaderSourceFromFile(std::string path, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddFragmentShaderSourceFromFile(std::string path, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
+		Shader& AddComputeShaderSourceFromFile(std::string path, ShaderSourceInfo options = ShaderSourceInfo::AppendNewline);
 		Shader& SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode);
 		Shader& Build();
 		Shader& QueryOptionalUniformLocations(const std::vector<std::string>& names);
@@ -437,21 +443,21 @@ namespace e186
 
 
 	private:
-		GLuint m_prog_handle;
 		static std::string kNewLine;
-		std::vector<std::string> m_vertex_shader_sources;
-		std::vector<std::string> m_tess_control_shader_sources;
-		std::vector<std::string> m_tess_eval_shader_sources;
-		std::vector<std::string> m_geometry_shader_sources;
-		std::vector<std::string> m_fragment_shader_sources;
-		std::vector<std::string> m_compute_shader_sources;
+		static const int kMaxShaders = 6;
+		GLuint m_prog_handle;
+		std::vector<std::tuple<std::string, ShaderSourceInfo>> m_vertex_shader_sources;
+		std::vector<std::tuple<std::string, ShaderSourceInfo>> m_tess_control_shader_sources;
+		std::vector<std::tuple<std::string, ShaderSourceInfo>> m_tess_eval_shader_sources;
+		std::vector<std::tuple<std::string, ShaderSourceInfo>> m_geometry_shader_sources;
+		std::vector<std::tuple<std::string, ShaderSourceInfo>> m_fragment_shader_sources;
+		std::vector<std::tuple<std::string, ShaderSourceInfo>> m_compute_shader_sources;
 		std::vector<std::tuple<GLuint, const GLchar*>> m_fragment_outputs;
 		std::unordered_map<std::string, GLint> m_uniform_locations;
 		std::unordered_map<std::string, GLuint> m_uniform_block_indices;
 		std::vector<const char*> m_transform_feedback_varyings;
 		GLenum m_transform_feedback_buffer_mode;
-		static const int kMaxShaders = 6;
-		std::array<GLuint, kMaxShaders> m_shaderHandles;
+		std::array<GLuint, kMaxShaders> m_shader_handles;
 		VertexAttribData m_vertex_attrib_config;
 		GLenum m_kind_of_primitives;
 		std::vector<std::tuple<std::string, AutoMatrix>> m_auto_matrices;
@@ -461,7 +467,7 @@ namespace e186
 		std::vector<std::function<void()>> m_auto_mat_calcers;
 		uint32_t m_sampler_auto_index;
 
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		std::function<void()> m_files_changed;
 #endif
 	};
