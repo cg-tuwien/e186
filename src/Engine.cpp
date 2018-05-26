@@ -648,8 +648,20 @@ namespace e186
 
 	void Engine::NotifyOnFileChanges(std::vector<std::string> files, std::function<void()>* callback)
 	{
-		m_file_watcher.addWatch(utils::ExtractBasePath(files[0]), &m_update_listener); // TODO: handle folders, not just first one
-		m_file_update_callbacks.push_back(std::make_tuple(std::move(files), callback));
+		// File watcher operates on folders, not files => get all unique folders
+		std::set<std::string> unique_folders;
+		for (const auto& file : files)
+		{
+			auto folder = utils::ExtractBasePath(file);
+			unique_folders.insert(folder);
+		}
+		// ...and pass them to the file watcher
+		for (const auto& folder : unique_folders)
+		{
+			//m_file_watcher.removeWatch(folder); // This should ensure that each directory is only watched once
+			m_file_watcher.addWatch(folder, &m_update_listener);
+			m_file_update_callbacks.push_back(std::make_tuple(std::move(files), callback));
+		}
 	}
 
 	void Engine::StopFileChangeNotifyCallbacks(std::function<void()>* callback)

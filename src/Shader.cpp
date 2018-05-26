@@ -156,16 +156,8 @@ namespace e186
 		m_fragment_shader_sources = other.m_fragment_shader_sources;
 		m_compute_shader_sources = other.m_compute_shader_sources;
 		m_fragment_outputs = other.m_fragment_outputs;
-		m_uniform_locations = other.m_uniform_locations;
-		m_uniform_block_indices = other.m_uniform_block_indices;
-		m_shader_handles = other.m_shader_handles;
 		m_kind_of_primitives = other.m_kind_of_primitives;
 		m_auto_matrices = other.m_auto_matrices;
-		m_auto_mats_action_config = other.m_auto_mats_action_config;
-		m_auto_mat_do_calc = other.m_auto_mat_do_calc;
-		m_auto_mat_action_cache = other.m_auto_mat_action_cache;
-		m_auto_mat_calcers = other.m_auto_mat_calcers;
-		m_sampler_auto_index = other.m_sampler_auto_index;
 	}
 
 	Shader::~Shader()
@@ -878,6 +870,19 @@ namespace e186
 				std::cout << std::endl << e.what() << std::endl;
 			}
 		};
+		// gather all files which contribute to the shader's source
+		std::vector<std::string> all_source_files;
+		for (const auto& collection : { m_vertex_shader_sources, m_tess_control_shader_sources, m_tess_eval_shader_sources, m_geometry_shader_sources, m_fragment_shader_sources, m_compute_shader_sources })
+		{
+			for (const auto& source_entry : collection)
+			{
+				if ((std::get<1>(source_entry) & ShaderSourceInfo::FromFile) != ShaderSourceInfo::Nothing)
+				{
+					all_source_files.push_back(std::get<0>(source_entry));
+				}
+			}
+		}
+		Engine::current()->NotifyOnFileChanges(all_source_files, &m_files_changed);
 #endif
 
 		CheckErrorAndPrintInfoLog("Shader::Build END", "Something went wrong");
