@@ -68,6 +68,7 @@ namespace e186
 	class Mesh
 	{
 		friend class Model;
+		friend void RenderMesh(const Shader& shader, Mesh& mesh);
 
 		MeshIdx m_index;
 		std::string m_name;

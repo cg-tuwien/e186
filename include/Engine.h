@@ -146,16 +146,22 @@ namespace e186
 			return m_running;
 		}
 
-		// Returns the width of the Application's main main_window
+		// Returns the width of the Application's main window
 		int window_width() const
 		{
 			return m_main_wnd_width;
 		}
 
-		// Returns the height of the Application's main main_window
+		// Returns the height of the Application's main window
 		int window_height() const
 		{
 			return m_main_wnd_height;
+		}
+
+		// Returns the size of the Application's main window
+		glm::tvec2<GLsizei> window_size() const
+		{
+			return { m_main_wnd_width, m_main_wnd_height };
 		}
 
 		// Return the aspect ratio of the Application's main main_window

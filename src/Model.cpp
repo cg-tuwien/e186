@@ -7,6 +7,7 @@
 //
 
 #include "Model.h"
+#include <sstream>
 
 namespace e186
 {

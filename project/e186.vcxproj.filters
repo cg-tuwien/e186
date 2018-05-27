@@ -127,6 +127,12 @@
     <Filter Include="Source Files\geometry">
       <UniqueIdentifier>{0e61d792-7e89-4b68-98ae-b6377564519b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\data">
+      <UniqueIdentifier>{6e0bf99b-0788-4ea5-9558-0b0e61334311}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\data">
+      <UniqueIdentifier>{712956f2-92e6-4418-ab3b-f7191066ab9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\e186stdafx.h">
@@ -279,6 +285,9 @@
     <ClInclude Include="..\include\SpotLight.h">
       <Filter>Header Files\lightsources</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Rect.h">
+      <Filter>Header Files\data</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\ShaderSourceInfo.h">
       <Filter>Header Files\shader</Filter>
     </ClInclude>
@@ -403,6 +412,9 @@
     </ClCompile>
     <ClCompile Include="..\src\SpotLight.cpp">
       <Filter>Source Files\lightsources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Rect.cpp">
+      <Filter>Source Files\data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

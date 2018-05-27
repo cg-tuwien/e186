@@ -37,9 +37,14 @@ namespace e186
 		Shader& operator=(const Shader& other) = delete;
 		Shader& operator=(Shader&& other) noexcept;
 		~Shader();
-
-		explicit operator GLuint() const;
-		GLuint handle() const;
+		
+		explicit operator GLuint() const { return m_prog_handle; }
+		GLuint handle() const { return m_prog_handle; }
+		bool ready_for_action() const { return 0 != handle(); }
+		bool is_compute_shader() const { return 0 != m_shader_handles[5]; }
+		GLint work_group_size_x() const { return m_work_group_sizes[0]; }
+		GLint work_group_size_y() const { return m_work_group_sizes[1]; }
+		GLint work_group_size_z() const { return m_work_group_sizes[2]; }
 
 		static std::string version_string();
 
@@ -173,10 +178,22 @@ namespace e186
 			glUniform1i(location, static_cast<GLint>(texture_unit));
 		}
 
+		void SetSampler(GLint location, const TexInfo* value, uint32_t texture_unit = 0) const
+		{
+			assert(value);
+			SetSampler(location, *value, texture_unit);
+		}
+
 		void SetFirstSampler(GLint location, const TexInfo& value, uint32_t first_texture_unit = 0)
 		{	
 			m_sampler_auto_index = first_texture_unit;
 			SetSampler(location, value, m_sampler_auto_index);
+		}
+
+		void SetFirstSampler(GLint location, const TexInfo* value, uint32_t first_texture_unit = 0)
+		{
+			assert(value);
+			SetFirstSampler(location, *value, first_texture_unit);
 		}
 
 		void SetNextSampler(GLint location, const TexInfo& value, uint32_t sampler_increment = 1)
@@ -184,11 +201,23 @@ namespace e186
 			m_sampler_auto_index += sampler_increment;
 			SetSampler(location, value, m_sampler_auto_index);
 		}
+
+		void SetNextSampler(GLint location, const TexInfo* value, uint32_t sampler_increment = 1)
+		{
+			assert(value);
+			SetNextSampler(location, *value, sampler_increment);
+		}
 			
 		void SetImageTexture(GLint location, const TexInfo& value, GLuint unit, GLint level, GLboolean layered, GLint layer, GLenum access)
 		{
 			glBindImageTexture(unit, value.handle(), level, layered, layer, access, value.internal_format());
 			glUniform1i(location, static_cast<GLint>(unit));
+		}
+
+		void SetImageTexture(GLint location, const TexInfo* value, GLuint unit, GLint level, GLboolean layered, GLint layer, GLenum access)
+		{
+			assert(value);
+			SetImageTexture(location, *value, unit, level, layered, layer, access);
 		}
 
 		void SetLight(GLint color_loc, const AmbientLightGpuData& data)
@@ -296,6 +325,12 @@ namespace e186
 				SetFirstSampler(loc, value, first_texture_unit);
 			else
 				m_sampler_auto_index = first_texture_unit;
+		}
+
+		void SetOptionalFirstSampler(const std::string& uniform_name, const TexInfo* value, uint32_t first_texture_unit = 0)
+		{
+			assert(value);
+			SetOptionalFirstSampler(uniform_name, *value, first_texture_unit);
 		}
 
 		template <typename... Args>
@@ -466,6 +501,7 @@ namespace e186
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;
 		uint32_t m_sampler_auto_index;
+		std::array<GLint, 3> m_work_group_sizes;
 
 #if defined(_DEBUG)
 		std::function<void()> m_files_changed;
@@ -479,4 +515,8 @@ namespace e186
 	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters);
 	void UnbindVAO();
 	void UnbindShader();
+	void Compute(const Shader& shader);
+	void Compute(const Shader& shader, GLsizei width);
+	void Compute(const Shader& shader, GLsizei width, GLsizei height);
+	void Compute(const Shader& shader, GLsizei width, GLsizei height, GLsizei depth);
 }

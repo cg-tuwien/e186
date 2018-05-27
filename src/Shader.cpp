@@ -816,9 +816,10 @@ namespace e186
 				CheckErrorAndPrintInfoLog((std::string("Shader::Build after output location for ") + name).c_str(), "Could not bind fragment data location");
 			}
 		}
-		else
+
+		if (0 == m_shader_handles[0] && 0 == m_shader_handles[5])
 		{
-			log_warning("Shader Handle for fragment shader is 0");
+			log_error("Both, the shader handle for the vertex shader and for the compute shader are 0");
 		}
 
 		// Don't define attribute locations - set them im shader files using layout (location = 0)
@@ -847,6 +848,11 @@ namespace e186
 		DetermineWhichAutoMatsToCalc();
 		PrepareAutoMatActionConfigs();
 		CreateAutoMatCalcers();
+
+		if (is_compute_shader())
+		{
+			glGetProgramiv(progHandle, GL_COMPUTE_WORK_GROUP_SIZE, &m_work_group_sizes[0]);
+		}
 
 #if defined(_DEBUG)
 		m_files_changed = [this]()
@@ -1100,16 +1106,6 @@ namespace e186
 		return loc->second;
 	}
 
-	Shader::operator GLuint() const
-	{
-		return m_prog_handle;
-	}
-
-	GLuint Shader::handle() const
-	{
-		return m_prog_handle;
-	}
-
 	std::string Shader::version_string()
 	{
 		auto version = std::string("#version ") + std::to_string(Context::current()->gl_major_version() * 100 + Context::current()->gl_minor_version() * 10);
@@ -1203,7 +1199,21 @@ namespace e186
 
 	void RenderMesh(const Shader& shader, Mesh& mesh)
 	{
-		Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
+		//Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
+		auto rnd_cfg = Mesh::GetOrCreateRenderConfigForShader(mesh, shader);
+		GLenum mode = shader.kind_of_primitives();
+		if (GL_PATCHES == mode)
+		{
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+		}
+		else
+		{
+			mode = rnd_cfg.m_render_mode;
+		}
+		glBindVertexArray(rnd_cfg.m_vao_handle);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vertex_data_vbo_id);      // TODO: WTF WTF WTF????
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices_vbo_id);  //   otherwise: Exception thrown at 0x0000000053C91A02 (nvoglv64.dll) in application.exe: 0xC0000005: Access violation reading location 0x0000000000000000.
+		glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void RenderFullScreen(const Shader& shader)
@@ -1277,5 +1287,41 @@ namespace e186
 	void UnbindShader()
 	{
 		glUseProgram(0u);
+	}
+
+	void Compute(const Shader& shader)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_x() == 1);
+		assert(shader.work_group_size_y() == 1);
+		assert(shader.work_group_size_z() == 1);
+		glDispatchCompute(1, 1, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_y() == 1);
+		assert(shader.work_group_size_z() == 1);
+		const auto num_groups_x = (width + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		glDispatchCompute(num_groups_x, 1, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width, GLsizei height)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_z() == 1);
+		const auto num_groups_x = (width + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		const auto num_groups_y = (height + shader.work_group_size_y() - 1) / shader.work_group_size_y();
+		glDispatchCompute(num_groups_x, num_groups_y, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width, GLsizei height, GLsizei depth)
+	{
+		assert(shader.is_compute_shader());
+		const auto num_groups_x = (width  + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		const auto num_groups_y = (height + shader.work_group_size_y() - 1) / shader.work_group_size_y();
+		const auto num_groups_z = (depth  + shader.work_group_size_z() - 1) / shader.work_group_size_z();
+		glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
 	}
 }
