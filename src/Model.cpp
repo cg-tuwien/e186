@@ -1148,14 +1148,14 @@ namespace e186
 		}
 	}
 
-	MeshUniformSettersForShader Model::CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes)
+	MeshUniformSettersForShader Model::CompileUniformSetters(Shader& shader, const std::vector<MeshRef>& meshes)
 	{
 		MeshUniformSettersForShader retval;
 		retval.m_shader_handle = shader.handle();
 
 		for (Mesh& mesh : meshes)
 		{
-			retval.m_mesh_uniform_setters.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), CreateUniformSetterForShader(shader, *mesh.m_material_data)));
+			retval.m_mesh_uniform_setters.push_back(std::make_tuple(std::reference_wrapper<Mesh>(mesh), CreateUniformSetterForShader(shader, mesh.material_data())));
 		}
 
 		return retval;

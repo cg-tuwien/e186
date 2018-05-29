@@ -10,11 +10,17 @@ namespace e186
 		Additive
 	};
 
-	UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
+	enum struct UniformSetterUsageMode : uint32_t
+	{
+		Static,
+		Dynamic
+	};
+
+	UniformSetter CreateUniformSetterForShader(Shader& shader, UniformSetterUsageMode usage_mode = UniformSetterUsageMode::Static, MaterialData* material_data_info = nullptr);
 
 	class MaterialData
 	{
-		friend UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
+		friend UniformSetter CreateUniformSetterForShader(Shader&, UniformSetterUsageMode, MaterialData*);
 
 	public:
 		MaterialData();

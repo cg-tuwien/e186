@@ -60,6 +60,7 @@
     <ClInclude Include="..\include\TexInfo.h" />
     <ClInclude Include="..\include\TexLoadingHelper.h" />
     <ClInclude Include="..\include\Transform.h" />
+    <ClInclude Include="..\include\UniformSetter.h" />
     <ClInclude Include="..\include\Vertex.h" />
     <ClInclude Include="..\include\VertexAttribData.h" />
     <ClInclude Include="..\include\VertexAttribLocation.h" />
@@ -108,6 +109,7 @@
     <ClCompile Include="..\src\TexInfo.cpp" />
     <ClCompile Include="..\src\TexLoadingHelper.cpp" />
     <ClCompile Include="..\src\Transform.cpp" />
+    <ClCompile Include="..\src\UniformSetter.cpp" />
     <ClCompile Include="..\src\Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>

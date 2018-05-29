@@ -76,7 +76,8 @@ namespace e186
 			glm::mat4(1.0)	// 15 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		},
 		m_auto_mat_calcers(),
-		m_sampler_auto_index(0)
+		m_sampler_auto_index(0),
+		m_dependent_uniform_setters()
 	{
 	}
 
@@ -102,12 +103,14 @@ namespace e186
 		m_auto_mat_do_calc(std::move(other.m_auto_mat_do_calc)),
 		m_auto_mat_action_cache(std::move(other.m_auto_mat_action_cache)),
 		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers)),
-		m_sampler_auto_index(std::move(other.m_sampler_auto_index))
+		m_sampler_auto_index(std::move(other.m_sampler_auto_index)),
+
+		m_dependent_uniform_setters(std::move(other.m_dependent_uniform_setters))
 	{
 		other.m_prog_handle = 0;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
 		other.m_transform_feedback_buffer_mode = 0;
-		log_debug("Move constructing Shader with m_prog_handle[%u]", m_prog_handle);
+		log_debug("Move-constructing Shader with m_prog_handle[%u]", m_prog_handle);
 	}
 
 	Shader& Shader::operator=(Shader&& other) noexcept
@@ -141,6 +144,8 @@ namespace e186
 		m_auto_mat_calcers = std::move(other.m_auto_mat_calcers);
 		m_sampler_auto_index = std::move(other.m_sampler_auto_index);
 
+		m_dependent_uniform_setters = std::move(other.m_dependent_uniform_setters);
+
 		log_debug("Move assigning Shader with m_prog_handle[%u]", m_prog_handle);
 		return *this;
 	}
@@ -158,6 +163,7 @@ namespace e186
 		m_fragment_outputs = other.m_fragment_outputs;
 		m_kind_of_primitives = other.m_kind_of_primitives;
 		m_auto_matrices = other.m_auto_matrices;
+		m_dependent_uniform_setters = other.m_dependent_uniform_setters;
 	}
 
 	Shader::~Shader()
@@ -1182,6 +1188,45 @@ namespace e186
 		return shaderHandle;
 	}
 
+	void Shader::HandleUniformSetterCreated(const UniformSetter* unisetter) 
+	{
+		if (std::find(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), unisetter) == m_dependent_uniform_setters.end())
+		{
+			// not found => insert
+			m_dependent_uniform_setters.push_back(unisetter);
+		}
+		else
+		{
+			log_warning("UniformSetter at address[%p] not found in HandleUniformSetterCreated", unisetter);
+		}
+	}
+
+	void Shader::HandleUniformSetterMoved(const UniformSetter* old_unisetter, const UniformSetter* new_unisetter)
+	{
+		auto found = std::find(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), old_unisetter);
+		if (found != m_dependent_uniform_setters.end())
+		{
+			*found = new_unisetter;
+		}
+		else
+		{
+			log_warning("UniformSetter at address[%p] not found in HandleUniformSetterMoved", old_unisetter);
+		}
+	}
+
+	void Shader::HandleUniformSetterDeleted(const UniformSetter* unisetter)
+	{
+		auto to_remove = std::remove(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), unisetter);
+		if (to_remove != m_dependent_uniform_setters.end())
+		{
+			m_dependent_uniform_setters.erase(to_remove);
+		}
+		else
+		{
+			log_warning("UniformSetter at address[%p] not found in HandleUniformSetterDeleted", unisetter);
+		}
+	}
+
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len)
 	{
 		GLenum mode = shader.kind_of_primitives();
@@ -1263,7 +1308,9 @@ namespace e186
 			Mesh& mesh = std::get<0>(tupl);
 			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters.m_mesh_uniform_setters[i])));
 			const RenderConfig& rnd_cfg = std::get<1>(tupl);
-			std::get<1>(uniform_setters.m_mesh_uniform_setters[i])(shader, *mesh.material_data());
+			auto& unisetter = std::get<1>(uniform_setters.m_mesh_uniform_setters[i]);
+			assert(unisetter.shader()->handle() == shader.handle());
+			unisetter(*mesh.material_data());
 
 			if (GL_PATCHES == mode)
 			{

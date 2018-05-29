@@ -91,6 +91,9 @@ namespace e186
 		void set_kind_of_primitives(GLenum mode);
 		void SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
 		GLint QueryPatchVertices();
+		void HandleUniformSetterCreated(const UniformSetter* unisetter);
+		void HandleUniformSetterMoved(const UniformSetter* old_unisetter, const UniformSetter* new_unisetter);
+		void HandleUniformSetterDeleted(const UniformSetter* unisetter);
 
 		void Use() const 
 		{
@@ -152,45 +155,50 @@ namespace e186
 			glUniformBlockBinding(m_prog_handle, location, block_binding);
 		}
 
-		void SetSampler(GLint location, GLenum tex_target, GLuint tex_handle, uint32_t texture_unit = 0) const
+		void SetSampler(GLint location, GLenum tex_target, GLuint tex_handle, int32_t texture_unit = 0) const
 		{
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
 			glBindTexture(tex_target, tex_handle);
 			glUniform1i(location, static_cast<GLint>(texture_unit));
 		}
 
-		void SetFirstSampler(GLint location, GLenum tex_target, GLuint tex_handle, uint32_t first_texture_unit = 0)
+		void InitTextureUnitForNextSampler(int32_t next_texture_unit = 0)
+		{
+			m_sampler_auto_index = next_texture_unit - 1;
+		}
+
+		void SetFirstSampler(GLint location, GLenum tex_target, GLuint tex_handle, int32_t first_texture_unit = 0)
 		{
 			m_sampler_auto_index = first_texture_unit;
 			SetSampler(location, tex_target, tex_handle, m_sampler_auto_index);
 		}
 
-		void SetNextSampler(GLint location, GLenum tex_target, GLuint tex_handle, uint32_t sampler_increment = 1)
+		void SetNextSampler(GLint location, GLenum tex_target, GLuint tex_handle, int32_t sampler_increment = 1)
 		{
 			m_sampler_auto_index += sampler_increment;
 			SetSampler(location, tex_target, tex_handle, m_sampler_auto_index);
 		}
 
-		void SetSampler(GLint location, const TexInfo& value, uint32_t texture_unit = 0) const
+		void SetSampler(GLint location, const TexInfo& value, int32_t texture_unit = 0) const
 		{
 			glActiveTexture(static_cast<GLenum>(GL_TEXTURE0 + texture_unit));
 			value.Bind();
 			glUniform1i(location, static_cast<GLint>(texture_unit));
 		}
 
-		void SetSampler(GLint location, const TexInfo* value, uint32_t texture_unit = 0) const
+		void SetSampler(GLint location, const TexInfo* value, int32_t texture_unit = 0) const
 		{
 			assert(value);
 			SetSampler(location, *value, texture_unit);
 		}
 
-		void SetFirstSampler(GLint location, const TexInfo& value, uint32_t first_texture_unit = 0)
+		void SetFirstSampler(GLint location, const TexInfo& value, int32_t first_texture_unit = 0)
 		{	
 			m_sampler_auto_index = first_texture_unit;
 			SetSampler(location, value, m_sampler_auto_index);
 		}
 
-		void SetFirstSampler(GLint location, const TexInfo* value, uint32_t first_texture_unit = 0)
+		void SetFirstSampler(GLint location, const TexInfo* value, int32_t first_texture_unit = 0)
 		{
 			assert(value);
 			SetFirstSampler(location, *value, first_texture_unit);
@@ -500,12 +508,12 @@ namespace e186
 		std::array<bool, 16> m_auto_mat_do_calc;
 		std::array<glm::mat4, 16> m_auto_mat_action_cache;
 		std::vector<std::function<void()>> m_auto_mat_calcers;
-		uint32_t m_sampler_auto_index;
+		int32_t m_sampler_auto_index;
 		std::array<GLint, 3> m_work_group_sizes;
-
 #if defined(_DEBUG)
 		std::function<void()> m_files_changed;
 #endif
+		std::vector<const UniformSetter*> m_dependent_uniform_setters;
 	};
 
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len);

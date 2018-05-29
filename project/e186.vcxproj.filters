@@ -291,6 +291,9 @@
     <ClInclude Include="..\include\ShaderSourceInfo.h">
       <Filter>Header Files\shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\UniformSetter.h">
+      <Filter>Header Files\material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
@@ -415,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Rect.cpp">
       <Filter>Source Files\data</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UniformSetter.cpp">
+      <Filter>Source Files\material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -57,6 +57,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "UniformSetter.h"
 #include "ShaderType.h"
 #include "ShaderSourceInfo.h"
 #include "Shader.h"

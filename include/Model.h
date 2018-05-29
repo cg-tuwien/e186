@@ -355,7 +355,7 @@ namespace e186
 			return SelectMeshes([](const Mesh& mesh) { return true; });
 		}
 
-		static MeshUniformSettersForShader CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshUniformSettersForShader CompileUniformSetters(Shader& shader, const std::vector<MeshRef>& meshes);
 
 		static MeshRenderData GetOrCreateRenderData(const Shader& shader, const std::vector<MeshRef>& meshes);
 
