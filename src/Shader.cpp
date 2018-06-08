@@ -1232,13 +1232,13 @@ namespace e186
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)
 		{
-			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 		}
 		else
 		{
-			mode = rnd_cfg.m_render_mode;
+			mode = rnd_cfg.render_mode();
 		}
-		glBindVertexArray(rnd_cfg.m_vao_handle);
+		glBindVertexArray(rnd_cfg.vao_handle());
 		glDrawElements(mode, indices_len, GL_UNSIGNED_INT, nullptr);
 	}
 
@@ -1249,13 +1249,13 @@ namespace e186
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)
 		{
-			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 		}
 		else
 		{
-			mode = rnd_cfg.m_render_mode;
+			mode = rnd_cfg.render_mode();
 		}
-		glBindVertexArray(rnd_cfg.m_vao_handle);
+		glBindVertexArray(rnd_cfg.vao_handle());
 		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vertex_data_vbo_id);      // TODO: WTF WTF WTF????
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices_vbo_id);  //   otherwise: Exception thrown at 0x0000000053C91A02 (nvoglv64.dll) in application.exe: 0xC0000005: Access violation reading location 0x0000000000000000.
 		glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
@@ -1273,26 +1273,25 @@ namespace e186
 
 		GLenum mode = shader.kind_of_primitives();
 
-		for (auto& tupl : mesh_render_data.m_mesh_render_configs)
+		for (const auto& rnd_cfg : mesh_render_data.m_mesh_render_configs)
 		{
-			Mesh& mesh = std::get<0>(tupl);
-			const RenderConfig& rnd_cfg = std::get<1>(tupl);
+			Mesh& mesh = rnd_cfg.mesh();
 
 			if (GL_PATCHES == mode)
 			{
-				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 			}
 			else
 			{
-				mode = rnd_cfg.m_render_mode;
+				mode = rnd_cfg.render_mode();
 			}
 
-			glBindVertexArray(rnd_cfg.m_vao_handle);
+			glBindVertexArray(rnd_cfg.vao_handle());
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 
-	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters)
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, MeshUniformSettersForShader& uniform_setters)
 	{
 		// If one of the following asserts fails, you are probably trying to render using the wrong shader!
 		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
@@ -1304,24 +1303,23 @@ namespace e186
 		auto n = meshes_and_their_vaos.m_mesh_render_configs.size();
 		for (auto i = 0; i < n; ++i)
 		{
-			auto& tupl = meshes_and_their_vaos.m_mesh_render_configs[i];
-			Mesh& mesh = std::get<0>(tupl);
+			const auto& rnd_cfg = meshes_and_their_vaos.m_mesh_render_configs[i];
+			Mesh& mesh = rnd_cfg.mesh();
 			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters.m_mesh_uniform_setters[i])));
-			const RenderConfig& rnd_cfg = std::get<1>(tupl);
 			auto& unisetter = std::get<1>(uniform_setters.m_mesh_uniform_setters[i]);
 			assert(unisetter.shader()->handle() == shader.handle());
 			unisetter(*mesh.material_data());
 
 			if (GL_PATCHES == mode)
 			{
-				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 			}
 			else
 			{
-				mode = rnd_cfg.m_render_mode;
+				mode = rnd_cfg.render_mode();
 			}
 
-			glBindVertexArray(rnd_cfg.m_vao_handle);
+			glBindVertexArray(rnd_cfg.vao_handle());
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 		}
 	}

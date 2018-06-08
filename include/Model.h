@@ -43,22 +43,6 @@ namespace e186
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
 
-	struct MeshUniformSettersForShader
-	{
-		GLuint m_shader_handle;
-		std::vector<std::tuple<MeshRef, UniformSetter>> m_mesh_uniform_setters;
-		MeshUniformSettersForShader() : m_shader_handle{0}, m_mesh_uniform_setters{} {}
-		auto num_meshes() const { return m_mesh_uniform_setters.size(); }
-	};
-	
-	struct MeshRenderData
-	{
-		VertexAttribData m_vertex_attrib_config;
-		std::vector<std::tuple<MeshRef, RenderConfig>> m_mesh_render_configs;
-		MeshRenderData() : m_vertex_attrib_config{VertexAttribData::Nothing}, m_mesh_render_configs{} {}
-		auto num_meshes() const { return m_mesh_render_configs.size(); }
-	};
-
 	void Append(MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append);
 	void Append(MeshRenderData& vaos, const MeshRenderData& vaos_to_append);
 	MeshUniformSettersForShader Concatenate(const MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append);
@@ -355,7 +339,7 @@ namespace e186
 			return SelectMeshes([](const Mesh& mesh) { return true; });
 		}
 
-		static MeshUniformSettersForShader CompileUniformSetters(Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshUniformSettersForShader CompileUniformSetters(Shader& shader, const std::vector<MeshRef>& meshes, UniformSetterUsageMode usage_mode = UniformSetterUsageMode::Static);
 
 		static MeshRenderData GetOrCreateRenderData(const Shader& shader, const std::vector<MeshRef>& meshes);
 

@@ -18,6 +18,8 @@ namespace e186
 	class MaterialData;
 	class Shader;
 	using UniformSetterFunc = std::function<void(const Shader&, const MaterialData&)>;
+	class UniformSubSetter;
+	using UniformSubSetterFunc = std::function<void(const Shader&, const MaterialData&, UniformSubSetter&)>;
 	class DirectionalLight;
 	using DirLightRef = std::reference_wrapper<DirectionalLight>;
 	

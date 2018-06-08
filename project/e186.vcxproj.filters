@@ -292,7 +292,10 @@
       <Filter>Header Files\shader</Filter>
     </ClInclude>
     <ClInclude Include="..\include\UniformSetter.h">
-      <Filter>Header Files\material</Filter>
+      <Filter>Header Files\shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\RenderData.h">
+      <Filter>Header Files\shader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

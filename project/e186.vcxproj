@@ -45,6 +45,7 @@
     <ClInclude Include="..\include\QuakeCamera.h" />
     <ClInclude Include="..\include\Rect.h" />
     <ClInclude Include="..\include\RenderConfig.h" />
+    <ClInclude Include="..\include\RenderData.h" />
     <ClInclude Include="..\include\SampleSceneTessIco.h" />
     <ClInclude Include="..\include\SceneSelectorScene.h" />
     <ClInclude Include="..\include\Shader.h" />

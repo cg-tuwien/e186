@@ -44,6 +44,7 @@
 #include "Engine.h"
 #include "Rect.h"
 #include "RenderConfig.h"
+#include "RenderData.h"
 #include "TexInfo.h"
 #include "TexData.h"
 #include "Transform.h"

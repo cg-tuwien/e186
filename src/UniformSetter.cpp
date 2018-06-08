@@ -2,25 +2,74 @@
 
 namespace e186
 {
-	UniformSetter::UniformSetter(Shader& shader, const std::shared_ptr<MaterialData>& mat_data, UniformSetterFunc func)
+
+	UniformSubSetter::UniformSubSetter() : m_func()
+	{
+	}
+
+	UniformSubSetter::UniformSubSetter(UniformSubSetterFunc func) : m_func(std::move(func))
+	{
+	}
+
+	UniformSubSetter::UniformSubSetter(UniformSubSetter&& other) : m_func(std::move(other.m_func))
+	{
+	}
+
+	UniformSubSetter::UniformSubSetter(const UniformSubSetter& other) : m_func(other.m_func)
+	{
+	}
+
+	UniformSubSetter& UniformSubSetter::operator= (UniformSubSetter&& other)
+	{
+		m_func = std::move(other.m_func);
+		return *this;
+	}
+
+	UniformSubSetter& UniformSubSetter::operator= (const UniformSubSetter& other)
+	{
+		m_func = other.m_func;
+		return *this;
+	}
+
+	UniformSubSetter::~UniformSubSetter()
+	{
+	}
+
+	void UniformSubSetter::operator()(const Shader& shader, const MaterialData& mat_data)
+	{
+		m_func(shader, mat_data, *this);
+	}
+
+	void UniformSubSetter::set_func(UniformSubSetterFunc func)
+	{
+		m_func = std::move(func);
+	}
+
+	// - - - - - - - - - - - - UniformSetter - - - - - - - - - - - - 
+
+	UniformSetter::UniformSetter() 
+		: m_shader(nullptr),
+		m_func()
+	{
+	}
+
+	UniformSetter::UniformSetter(Shader& shader, UniformSetterFunc func)
 		: m_shader(&shader),
-		m_material_data(mat_data),
-		m_func(func)
+		m_func(std::move(func))
 	{
 		m_shader->HandleUniformSetterCreated(this);
 	}
 
 	UniformSetter::UniformSetter(UniformSetter&& other)
 		: m_shader(std::move(other.m_shader)),
-		m_material_data(std::move(other.m_material_data)),
 		m_func(std::move(other.m_func))
 	{
+		other.m_shader = nullptr;
 		m_shader->HandleUniformSetterMoved(&other, this);
 	}
 
 	UniformSetter::UniformSetter(const UniformSetter& other)
 		: m_shader(other.m_shader),
-		m_material_data(other.m_material_data),
 		m_func(other.m_func)
 	{
 		m_shader->HandleUniformSetterCreated(this);
@@ -28,8 +77,8 @@ namespace e186
 
 	UniformSetter& UniformSetter::operator= (UniformSetter&& other)
 	{
+		other.m_shader = nullptr;
 		m_shader = std::move(other.m_shader);
-		m_material_data = std::move(other.m_material_data);
 		m_func = std::move(other.m_func);
 		m_shader->HandleUniformSetterMoved(&other, this);
 		return *this;
@@ -38,28 +87,30 @@ namespace e186
 	UniformSetter& UniformSetter::operator= (const UniformSetter& other)
 	{
 		m_shader = other.m_shader;
-		m_material_data = other.m_material_data;
 		m_func = other.m_func;
 		return *this;
 	}
 
 	UniformSetter::~UniformSetter()
 	{
-		m_shader->HandleUniformSetterDeleted(this);
+		if (nullptr != m_shader)
+		{
+			m_shader->HandleUniformSetterDeleted(this);
+		}
 	}
 
-	void UniformSetter::operator()(const MaterialData&) const
+	void UniformSetter::operator()(const MaterialData& mat_data)
 	{
-
+		m_func(*m_shader, mat_data);
 	}
 
-	void UniformSetter::UpdateMaterialData(const std::shared_ptr<MaterialData>& mat_data)
+	void UniformSetter::operator()(const Shader& shader, const MaterialData& mat_data)
 	{
-		*this = CreateUniformSetterForShader(*m_shader, mat_data);
+		m_func(shader, mat_data);
 	}
 
 	void UniformSetter::ShaderUpdated(Shader& new_shader)
 	{
-		*this = CreateUniformSetterForShader(new_shader, m_material_data);
+		*this = CreateUniformSetterForShader(new_shader); // TODO: uniform setter mode static/dynamic
 	}
 }
