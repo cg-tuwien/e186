@@ -527,7 +527,7 @@ namespace e186
 		return success;
 	}
 
-	bool Model::GenerateVAOsForShader(MeshIdx mesh_index, const Shader& shader)
+	bool Model::GenerateVAOsForShader(MeshIdx mesh_index, Shader& shader)
 	{
 		return GenerateVAOsWithVertexAttribConfig(shader.vertex_attrib_config());
 	}
@@ -622,21 +622,14 @@ namespace e186
 		return vao;
 	}
 
-	VAOType Mesh::GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader)
+	VAOType Mesh::GetOrCreateVAOForShader(Mesh& mesh, Shader& shader)
 	{
 		return GetOrCreateVAOForVertexAttribConfig(mesh, shader.vertex_attrib_config());
 	}
 
-	RenderConfig Mesh::GetOrCreateRenderConfigForShader(Mesh& mesh, const Shader& shader)
+	MeshRenderConfig Mesh::GetOrCreateRenderConfigForShader(Mesh& mesh, Shader& shader)
 	{
-		auto vao = Mesh::GetOrCreateVAOForShader(mesh, shader);
-		return RenderConfig{ vao, mesh.topology(), mesh.patch_size() };
-	}
-
-	RenderConfig Mesh::GetOrCreateRenderConfigForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig)
-	{
-		auto vao = Mesh::GetOrCreateVAOForVertexAttribConfig(mesh, vertexDataConfig);
-		return RenderConfig{ vao, mesh.topology(), mesh.patch_size() };
+		return MeshRenderConfig(std::ref(mesh), shader);
 	}
 
 	VAOType Model::GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig)
@@ -644,19 +637,14 @@ namespace e186
 		return Mesh::GetOrCreateVAOForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
 	}
 
-	VAOType Model::GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader)
+	VAOType Model::GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, Shader& shader)
 	{
 		return GetOrCreateVAOForMeshForVertexAttribConfig(mesh_index, shader.vertex_attrib_config());
 	}
 
-	RenderConfig Model::GetOrCreateRenderConfigForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig)
+	MeshRenderConfig Model::GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, Shader& shader)
 	{
-		return Mesh::GetOrCreateRenderConfigForVertexAttribConfig(m_meshes[mesh_index], vertexDataConfig);
-	}
-
-	RenderConfig Model::GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, const Shader& shader)
-	{
-		return GetOrCreateRenderConfigForMeshForVertexAttribConfig(mesh_index, shader.vertex_attrib_config());
+		return Mesh::GetOrCreateRenderConfigForShader(m_meshes[mesh_index], shader);
 	}
 
 	//void Model::RenderForVertexAttribConfig(unsigned int meshIndex, const unsigned int vertexDataConfig, GLenum mode) const
@@ -1163,14 +1151,14 @@ namespace e186
 		return retval;
 	}
 
-	MeshRenderData Model::GetOrCreateRenderData(const Shader& shader, const std::vector<MeshRef>& meshes)
+	MeshRenderData Model::GetOrCreateRenderData(Shader& shader, const std::vector<MeshRef>& meshes)
 	{
 		MeshRenderData retval;
 		retval.m_vertex_attrib_config = shader.vertex_attrib_config();
 		
 		for (Mesh& mesh : meshes)
 		{
-			retval.m_mesh_render_configs.emplace_back(std::reference_wrapper<Mesh>(mesh), Mesh::GetOrCreateRenderConfigForShader(mesh, shader));
+			retval.m_mesh_render_configs.emplace_back(std::reference_wrapper<Mesh>(mesh), shader);
 		}
 		
 		return retval;

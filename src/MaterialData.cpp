@@ -785,7 +785,7 @@ namespace e186
 			{
 				setters[i](shader, mat);
 			}
-		});
+		}, usage_mode);
 	}
 
 }

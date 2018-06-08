@@ -98,6 +98,7 @@
     <ClCompile Include="..\src\PointLight.cpp" />
     <ClCompile Include="..\src\QuakeCamera.cpp" />
     <ClCompile Include="..\src\Rect.cpp" />
+    <ClCompile Include="..\src\RenderConfig.cpp" />
     <ClCompile Include="..\src\SampleSceneTessIco.cpp" />
     <ClCompile Include="..\src\SceneSelectorScene.cpp" />
     <ClCompile Include="..\src\Shader.cpp" />

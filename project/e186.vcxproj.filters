@@ -422,8 +422,11 @@
     <ClCompile Include="..\src\Rect.cpp">
       <Filter>Source Files\data</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\RenderConfig.cpp">
+      <Filter>Source Files\shader</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\UniformSetter.cpp">
-      <Filter>Source Files\material</Filter>
+      <Filter>Source Files\shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

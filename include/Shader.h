@@ -94,6 +94,9 @@ namespace e186
 		void HandleUniformSetterCreated(const UniformSetter* unisetter);
 		void HandleUniformSetterMoved(const UniformSetter* old_unisetter, const UniformSetter* new_unisetter);
 		void HandleUniformSetterDeleted(const UniformSetter* unisetter);
+		void HandleMeshRenderConfigCreated(const MeshRenderConfig* mesh_render_cfg);
+		void HandleMeshRenderConfigMoved(const MeshRenderConfig* old_mesh_render_cfg, const MeshRenderConfig* new_mesh_render_cfg);
+		void HandleMeshRenderConfigDeleted(const MeshRenderConfig* mesh_render_cfg);
 
 		void Use() const 
 		{
@@ -514,11 +517,12 @@ namespace e186
 		std::function<void()> m_files_changed;
 #endif
 		std::vector<const UniformSetter*> m_dependent_uniform_setters;
+		std::vector<const MeshRenderConfig*> m_dependent_mesh_render_configs;
 	};
 
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len);
-	void RenderMesh(const Shader& shader, Mesh& mesh);
-	void RenderFullScreen(const Shader& shader);
+	void RenderMesh(Shader& shader, Mesh& mesh);
+	void RenderFullScreen(Shader& shader);
 	void RenderMeshes(const Shader& shader, const MeshRenderData& meshes_and_their_vaos);
 	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, MeshUniformSettersForShader& uniform_setters);
 	void UnbindVAO();

@@ -52,7 +52,7 @@ namespace e186
 	class Mesh
 	{
 		friend class Model;
-		friend void RenderMesh(const Shader& shader, Mesh& mesh);
+		friend void RenderMesh(Shader& shader, Mesh& mesh);
 
 		MeshIdx m_index;
 		std::string m_name;
@@ -199,10 +199,9 @@ namespace e186
 		void set_topology(const GLenum value) { m_topology = value; }
 		void set_patch_size(const int value) { m_patch_size = value; }
 
-		static VAOType GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader);
+		static VAOType GetOrCreateVAOForShader(Mesh& mesh, Shader& shader);
 		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);
-		static RenderConfig GetOrCreateRenderConfigForShader(Mesh& mesh, const Shader& shader);
-		static RenderConfig GetOrCreateRenderConfigForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);
+		static MeshRenderConfig GetOrCreateRenderConfigForShader(Mesh& mesh, Shader& shader);
 	};
 	
 	class Model
@@ -283,11 +282,10 @@ namespace e186
 		void CreateAndUploadGpuData(GLenum vertex_data_usage = GL_STATIC_DRAW, GLenum indices_usage = GL_STATIC_DRAW);
 
 		bool GenerateVAOsWithVertexAttribConfig(VertexAttribData vertexDataConfig);
-		bool GenerateVAOsForShader(MeshIdx mesh_index, const Shader& shader);
+		bool GenerateVAOsForShader(MeshIdx mesh_index, Shader& shader);
 		VAOType GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig);
-		VAOType GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader);
-		RenderConfig GetOrCreateRenderConfigForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig);
-		RenderConfig GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, const Shader& shader);
+		VAOType GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, Shader& shader);
+		MeshRenderConfig GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, Shader& shader);
 
 		const glm::mat4& transformation_matrix() const;
 		const glm::mat4 transformation_matrix(unsigned int meshIndex) const;
@@ -341,7 +339,7 @@ namespace e186
 
 		static MeshUniformSettersForShader CompileUniformSetters(Shader& shader, const std::vector<MeshRef>& meshes, UniformSetterUsageMode usage_mode = UniformSetterUsageMode::Static);
 
-		static MeshRenderData GetOrCreateRenderData(const Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshRenderData GetOrCreateRenderData(Shader& shader, const std::vector<MeshRef>& meshes);
 
 		Mesh& mesh_at(unsigned int meshIndex);
 

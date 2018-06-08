@@ -1227,6 +1227,48 @@ namespace e186
 		}
 	}
 
+
+	void Shader::HandleMeshRenderConfigCreated(const MeshRenderConfig* mesh_render_cfg)
+	{
+		if (std::find(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), mesh_render_cfg) == m_dependent_mesh_render_configs.end())
+		{
+			// not found => insert
+			m_dependent_mesh_render_configs.push_back(mesh_render_cfg);
+		}
+		else
+		{
+			log_warning("MeshRenderConfig at address[%p] not found in HandleMeshRenderConfigCreated", mesh_render_cfg);
+		}
+	}
+
+	void Shader::HandleMeshRenderConfigMoved(const MeshRenderConfig* old_mesh_render_cfg, const MeshRenderConfig* new_mesh_render_cfg)
+	{
+		auto found = std::find(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), old_mesh_render_cfg);
+		if (found != m_dependent_mesh_render_configs.end())
+		{
+			*found = new_mesh_render_cfg;
+		}
+		else
+		{
+			log_warning("MeshRenderConfig at address[%p] not found in HandleMeshRenderConfigMoved", old_mesh_render_cfg);
+		}
+	}
+
+	void Shader::HandleMeshRenderConfigDeleted(const MeshRenderConfig* mesh_render_cfg)
+	{
+		auto to_remove = std::remove(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), mesh_render_cfg);
+		if (to_remove != m_dependent_mesh_render_configs.end())
+		{
+			m_dependent_mesh_render_configs.erase(to_remove);
+		}
+		else
+		{
+			log_warning("MeshRenderConfig at address[%p] not found in HandleMeshRenderConfigDeleted", mesh_render_cfg);
+		}
+	}
+
+
+
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len)
 	{
 		GLenum mode = shader.kind_of_primitives();
@@ -1242,7 +1284,7 @@ namespace e186
 		glDrawElements(mode, indices_len, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void RenderMesh(const Shader& shader, Mesh& mesh)
+	void RenderMesh(Shader& shader, Mesh& mesh)
 	{
 		//Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
 		auto rnd_cfg = Mesh::GetOrCreateRenderConfigForShader(mesh, shader);
@@ -1261,7 +1303,7 @@ namespace e186
 		glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void RenderFullScreen(const Shader& shader)
+	void RenderFullScreen(Shader& shader)
 	{
 		RenderMesh(shader, Model::GetFullScreenQuadMesh());
 	}
