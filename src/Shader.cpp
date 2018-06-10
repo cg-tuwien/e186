@@ -77,7 +77,8 @@ namespace e186
 		},
 		m_auto_mat_calcers(),
 		m_sampler_auto_index(0),
-		m_dependent_uniform_setters()
+		m_dependent_uniform_setters(),
+		m_dependent_mesh_render_configs()
 	{
 	}
 
@@ -105,7 +106,8 @@ namespace e186
 		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers)),
 		m_sampler_auto_index(std::move(other.m_sampler_auto_index)),
 
-		m_dependent_uniform_setters(std::move(other.m_dependent_uniform_setters))
+		m_dependent_uniform_setters(std::move(other.m_dependent_uniform_setters)),
+		m_dependent_mesh_render_configs(std::move(other.m_dependent_mesh_render_configs))
 	{
 		other.m_prog_handle = 0;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
@@ -145,6 +147,7 @@ namespace e186
 		m_sampler_auto_index = std::move(other.m_sampler_auto_index);
 
 		m_dependent_uniform_setters = std::move(other.m_dependent_uniform_setters);
+		m_dependent_mesh_render_configs = std::move(other.m_dependent_mesh_render_configs);
 
 		log_debug("Move assigning Shader with m_prog_handle[%u]", m_prog_handle);
 		return *this;
@@ -164,6 +167,7 @@ namespace e186
 		m_kind_of_primitives = other.m_kind_of_primitives;
 		m_auto_matrices = other.m_auto_matrices;
 		m_dependent_uniform_setters = other.m_dependent_uniform_setters;
+		m_dependent_mesh_render_configs = other.m_dependent_mesh_render_configs;
 	}
 
 	Shader::~Shader()
@@ -869,6 +873,24 @@ namespace e186
 				reloaded.CopyConfigFrom(*this);
 				reloaded.Build();
 				*this = std::move(reloaded);
+				
+				// Inform all the UniformSetters about this change
+				// (make a copy of the vector because the original might/will
+				//  be modified by uniform setters calling Handle...() methods)
+				auto uniform_setters_to_update = m_dependent_uniform_setters; 
+				for (auto* unisetter : uniform_setters_to_update)
+				{
+					unisetter->ShaderUpdated(*this);
+				}
+
+				// Inform all the MeshRenderConfigs about this change
+				// (make a copy of the vector because the original might/will
+				//  be modified by uniform setters calling Handle...() methods)
+				auto mesh_render_configs_to_update = m_dependent_mesh_render_configs;
+				for (auto* msh_rdr_cfg : mesh_render_configs_to_update)
+				{
+					msh_rdr_cfg->ShaderUpdated(*this);
+				}
 			}
 			catch (e186::ExceptionWithCallstack& ecs)
 			{
@@ -1188,7 +1210,7 @@ namespace e186
 		return shaderHandle;
 	}
 
-	void Shader::HandleUniformSetterCreated(const UniformSetter* unisetter) 
+	void Shader::HandleUniformSetterCreated(UniformSetter* unisetter) 
 	{
 		if (std::find(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), unisetter) == m_dependent_uniform_setters.end())
 		{
@@ -1201,20 +1223,7 @@ namespace e186
 		}
 	}
 
-	void Shader::HandleUniformSetterMoved(const UniformSetter* old_unisetter, const UniformSetter* new_unisetter)
-	{
-		auto found = std::find(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), old_unisetter);
-		if (found != m_dependent_uniform_setters.end())
-		{
-			*found = new_unisetter;
-		}
-		else
-		{
-			log_warning("UniformSetter at address[%p] not found in HandleUniformSetterMoved", old_unisetter);
-		}
-	}
-
-	void Shader::HandleUniformSetterDeleted(const UniformSetter* unisetter)
+	void Shader::HandleUniformSetterDeleted(UniformSetter* unisetter)
 	{
 		auto to_remove = std::remove(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), unisetter);
 		if (to_remove != m_dependent_uniform_setters.end())
@@ -1228,7 +1237,7 @@ namespace e186
 	}
 
 
-	void Shader::HandleMeshRenderConfigCreated(const MeshRenderConfig* mesh_render_cfg)
+	void Shader::HandleMeshRenderConfigCreated(MeshRenderConfig* mesh_render_cfg)
 	{
 		if (std::find(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), mesh_render_cfg) == m_dependent_mesh_render_configs.end())
 		{
@@ -1241,20 +1250,7 @@ namespace e186
 		}
 	}
 
-	void Shader::HandleMeshRenderConfigMoved(const MeshRenderConfig* old_mesh_render_cfg, const MeshRenderConfig* new_mesh_render_cfg)
-	{
-		auto found = std::find(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), old_mesh_render_cfg);
-		if (found != m_dependent_mesh_render_configs.end())
-		{
-			*found = new_mesh_render_cfg;
-		}
-		else
-		{
-			log_warning("MeshRenderConfig at address[%p] not found in HandleMeshRenderConfigMoved", old_mesh_render_cfg);
-		}
-	}
-
-	void Shader::HandleMeshRenderConfigDeleted(const MeshRenderConfig* mesh_render_cfg)
+	void Shader::HandleMeshRenderConfigDeleted(MeshRenderConfig* mesh_render_cfg)
 	{
 		auto to_remove = std::remove(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), mesh_render_cfg);
 		if (to_remove != m_dependent_mesh_render_configs.end())
@@ -1310,13 +1306,13 @@ namespace e186
 
 	void RenderMeshes(const Shader& shader, const MeshRenderData& mesh_render_data)
 	{
-		// If the following assert fails, you are probably trying to render using the wrong shader!
-		assert(shader.vertex_attrib_config() == mesh_render_data.m_vertex_attrib_config);
-
 		GLenum mode = shader.kind_of_primitives();
 
 		for (const auto& rnd_cfg : mesh_render_data.m_mesh_render_configs)
 		{
+			// If the following assert fails, you are trying to render using an incompatible shader!
+			assert(rnd_cfg.shader() == nullptr || shader.vertex_attrib_config() == rnd_cfg.shader()->vertex_attrib_config());
+
 			Mesh& mesh = rnd_cfg.mesh();
 
 			if (GL_PATCHES == mode)
@@ -1335,10 +1331,6 @@ namespace e186
 
 	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, MeshUniformSettersForShader& uniform_setters)
 	{
-		// If one of the following asserts fails, you are probably trying to render using the wrong shader!
-		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
-		//assert(shader.handle() == uniform_setters.m_shader_handle);
-
 		GLenum mode = shader.kind_of_primitives();
 
 		assert(meshes_and_their_vaos.m_mesh_render_configs.size() == uniform_setters.m_mesh_uniform_setters.size());
@@ -1346,6 +1338,10 @@ namespace e186
 		for (auto i = 0; i < n; ++i)
 		{
 			const auto& rnd_cfg = meshes_and_their_vaos.m_mesh_render_configs[i];
+
+			// If the following assert fails, you are trying to render using an incompatible shader!
+			assert(rnd_cfg.shader() == nullptr || shader.vertex_attrib_config() == rnd_cfg.shader()->vertex_attrib_config());
+
 			Mesh& mesh = rnd_cfg.mesh();
 			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters.m_mesh_uniform_setters[i])));
 			auto& unisetter = std::get<1>(uniform_setters.m_mesh_uniform_setters[i]);

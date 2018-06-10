@@ -91,12 +91,10 @@ namespace e186
 		void set_kind_of_primitives(GLenum mode);
 		void SetAutoMatrices(const glm::mat4& transformationMatrix, const glm::mat4& modelMatrix, const glm::mat4& viewMatrix, const glm::mat4& projectionMatrix);
 		GLint QueryPatchVertices();
-		void HandleUniformSetterCreated(const UniformSetter* unisetter);
-		void HandleUniformSetterMoved(const UniformSetter* old_unisetter, const UniformSetter* new_unisetter);
-		void HandleUniformSetterDeleted(const UniformSetter* unisetter);
-		void HandleMeshRenderConfigCreated(const MeshRenderConfig* mesh_render_cfg);
-		void HandleMeshRenderConfigMoved(const MeshRenderConfig* old_mesh_render_cfg, const MeshRenderConfig* new_mesh_render_cfg);
-		void HandleMeshRenderConfigDeleted(const MeshRenderConfig* mesh_render_cfg);
+		void HandleUniformSetterCreated(UniformSetter* unisetter);
+		void HandleUniformSetterDeleted(UniformSetter* unisetter);
+		void HandleMeshRenderConfigCreated(MeshRenderConfig* mesh_render_cfg);
+		void HandleMeshRenderConfigDeleted(MeshRenderConfig* mesh_render_cfg);
 
 		void Use() const 
 		{
@@ -516,8 +514,8 @@ namespace e186
 #if defined(_DEBUG)
 		std::function<void()> m_files_changed;
 #endif
-		std::vector<const UniformSetter*> m_dependent_uniform_setters;
-		std::vector<const MeshRenderConfig*> m_dependent_mesh_render_configs;
+		std::vector<UniformSetter*> m_dependent_uniform_setters;
+		std::vector<MeshRenderConfig*> m_dependent_mesh_render_configs;
 	};
 
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len);

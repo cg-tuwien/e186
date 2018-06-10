@@ -1154,8 +1154,7 @@ namespace e186
 	MeshRenderData Model::GetOrCreateRenderData(Shader& shader, const std::vector<MeshRef>& meshes)
 	{
 		MeshRenderData retval;
-		retval.m_vertex_attrib_config = shader.vertex_attrib_config();
-		
+
 		for (Mesh& mesh : meshes)
 		{
 			retval.m_mesh_render_configs.emplace_back(std::reference_wrapper<Mesh>(mesh), shader);
@@ -1173,8 +1172,6 @@ namespace e186
 
 	void Append(MeshRenderData& vaos, const MeshRenderData& vaos_to_append)
 	{
-		assert(vaos.m_vertex_attrib_config == VertexAttribData::Nothing || vaos.m_vertex_attrib_config == vaos_to_append.m_vertex_attrib_config);
-		vaos.m_vertex_attrib_config = vaos_to_append.m_vertex_attrib_config;
 		vaos.m_mesh_render_configs.insert(std::end(vaos.m_mesh_render_configs), std::begin(vaos_to_append.m_mesh_render_configs), std::end(vaos_to_append.m_mesh_render_configs));
 	}
 

@@ -52,6 +52,22 @@ namespace e186
 
 	// - - - - - - - - - - - - MeshRenderConfig - - - - - - - - - - - - 
 
+	void MeshRenderConfig::NotifyShaderAboutCreation()
+	{
+		if (nullptr != m_shader)
+		{
+			m_shader->HandleMeshRenderConfigCreated(this);
+		}
+	}
+
+	void MeshRenderConfig::NotifyShaderAboutDeletion()
+	{
+		if (nullptr != m_shader)
+		{
+			m_shader->HandleMeshRenderConfigDeleted(this);
+		}
+	}
+
 	MeshRenderConfig::MeshRenderConfig(MeshRef mesh_ref, Shader& shader) noexcept
 		: RenderConfig(	Mesh::GetOrCreateVAOForShader(mesh_ref, shader), 
 						mesh_ref.get().topology(), 
@@ -60,8 +76,7 @@ namespace e186
 		m_shader(&shader)
 	{
 		// inform the shader about the new MeshRenderConfig
-		assert(is_valid());
-		m_shader->HandleMeshRenderConfigCreated(this);
+		NotifyShaderAboutCreation();
 	}
 
 	MeshRenderConfig::MeshRenderConfig(MeshRef mesh_ref, Shader& shader, const VAOType vao, const GLenum mode, const int patch_size) noexcept
@@ -70,8 +85,7 @@ namespace e186
 		m_shader(&shader)
 	{
 		// inform the shader about the new MeshRenderConfig
-		assert(is_valid());
-		m_shader->HandleMeshRenderConfigCreated(this);
+		NotifyShaderAboutCreation();
 	}
 
 	MeshRenderConfig::MeshRenderConfig(MeshRef mesh_ref, Shader& shader, RenderConfig render_config) noexcept
@@ -80,8 +94,7 @@ namespace e186
 		m_shader(&shader)
 	{
 		// inform the shader about the new MeshRenderConfig
-		assert(is_valid());
-		m_shader->HandleMeshRenderConfigCreated(this);
+		NotifyShaderAboutCreation();
 	}
 
 	MeshRenderConfig::MeshRenderConfig(MeshRenderConfig&& other) noexcept
@@ -89,12 +102,12 @@ namespace e186
 		m_mesh(std::move(other.m_mesh)),
 		m_shader(std::move(other.m_shader))
 	{
-		// invalidate other's vao and shader-pointer to indicate it has been moved from
+		// cleanup other and invalidate its vao and shader-pointer to indicate it has been moved from
+		other.NotifyShaderAboutDeletion();
 		other.m_vao_handle = 0;
 		other.m_shader = nullptr;
 		// inform the shader about the new memory location of the MeshRenderConfig
-		assert(is_valid());
-		m_shader->HandleMeshRenderConfigMoved(&other, this);
+		NotifyShaderAboutCreation();
 	}
 
 	MeshRenderConfig::MeshRenderConfig(const MeshRenderConfig& other) noexcept
@@ -103,47 +116,47 @@ namespace e186
 		m_shader(other.m_shader)
 	{
 		// inform the shader about the new MeshRenderConfig (copy)
-		assert(is_valid());
-		m_shader->HandleMeshRenderConfigCreated(this);
+		NotifyShaderAboutCreation();
 	}
 
 	MeshRenderConfig& MeshRenderConfig::operator=(MeshRenderConfig&& other) noexcept
 	{
-		assert(other.is_valid());
+		// possibly clean myself up
+		NotifyShaderAboutDeletion();
+
+		// move data
 		RenderConfig::operator=(std::move(other));
 		m_mesh = std::move(other.m_mesh);
 		m_shader = std::move(other.m_shader);
-		// invalidate other's vao and shader-pointer to indicate it has been moved from
+		
+		// Cleanup other and invalidate its vao and shader-pointer to indicate it has been moved from
+		other.NotifyShaderAboutDeletion();
 		other.m_vao_handle = 0;
 		other.m_shader = nullptr;
+
 		// inform the shader about the new memory location of the MeshRenderConfig
-		assert(is_valid());
-		m_shader->HandleMeshRenderConfigMoved(&other, this);
+		NotifyShaderAboutCreation();
 		return *this;
 	}
 
 	MeshRenderConfig& MeshRenderConfig::operator=(const MeshRenderConfig& other) noexcept
 	{
-		auto* shader_at_the_beginning = m_shader;
-		assert(other.is_valid());
+		// possibly clean myself up
+		NotifyShaderAboutDeletion();
+
+		// copy data
 		RenderConfig::operator=(other);
 		m_mesh = other.m_mesh;
 		m_shader = other.m_shader;
-		// inform shaders, if shaders have changed:
-		if (shader_at_the_beginning != m_shader)
-		{
-			shader_at_the_beginning->HandleMeshRenderConfigDeleted(this);
-			m_shader->HandleMeshRenderConfigCreated(this);
-		}
+		
+		// inform the shader about the new memory location of the MeshRenderConfig
+		NotifyShaderAboutCreation();
 		return *this;
 	}
 	
 	MeshRenderConfig::~MeshRenderConfig()
 	{
-		if (nullptr != m_shader)
-		{
-			m_shader->HandleMeshRenderConfigDeleted(this);
-		}
+		NotifyShaderAboutDeletion();
 	}
 
 	void MeshRenderConfig::ShaderUpdated(Shader& new_shader)

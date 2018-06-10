@@ -66,6 +66,10 @@ namespace e186
 		bool is_valid() const { return nullptr != m_shader; }
 
 	private:
+		void NotifyShaderAboutCreation();
+		void NotifyShaderAboutDeletion();
+
+	private:
 		Shader* m_shader;
 		UniformSetterFunc m_func;
 		UniformSetterUsageMode m_usage_mode;

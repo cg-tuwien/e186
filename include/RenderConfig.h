@@ -49,6 +49,11 @@ namespace e186
 
 		Mesh& mesh() const { return m_mesh; }
 		Shader* shader() const { return m_shader; }
+
+	private:
+		void NotifyShaderAboutCreation();
+		void NotifyShaderAboutDeletion();
+
 	private:
 		MeshRef m_mesh;
 		Shader* m_shader;
