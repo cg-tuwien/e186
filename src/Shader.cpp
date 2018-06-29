@@ -29,9 +29,10 @@ namespace e186
 		m_compute_shader_sources(),
 		m_fragment_outputs(),
 		m_uniform_locations(),
+		m_uniform_block_indices(),
 		m_transform_feedback_varyings(),
 		m_transform_feedback_buffer_mode(0),
-		m_shaderHandles { 0, 0, 0, 0, 0, 0, },
+		m_shader_handles { 0, 0, 0, 0, 0, 0, },
 		m_vertex_attrib_config(VertexAttribData::Nothing),
 		m_kind_of_primitives(GL_TRIANGLES),
 		m_auto_matrices(),
@@ -75,7 +76,9 @@ namespace e186
 			glm::mat4(1.0)	// 15 AutoMatrix::TransformMatrix | AutoMatrix::ModelMatrix | AutoMatrix::ViewMatrix | AutoMatrix::ProjectionMatrix
 		},
 		m_auto_mat_calcers(),
-		m_sampler_auto_index(0)
+		m_sampler_auto_index(0),
+		m_dependent_uniform_setters(),
+		m_dependent_mesh_render_configs()
 	{
 	}
 
@@ -89,22 +92,27 @@ namespace e186
 		m_compute_shader_sources(std::move(other.m_compute_shader_sources)),
 		m_fragment_outputs(std::move(other.m_fragment_outputs)),
 		m_uniform_locations(std::move(other.m_uniform_locations)),
+		m_uniform_block_indices(std::move(other.m_uniform_block_indices)),
 		m_transform_feedback_varyings(std::move(other.m_transform_feedback_varyings)),
 		m_transform_feedback_buffer_mode(std::move(other.m_transform_feedback_buffer_mode)),
-		m_shaderHandles(std::move(other.m_shaderHandles)),
+		m_shader_handles(std::move(other.m_shader_handles)),
 		m_vertex_attrib_config(other.m_vertex_attrib_config),
 		m_kind_of_primitives(other.m_kind_of_primitives),
 		m_auto_matrices(std::move(other.m_auto_matrices)),
+
 		m_auto_mats_action_config(std::move(other.m_auto_mats_action_config)),
 		m_auto_mat_do_calc(std::move(other.m_auto_mat_do_calc)),
 		m_auto_mat_action_cache(std::move(other.m_auto_mat_action_cache)),
 		m_auto_mat_calcers(std::move(other.m_auto_mat_calcers)),
-		m_sampler_auto_index(std::move(other.m_sampler_auto_index))
+		m_sampler_auto_index(std::move(other.m_sampler_auto_index)),
+
+		m_dependent_uniform_setters(std::move(other.m_dependent_uniform_setters)),
+		m_dependent_mesh_render_configs(std::move(other.m_dependent_mesh_render_configs))
 	{
 		other.m_prog_handle = 0;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
 		other.m_transform_feedback_buffer_mode = 0;
-		log_debug("Move constructing Shader with m_prog_handle[%u]", m_prog_handle);
+		log_debug("Move-constructing Shader with m_prog_handle[%u]", m_prog_handle);
 	}
 
 	Shader& Shader::operator=(Shader&& other) noexcept
@@ -114,11 +122,11 @@ namespace e186
 
 		m_vertex_attrib_config = other.m_vertex_attrib_config;
 		other.m_vertex_attrib_config = VertexAttribData::Nothing;
+		
+		m_transform_feedback_varyings = std::move(other.m_transform_feedback_varyings);
 
 		m_transform_feedback_buffer_mode = other.m_transform_feedback_buffer_mode;
 		other.m_transform_feedback_buffer_mode = 0;
-
-		m_kind_of_primitives = other.m_kind_of_primitives;
 
 		m_vertex_shader_sources = std::move(other.m_vertex_shader_sources);
 		m_tess_control_shader_sources = std::move(other.m_tess_control_shader_sources);
@@ -128,8 +136,9 @@ namespace e186
 		m_compute_shader_sources = std::move(other.m_compute_shader_sources);
 		m_fragment_outputs = std::move(other.m_fragment_outputs);
 		m_uniform_locations = std::move(other.m_uniform_locations); 
-		m_transform_feedback_varyings = std::move(other.m_transform_feedback_varyings);
-		m_shaderHandles = std::move(other.m_shaderHandles);
+		m_uniform_block_indices = std::move(other.m_uniform_block_indices);
+		m_shader_handles = std::move(other.m_shader_handles);
+		m_kind_of_primitives = std::move(other.m_kind_of_primitives);
 		m_auto_matrices = std::move(other.m_auto_matrices);
 		m_auto_mats_action_config = std::move(other.m_auto_mats_action_config);
 		m_auto_mat_do_calc = std::move(other.m_auto_mat_do_calc);
@@ -137,14 +146,33 @@ namespace e186
 		m_auto_mat_calcers = std::move(other.m_auto_mat_calcers);
 		m_sampler_auto_index = std::move(other.m_sampler_auto_index);
 
+		m_dependent_uniform_setters = std::move(other.m_dependent_uniform_setters);
+		m_dependent_mesh_render_configs = std::move(other.m_dependent_mesh_render_configs);
+
 		log_debug("Move assigning Shader with m_prog_handle[%u]", m_prog_handle);
 		return *this;
 	}
 
+	void Shader::CopyConfigFrom(const Shader& other)
+	{
+		m_transform_feedback_varyings = other.m_transform_feedback_varyings;
+		m_transform_feedback_buffer_mode = other.m_transform_feedback_buffer_mode;
+		m_vertex_shader_sources = other.m_vertex_shader_sources;
+		m_tess_control_shader_sources = other.m_tess_control_shader_sources;
+		m_tess_eval_shader_sources = other.m_tess_eval_shader_sources;
+		m_geometry_shader_sources = other.m_geometry_shader_sources;
+		m_fragment_shader_sources = other.m_fragment_shader_sources;
+		m_compute_shader_sources = other.m_compute_shader_sources;
+		m_fragment_outputs = other.m_fragment_outputs;
+		m_kind_of_primitives = other.m_kind_of_primitives;
+		m_auto_matrices = other.m_auto_matrices;
+		m_dependent_uniform_setters = other.m_dependent_uniform_setters;
+		m_dependent_mesh_render_configs = other.m_dependent_mesh_render_configs;
+	}
 
 	Shader::~Shader()
 	{
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		Engine::current()->StopFileChangeNotifyCallbacks(&m_files_changed);
 #endif
 		if (0 != m_prog_handle)
@@ -340,16 +368,52 @@ namespace e186
 	//	return c_strs;
 	//}
 
-	std::string Shader::ConcatSources(const std::vector<std::string>& sources)
+	std::string Shader::ConcatSources(const std::vector<std::tuple<std::string, ShaderSourceInfo>>& sources)
 	{
 		std::stringstream ss;
 		for (const auto& s : sources)
 		{
-			ss << s;
+			const auto path_or_content = std::get<0>(s);
+			const auto options = std::get<1>(s);
+			
+			if ((options & ShaderSourceInfo::FromFile) != ShaderSourceInfo::Nothing)
+				ss << LoadFromFile(path_or_content);
+			else
+				ss << path_or_content;
+
+			if ((options & ShaderSourceInfo::AppendNewline) != ShaderSourceInfo::Nothing)
+				ss << std::endl;
 		}
 		return ss.str();
 	}
 
+#if defined(_DEBUG)
+	void Shader::SetUpNotificationsForAllFiles(const std::vector<std::tuple<std::string, ShaderSourceInfo>>& sources)
+	{
+		// TODO: Gather AAAALALLLL files and pass all of them to the Engine for notifications
+		std::vector<std::string> files;
+		for (const auto& s : sources)
+		{
+			const auto path_or_content = std::get<0>(s);
+			const auto options = std::get<1>(s);
+			if ((options & ShaderSourceInfo::FromFile) != ShaderSourceInfo::Nothing)
+			{
+				files.push_back("assets/shaders/blinnphong.vert");
+				files.push_back("assets/shaders/blinnphong.frag");
+				Engine::current()->NotifyOnFileChanges(std::move(files), &m_files_changed);
+			}
+		}
+	}
+#endif
+
+	void Shader::StoreShaderSource(std::vector<std::tuple<std::string, ShaderSourceInfo>>& shader_sources, std::string shader_source, ShaderSourceInfo options)
+	{
+		if ((ShaderSourceInfo::FromFile & options) == ShaderSourceInfo::Nothing)
+		{
+			options |= ShaderSourceInfo::FromMemory;
+		}
+		shader_sources.push_back(std::make_tuple(std::move(shader_source), options));
+	}
 
 	void Shader::PrepareAutoMatActionConfigs()
 	{
@@ -442,39 +506,39 @@ namespace e186
 
 	std::string Shader::kNewLine = "\n";
 
-	Shader& Shader::AddVertexShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddVertexShaderSourceFromFile(std::string path, ShaderSourceInfo options)
 	{
-		return AddVertexShaderSource(LoadFromFile(path), append_newline);
+		return AddVertexShaderSource(path, options | ShaderSourceInfo::FromFile);
 	}
 
-	Shader& Shader::AddTessellationControlShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddTessellationControlShaderSourceFromFile(std::string path, ShaderSourceInfo options)
 	{
-		return AddTessellationControlShaderSource(LoadFromFile(path), append_newline);
+		return AddTessellationControlShaderSource(path, options | ShaderSourceInfo::FromFile);
 	}
 
-	Shader& Shader::AddTessellationEvaluationShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddTessellationEvaluationShaderSourceFromFile(std::string path, ShaderSourceInfo options)
 	{
-		return AddTessellationEvaluationShaderSource(LoadFromFile(path), append_newline);
+		return AddTessellationEvaluationShaderSource(path, options | ShaderSourceInfo::FromFile);
 	}
 
-	Shader& Shader::AddGeometryShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddGeometryShaderSourceFromFile(std::string path, ShaderSourceInfo options)
 	{
-		return AddGeometryShaderSource(LoadFromFile(path), append_newline);
+		return AddGeometryShaderSource(path, options | ShaderSourceInfo::FromFile);
 	}
 
-	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, ShaderSourceInfo options)
 	{
-		return AddFragmentShaderSource(LoadFromFile(path), append_newline);
+		return AddFragmentShaderSource(path, options | ShaderSourceInfo::FromFile);
 	}
 
-	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline)
+	Shader& Shader::AddFragmentShaderSourceFromFile(std::string path, std::vector<std::tuple<GLuint, const GLchar*>> outputs, ShaderSourceInfo options)
 	{
-		return AddFragmentShaderSource(LoadFromFile(path), outputs, append_newline);
+		return AddFragmentShaderSource(path, outputs, options | ShaderSourceInfo::FromFile);
 	}
 
-	Shader& Shader::AddComputeShaderSourceFromFile(std::string path, bool append_newline)
+	Shader& Shader::AddComputeShaderSourceFromFile(std::string path, ShaderSourceInfo options)
 	{
-		return AddComputeShaderSource(LoadFromFile(path), append_newline);
+		return AddComputeShaderSource(path, options | ShaderSourceInfo::FromFile);
 	}
 
 	Shader& Shader::SetTransformFeedbackVaryings(std::vector<const char*> varyings, GLenum buffer_mode)
@@ -484,40 +548,33 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::AddVertexShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddVertexShaderSource(std::string shader_source, ShaderSourceInfo options)
 	{
-		m_vertex_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
+		StoreShaderSource(m_vertex_shader_sources, std::move(shader_source), options);
 		return *this;
 	}
 
-	Shader& Shader::AddTessellationControlShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddTessellationControlShaderSource(std::string shader_source, ShaderSourceInfo options)
 	{
-		m_tess_control_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
+		StoreShaderSource(m_tess_control_shader_sources, std::move(shader_source), options);
 		return *this;
 	}
 
-	Shader& Shader::AddTessellationEvaluationShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddTessellationEvaluationShaderSource(std::string shader_source, ShaderSourceInfo options)
 	{
-		m_tess_eval_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
+		StoreShaderSource(m_tess_eval_shader_sources, std::move(shader_source), options);
 		return *this;
 	}
 
-	Shader& Shader::AddGeometryShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddGeometryShaderSource(std::string shader_source, ShaderSourceInfo options)
 	{
-		m_geometry_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
+		StoreShaderSource(m_geometry_shader_sources, std::move(shader_source), options);
 		return *this;
 	}
 
-	Shader& Shader::AddFragmentShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddFragmentShaderSource(std::string shader_source, ShaderSourceInfo options)
 	{
-		m_fragment_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
-		return *this;
-	}
-
-	Shader& Shader::AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, bool append_newline)
-	{
-		AddFragmentShaderSource(std::move(append_newline ? shader_source + kNewLine : shader_source));
-		AddFragmentShaderOutput(std::move(outputs));
+		StoreShaderSource(m_fragment_shader_sources, std::move(shader_source), options);
 		return *this;
 	}
 
@@ -527,45 +584,51 @@ namespace e186
 		return *this;
 	}
 
-	Shader& Shader::AddComputeShaderSource(std::string shader_source, bool append_newline)
+	Shader& Shader::AddFragmentShaderSource(std::string shader_source, std::vector<std::tuple<GLuint, const GLchar*>> outputs, ShaderSourceInfo options)
 	{
-		m_compute_shader_sources.push_back(std::move(append_newline ? shader_source + kNewLine : shader_source));
+		AddFragmentShaderSource(std::move(shader_source), options);
+		AddFragmentShaderOutput(std::move(outputs));
 		return *this;
 	}
 
-	Shader& Shader::AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, bool append_newline)
+	Shader& Shader::AddComputeShaderSource(std::string shader_source, ShaderSourceInfo options)
 	{
-		auto shader_src_with_or_without_newline = append_newline ? shader_source + kNewLine : shader_source;
+		StoreShaderSource(m_compute_shader_sources, std::move(shader_source), options);
+		return *this;
+	}
+
+	Shader& Shader::AddToMultipleShaderSources(std::string shader_source, ShaderType which_shaders, ShaderSourceInfo options)
+	{
 		if (ShaderType::None != (which_shaders & ShaderType::Vertex))
 		{
-			AddVertexShaderSource(shader_src_with_or_without_newline);
+			AddVertexShaderSource(shader_source, options);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::TessControl))
 		{
-			AddTessellationControlShaderSource(shader_src_with_or_without_newline);
+			AddTessellationControlShaderSource(shader_source, options);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::TessEval))
 		{
-			AddTessellationEvaluationShaderSource(shader_src_with_or_without_newline);
+			AddTessellationEvaluationShaderSource(shader_source, options);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Geometry))
 		{
-			AddGeometryShaderSource(shader_src_with_or_without_newline);
+			AddGeometryShaderSource(shader_source, options);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Fragment))
 		{
-			AddFragmentShaderSource(shader_src_with_or_without_newline);
+			AddFragmentShaderSource(shader_source, options);
 		}
 		if (ShaderType::None != (which_shaders & ShaderType::Compute))
 		{
-			AddComputeShaderSource(shader_src_with_or_without_newline);
+			AddComputeShaderSource(shader_source, options);
 		}
 		return *this;
 	}
 
 	bool Shader::has_tessellation_shaders() const
 	{
-		return 0 != m_shaderHandles[1] && 0 != m_shaderHandles[2];
+		return 0 != m_shader_handles[1] && 0 != m_shader_handles[2];
 	}
 
 	VertexAttribData Shader::vertex_attrib_config() const
@@ -585,7 +648,7 @@ namespace e186
 
 	bool Shader::has_geometry_shader() const
 	{
-		return 0 != m_shaderHandles[3];
+		return 0 != m_shader_handles[3];
 	}
 
 	GLint Shader::QueryPatchVertices()
@@ -732,27 +795,27 @@ namespace e186
 
 	Shader& Shader::Build()
 	{
-		m_shaderHandles[0] = m_vertex_shader_sources.empty()		? 0 : Compile(ConcatSources(m_vertex_shader_sources),		GL_VERTEX_SHADER);
-		m_shaderHandles[1] = m_tess_control_shader_sources.empty()	? 0 : Compile(ConcatSources(m_tess_control_shader_sources),	GL_TESS_CONTROL_SHADER);
-		m_shaderHandles[2] = m_tess_eval_shader_sources.empty()		? 0 : Compile(ConcatSources(m_tess_eval_shader_sources),	GL_TESS_EVALUATION_SHADER);
-		m_shaderHandles[3] = m_geometry_shader_sources.empty()		? 0 : Compile(ConcatSources(m_geometry_shader_sources),		GL_GEOMETRY_SHADER);
-		m_shaderHandles[4] = m_fragment_shader_sources.empty()		? 0	: Compile(ConcatSources(m_fragment_shader_sources),		GL_FRAGMENT_SHADER);
-		m_shaderHandles[5] = m_compute_shader_sources.empty()		? 0	: Compile(ConcatSources(m_compute_shader_sources),      GL_COMPUTE_SHADER);
+		m_shader_handles[0] = m_vertex_shader_sources.empty()		? 0 : Compile(ConcatSources(m_vertex_shader_sources),		GL_VERTEX_SHADER);
+		m_shader_handles[1] = m_tess_control_shader_sources.empty()	? 0 : Compile(ConcatSources(m_tess_control_shader_sources),	GL_TESS_CONTROL_SHADER);
+		m_shader_handles[2] = m_tess_eval_shader_sources.empty()	? 0 : Compile(ConcatSources(m_tess_eval_shader_sources),	GL_TESS_EVALUATION_SHADER);
+		m_shader_handles[3] = m_geometry_shader_sources.empty()		? 0 : Compile(ConcatSources(m_geometry_shader_sources),		GL_GEOMETRY_SHADER);
+		m_shader_handles[4] = m_fragment_shader_sources.empty()		? 0	: Compile(ConcatSources(m_fragment_shader_sources),		GL_FRAGMENT_SHADER);
+		m_shader_handles[5] = m_compute_shader_sources.empty()		? 0	: Compile(ConcatSources(m_compute_shader_sources),      GL_COMPUTE_SHADER);
 
 		const auto progHandle = glCreateProgram();
 		m_prog_handle = progHandle;
 
 		for (int i = 0; i < kMaxShaders; ++i)
 		{
-			if (0 == m_shaderHandles[i])
+			if (0 == m_shader_handles[i])
 			{
 				continue;
 			}
-			glAttachShader(progHandle, m_shaderHandles[i]);
+			glAttachShader(progHandle, m_shader_handles[i]);
 			CheckErrorAndPrintInfoLog("Shader::Build after glAttachShader", "Could not attach shader");
 		}
 
-		if (0 != m_shaderHandles[4])
+		if (0 != m_shader_handles[4])
 		{
 			// before linking, define outputs of fragment-shader
 			for (auto const& outp : m_fragment_outputs)
@@ -763,9 +826,10 @@ namespace e186
 				CheckErrorAndPrintInfoLog((std::string("Shader::Build after output location for ") + name).c_str(), "Could not bind fragment data location");
 			}
 		}
-		else
+
+		if (0 == m_shader_handles[0] && 0 == m_shader_handles[5])
 		{
-			log_warning("Shader Handle for fragment shader is 0");
+			log_error("Both, the shader handle for the vertex shader and for the compute shader are 0");
 		}
 
 		// Don't define attribute locations - set them im shader files using layout (location = 0)
@@ -795,21 +859,64 @@ namespace e186
 		PrepareAutoMatActionConfigs();
 		CreateAutoMatCalcers();
 
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+		if (is_compute_shader())
+		{
+			glGetProgramiv(progHandle, GL_COMPUTE_WORK_GROUP_SIZE, &m_work_group_sizes[0]);
+		}
+
+#if defined(_DEBUG)
 		m_files_changed = [this]()
 		{
-			log_info("RELOAD THIS SHADER!");
-			Shader nuShader;
-			nuShader.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
-				.AddVertexShaderSourceFromFile("assets/shaders/blinnphong.vert")
-				.AddFragmentShaderSourceFromFile("assets/shaders/blinnphong.frag", { std::make_tuple(0, "oFragColor") })
-				.Build();
-			*this = std::move(nuShader);
+			try
+			{
+				Shader reloaded;
+				reloaded.CopyConfigFrom(*this);
+				reloaded.Build();
+				*this = std::move(reloaded);
+				
+				// Inform all the UniformSetters about this change
+				// (make a copy of the vector because the original might/will
+				//  be modified by uniform setters calling Handle...() methods)
+				auto uniform_setters_to_update = m_dependent_uniform_setters; 
+				for (auto* unisetter : uniform_setters_to_update)
+				{
+					unisetter->ShaderUpdated(*this);
+				}
+
+				// Inform all the MeshRenderConfigs about this change
+				// (make a copy of the vector because the original might/will
+				//  be modified by uniform setters calling Handle...() methods)
+				auto mesh_render_configs_to_update = m_dependent_mesh_render_configs;
+				for (auto* msh_rdr_cfg : mesh_render_configs_to_update)
+				{
+					msh_rdr_cfg->ShaderUpdated(*this);
+				}
+			}
+			catch (e186::ExceptionWithCallstack& ecs)
+			{
+				std::cout << std::endl << "Couldn't reload shader." << std::endl;
+				std::cout << std::endl << ecs.what() << std::endl;
+				std::cout << std::endl << ecs.callstack() << std::endl;
+			}
+			catch (std::exception& e)
+			{
+				std::cout << std::endl << "Couldn't reload shader." << std::endl;
+				std::cout << std::endl << e.what() << std::endl;
+			}
 		};
-		std::vector<std::string> files;
-		files.push_back("assets/shaders/blinnphong.vert");
-		files.push_back("assets/shaders/blinnphong.frag");
-		Engine::current()->NotifyOnFileChanges(std::move(files), &m_files_changed);
+		// gather all files which contribute to the shader's source
+		std::vector<std::string> all_source_files;
+		for (const auto& collection : { m_vertex_shader_sources, m_tess_control_shader_sources, m_tess_eval_shader_sources, m_geometry_shader_sources, m_fragment_shader_sources, m_compute_shader_sources })
+		{
+			for (const auto& source_entry : collection)
+			{
+				if ((std::get<1>(source_entry) & ShaderSourceInfo::FromFile) != ShaderSourceInfo::Nothing)
+				{
+					all_source_files.push_back(std::get<0>(source_entry));
+				}
+			}
+		}
+		Engine::current()->NotifyOnFileChanges(all_source_files, &m_files_changed);
 #endif
 
 		CheckErrorAndPrintInfoLog("Shader::Build END", "Something went wrong");
@@ -1027,16 +1134,6 @@ namespace e186
 		return loc->second;
 	}
 
-	Shader::operator GLuint() const
-	{
-		return m_prog_handle;
-	}
-
-	GLuint Shader::handle() const
-	{
-		return m_prog_handle;
-	}
-
 	std::string Shader::version_string()
 	{
 		auto version = std::string("#version ") + std::to_string(Context::current()->gl_major_version() * 100 + Context::current()->gl_minor_version() * 10);
@@ -1113,85 +1210,154 @@ namespace e186
 		return shaderHandle;
 	}
 
+	void Shader::HandleUniformSetterCreated(UniformSetter* unisetter) 
+	{
+		if (std::find(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), unisetter) == m_dependent_uniform_setters.end())
+		{
+			// not found => insert
+			m_dependent_uniform_setters.push_back(unisetter);
+		}
+		else
+		{
+			log_warning("UniformSetter at address[%p] not found in HandleUniformSetterCreated", unisetter);
+		}
+	}
+
+	void Shader::HandleUniformSetterDeleted(UniformSetter* unisetter)
+	{
+		auto to_remove = std::remove(std::begin(m_dependent_uniform_setters), std::end(m_dependent_uniform_setters), unisetter);
+		if (to_remove != m_dependent_uniform_setters.end())
+		{
+			m_dependent_uniform_setters.erase(to_remove);
+		}
+		else
+		{
+			log_warning("UniformSetter at address[%p] not found in HandleUniformSetterDeleted", unisetter);
+		}
+	}
+
+
+	void Shader::HandleMeshRenderConfigCreated(MeshRenderConfig* mesh_render_cfg)
+	{
+		if (std::find(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), mesh_render_cfg) == m_dependent_mesh_render_configs.end())
+		{
+			// not found => insert
+			m_dependent_mesh_render_configs.push_back(mesh_render_cfg);
+		}
+		else
+		{
+			log_warning("MeshRenderConfig at address[%p] not found in HandleMeshRenderConfigCreated", mesh_render_cfg);
+		}
+	}
+
+	void Shader::HandleMeshRenderConfigDeleted(MeshRenderConfig* mesh_render_cfg)
+	{
+		auto to_remove = std::remove(std::begin(m_dependent_mesh_render_configs), std::end(m_dependent_mesh_render_configs), mesh_render_cfg);
+		if (to_remove != m_dependent_mesh_render_configs.end())
+		{
+			m_dependent_mesh_render_configs.erase(to_remove);
+		}
+		else
+		{
+			log_warning("MeshRenderConfig at address[%p] not found in HandleMeshRenderConfigDeleted", mesh_render_cfg);
+		}
+	}
+
+
+
 	void Render(const Shader& shader, RenderConfig rnd_cfg, GLuint indices_len)
 	{
 		GLenum mode = shader.kind_of_primitives();
 		if (GL_PATCHES == mode)
 		{
-			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 		}
 		else
 		{
-			mode = rnd_cfg.m_render_mode;
+			mode = rnd_cfg.render_mode();
 		}
-		glBindVertexArray(rnd_cfg.m_vao_handle);
+		glBindVertexArray(rnd_cfg.vao_handle());
 		glDrawElements(mode, indices_len, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void RenderMesh(const Shader& shader, Mesh& mesh)
+	void RenderMesh(Shader& shader, Mesh& mesh)
 	{
-		Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
+		//Render(shader, Mesh::GetOrCreateRenderConfigForShader(mesh, shader), mesh.indices_length());
+		auto rnd_cfg = Mesh::GetOrCreateRenderConfigForShader(mesh, shader);
+		GLenum mode = shader.kind_of_primitives();
+		if (GL_PATCHES == mode)
+		{
+			glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
+		}
+		else
+		{
+			mode = rnd_cfg.render_mode();
+		}
+		glBindVertexArray(rnd_cfg.vao_handle());
+		glBindBuffer(GL_ARRAY_BUFFER, mesh.m_vertex_data_vbo_id);      // TODO: WTF WTF WTF????
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.m_indices_vbo_id);  //   otherwise: Exception thrown at 0x0000000053C91A02 (nvoglv64.dll) in application.exe: 0xC0000005: Access violation reading location 0x0000000000000000.
+		glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void RenderFullScreen(const Shader& shader)
+	void RenderFullScreen(Shader& shader)
 	{
 		RenderMesh(shader, Model::GetFullScreenQuadMesh());
 	}
 
 	void RenderMeshes(const Shader& shader, const MeshRenderData& mesh_render_data)
 	{
-		// If the following assert fails, you are probably trying to render using the wrong shader!
-		assert(shader.vertex_attrib_config() == mesh_render_data.m_vertex_attrib_config);
-
 		GLenum mode = shader.kind_of_primitives();
 
-		for (auto& tupl : mesh_render_data.m_mesh_render_configs)
+		for (const auto& rnd_cfg : mesh_render_data.m_mesh_render_configs)
 		{
-			Mesh& mesh = std::get<0>(tupl);
-			const RenderConfig& rnd_cfg = std::get<1>(tupl);
+			// If the following assert fails, you are trying to render using an incompatible shader!
+			assert(rnd_cfg.shader() == nullptr || shader.vertex_attrib_config() == rnd_cfg.shader()->vertex_attrib_config());
+
+			Mesh& mesh = rnd_cfg.mesh();
 
 			if (GL_PATCHES == mode)
 			{
-				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 			}
 			else
 			{
-				mode = rnd_cfg.m_render_mode;
+				mode = rnd_cfg.render_mode();
 			}
 
-			glBindVertexArray(rnd_cfg.m_vao_handle);
+			glBindVertexArray(rnd_cfg.vao_handle());
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
 
-	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, const MeshUniformSettersForShader& uniform_setters)
+	void RenderMeshesWithAlignedUniformSetters(const Shader& shader, const MeshRenderData& meshes_and_their_vaos, MeshUniformSettersForShader& uniform_setters)
 	{
-		// If one of the following asserts fails, you are probably trying to render using the wrong shader!
-		assert(shader.vertex_attrib_config() == meshes_and_their_vaos.m_vertex_attrib_config);
-		//assert(shader.handle() == uniform_setters.m_shader_handle);
-
 		GLenum mode = shader.kind_of_primitives();
 
 		assert(meshes_and_their_vaos.m_mesh_render_configs.size() == uniform_setters.m_mesh_uniform_setters.size());
 		auto n = meshes_and_their_vaos.m_mesh_render_configs.size();
 		for (auto i = 0; i < n; ++i)
 		{
-			auto& tupl = meshes_and_their_vaos.m_mesh_render_configs[i];
-			Mesh& mesh = std::get<0>(tupl);
+			const auto& rnd_cfg = meshes_and_their_vaos.m_mesh_render_configs[i];
+
+			// If the following assert fails, you are trying to render using an incompatible shader!
+			assert(rnd_cfg.shader() == nullptr || shader.vertex_attrib_config() == rnd_cfg.shader()->vertex_attrib_config());
+
+			Mesh& mesh = rnd_cfg.mesh();
 			assert(&mesh == &static_cast<Mesh&>(std::get<0>(uniform_setters.m_mesh_uniform_setters[i])));
-			const RenderConfig& rnd_cfg = std::get<1>(tupl);
-			std::get<1>(uniform_setters.m_mesh_uniform_setters[i])(shader, *mesh.material_data());
+			auto& unisetter = std::get<1>(uniform_setters.m_mesh_uniform_setters[i]);
+			assert(unisetter.shader()->handle() == shader.handle());
+			unisetter(*mesh.material_data());
 
 			if (GL_PATCHES == mode)
 			{
-				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.m_patch_size);
+				glPatchParameteri(GL_PATCH_VERTICES, rnd_cfg.patch_size());
 			}
 			else
 			{
-				mode = rnd_cfg.m_render_mode;
+				mode = rnd_cfg.render_mode();
 			}
 
-			glBindVertexArray(rnd_cfg.m_vao_handle);
+			glBindVertexArray(rnd_cfg.vao_handle());
 			glDrawElements(mode, mesh.indices_length(), GL_UNSIGNED_INT, nullptr);
 		}
 	}
@@ -1204,5 +1370,41 @@ namespace e186
 	void UnbindShader()
 	{
 		glUseProgram(0u);
+	}
+
+	void Compute(const Shader& shader)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_x() == 1);
+		assert(shader.work_group_size_y() == 1);
+		assert(shader.work_group_size_z() == 1);
+		glDispatchCompute(1, 1, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_y() == 1);
+		assert(shader.work_group_size_z() == 1);
+		const auto num_groups_x = (width + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		glDispatchCompute(num_groups_x, 1, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width, GLsizei height)
+	{
+		assert(shader.is_compute_shader());
+		assert(shader.work_group_size_z() == 1);
+		const auto num_groups_x = (width + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		const auto num_groups_y = (height + shader.work_group_size_y() - 1) / shader.work_group_size_y();
+		glDispatchCompute(num_groups_x, num_groups_y, 1);
+	}
+
+	void Compute(const Shader& shader, GLsizei width, GLsizei height, GLsizei depth)
+	{
+		assert(shader.is_compute_shader());
+		const auto num_groups_x = (width  + shader.work_group_size_x() - 1) / shader.work_group_size_x();
+		const auto num_groups_y = (height + shader.work_group_size_y() - 1) / shader.work_group_size_y();
+		const auto num_groups_z = (depth  + shader.work_group_size_z() - 1) / shader.work_group_size_z();
+		glDispatchCompute(num_groups_x, num_groups_y, num_groups_z);
 	}
 }

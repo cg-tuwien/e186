@@ -10,13 +10,19 @@ namespace e186
 		Additive
 	};
 
-	UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
+	UniformSetter CreateUniformSetterForShader(Shader& shader, MaterialData& material_data_info);
+	UniformSetter CreateUniformSetterForShader(Shader& shader, UniformSetterUsageMode usage_mode = UniformSetterUsageMode::Static, MaterialData* material_data_info = nullptr);
 
 	class MaterialData
 	{
-		friend UniformSetter CreateUniformSetterForShader(const Shader& shader, MaterialData& material_data);
+		friend UniformSetter CreateUniformSetterForShader(Shader&, MaterialData&);
+		friend UniformSetter CreateUniformSetterForShader(Shader&, UniformSetterUsageMode, MaterialData*);
 
 	public:
+		static const std::shared_ptr<Tex2D>& GetOrCreateWhiteTex();
+		static const std::shared_ptr<Tex2D>& GetOrCreateBlackTex();
+		static const std::shared_ptr<Tex2D>& GetOrCreateStraightUpNormalTex();
+
 		MaterialData();
 		/*! Initialize from an Assimp-mesh */
 		MaterialData(aiMaterial* aimat, TexLoadingHelper& tlh);

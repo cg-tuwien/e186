@@ -18,8 +18,9 @@ namespace e186
 	
 	class MaterialData;
 	class Shader;
-	using UniformSetter = std::function<void(const Shader&, const MaterialData&)>;
-	
+	using UniformSetterFunc = std::function<void(const Shader&, const MaterialData&)>;
+	class UniformSubSetter;
+	using UniformSubSetterFunc = std::function<void(const Shader&, const MaterialData&, UniformSubSetter&)>;
 	class DirectionalLight;
 	using DirLightRef = std::reference_wrapper<DirectionalLight>;
 	
@@ -56,7 +57,7 @@ namespace e186
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>> m_stored_char_callbacks;
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>*> m_char_callbacks;
 
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		std::vector<std::string> m_files_to_update;
 		std::vector<std::tuple<std::vector<std::string>, std::function<void()>*>> m_file_update_callbacks;
 
@@ -86,20 +87,18 @@ namespace e186
 		int m_main_wnd_height;
 		float m_main_wnd_aspectRatio;
 		bool m_render_tweak_bars;
-		unsigned int m_renderTime, m_renderTimerStart;
+		double m_render_time, m_render_timer_start;
 
 		std::unique_ptr<IScene> m_current_scene;
 		std::unique_ptr<IScene> m_next_scene;
 		bool m_next_is_root;
 		bool m_current_is_root;
 		std::function<std::unique_ptr<IScene>()> m_root_scene_generator_func;
-
-		AntTweakBarManager m_ant_tweak_bar_manager;
-
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		FW::FileWatcher m_file_watcher;
 		UpdateListener m_update_listener;
 #endif
+		AntTweakBarManager m_ant_tweak_bar_manager;
 
 		void SetRootSceneAsNextScene();
 
@@ -149,16 +148,22 @@ namespace e186
 			return m_running;
 		}
 
-		// Returns the width of the Application's main main_window
+		// Returns the width of the Application's main window
 		int window_width() const
 		{
 			return m_main_wnd_width;
 		}
 
-		// Returns the height of the Application's main main_window
+		// Returns the height of the Application's main window
 		int window_height() const
 		{
 			return m_main_wnd_height;
+		}
+
+		// Returns the size of the Application's main window
+		glm::tvec2<GLsizei> window_size() const
+		{
+			return { m_main_wnd_width, m_main_wnd_height };
 		}
 
 		// Return the aspect ratio of the Application's main main_window
@@ -226,7 +231,10 @@ namespace e186
 		 */
 		bool render_tweak_bars() const;
 
-		const unsigned int* renderTime();
+		double render_time() const;
+		double render_time_ms() const;
+		static void TW_CALL GetRenderTimeCB(void *value, void *clientData);
+		static void TW_CALL GetRenderTimeMsCB(void *value, void *clientData);
 
 	public:
 		static void StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func);

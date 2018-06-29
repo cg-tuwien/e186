@@ -12,14 +12,15 @@ namespace e186
 		m_main_wnd_height(0),
 		m_main_wnd_aspectRatio(0),
 		m_render_tweak_bars(false),
-		m_renderTime(0),
+		m_render_time(0),
 		m_root_scene_generator_func([]() { return nullptr; }),
 		m_next_is_root(false),
 		m_current_is_root(false),
-		m_ant_tweak_bar_manager()
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
-		, m_update_listener(this)
+#if defined(_DEBUG)
+		m_file_watcher(),
+		m_update_listener(this),
 #endif
+		m_ant_tweak_bar_manager()
 	{
 		glfwGetFramebufferSize(m_mainWindow, &m_main_wnd_width, &m_main_wnd_height);
 		m_main_wnd_aspectRatio = static_cast<float>(m_main_wnd_width) / static_cast<float>(m_main_wnd_height);
@@ -358,19 +359,19 @@ namespace e186
 	void Engine::BeginFrame()
 	{
 		WorkOffPendingActions();
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 		m_file_watcher.update();
 #endif
 		ProcessEvents();
 		WorkOffPendingActions();
 		glFinish();
-		m_renderTimerStart = static_cast<unsigned int>(glfwGetTime() * 1000.0);
+		m_render_timer_start = glfwGetTime();
 	}
 
 	void Engine::EndFrame()
 	{
 		glFinish();
-		m_renderTime = static_cast<unsigned int>(glfwGetTime() * 1000.0) - m_renderTimerStart;
+		m_render_time = glfwGetTime() - m_render_timer_start;
 
 		if (m_render_tweak_bars)
 		{
@@ -460,9 +461,26 @@ namespace e186
 		return m_render_tweak_bars;
 	}
 
-	const unsigned int * Engine::renderTime()
+	double Engine::render_time() const
 	{
-		return &m_renderTime;
+		return m_render_time;
+	}
+
+	double Engine::render_time_ms() const
+	{
+		return m_render_time * 1000.0;
+	}
+
+	void TW_CALL Engine::GetRenderTimeCB(void *value, void *clientData)
+	{
+		auto* eng = reinterpret_cast<Engine*>(clientData);
+		*reinterpret_cast<double*>(value) = eng->render_time();
+	}
+
+	void TW_CALL Engine::GetRenderTimeMsCB(void *value, void *clientData)
+	{
+		auto* eng = reinterpret_cast<Engine*>(clientData);
+		*reinterpret_cast<double*>(value) = eng->render_time_ms();
 	}
 
 	void Engine::StartWithRootScene(std::function<std::unique_ptr<IScene>()> root_scene_gen_func)
@@ -543,6 +561,8 @@ namespace e186
 			// (has to be static, so that it gets destructed last)
 			static e186::Engine app(wnd);
 			e186::Engine::g_current = &app;
+			static e186::FrameBufferObject default_framebuffer(g_current->window_width(), g_current->window_height(), false);
+			e186::FrameBufferObject::g_default_framebuffer = &default_framebuffer;
 
 			// Set the root scene generation function, if we have one
 			if (root_scene_gen_func)
@@ -577,7 +597,7 @@ namespace e186
 		}
 	}
 
-#if defined(_DEBUG) && defined(FEATURE_NOT_READY_YET)
+#if defined(_DEBUG)
 	Engine::UpdateListener::UpdateListener(Engine* engine) 
 		: m_engine{ engine }
 	{
@@ -630,8 +650,20 @@ namespace e186
 
 	void Engine::NotifyOnFileChanges(std::vector<std::string> files, std::function<void()>* callback)
 	{
-		m_file_watcher.addWatch(utils::ExtractBasePath(files[0]), &m_update_listener); // TODO: handle folders, not just first one
-		m_file_update_callbacks.push_back(std::make_tuple(std::move(files), callback));
+		// File watcher operates on folders, not files => get all unique folders
+		std::set<std::string> unique_folders;
+		for (const auto& file : files)
+		{
+			auto folder = utils::ExtractBasePath(file);
+			unique_folders.insert(folder);
+		}
+		// ...and pass them to the file watcher
+		for (const auto& folder : unique_folders)
+		{
+			//m_file_watcher.removeWatch(folder); // This should ensure that each directory is only watched once
+			m_file_watcher.addWatch(folder, &m_update_listener);
+			m_file_update_callbacks.push_back(std::make_tuple(std::move(files), callback));
+		}
 	}
 
 	void Engine::StopFileChangeNotifyCallbacks(std::function<void()>* callback)

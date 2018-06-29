@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 namespace e186
 {
 	/// Helper method to get up-down and left-right rotation angles from a given direction
@@ -51,4 +53,22 @@ namespace e186
 	/// Vectors a, and b must be normalized (I guess)
 	/// [See Real-Time Rendering (Akenine Möller et. al) chapter 4.3.2]
 	glm::mat4 rotate_vector_a_to_vector_b(glm::vec3 a, glm::vec3 b);
+
+	///<summary>Solve an equation of the form a * x + b = 0</summary>
+	///Checks if a given equation can be solved with real numbers.
+	///If a real solution exists, a result is returned
+	///<param name="constant_coeff">the constant coefficient b</param>
+	///<param name="linear_coeff">the linear coefficient a</param>
+	///<returns>The solution to the linear equation if a real solution can be found, std::nullopt otherwise</returns>
+	std::optional<float> solve_linear_equation(float constant_coeff, float linear_coeff);
+
+	///<summary>Solve an equation of the form a * x^2 + b * x + c = 0</summary>
+	///Checks if a given equation can be solved with real numbers.
+	///If a real solution exists, a result is returned
+	///<param name="constant_coeff">the constant coefficient c</param>
+	///<param name="linear_coeff">the linear coefficient b</param>
+	///<param name="quadratic_coeff">the quadratic coefficient a</param>
+	///<returns>Both solutions to the quadratic equation if a real solution can be found, std::nullopt otherwise</returns>
+	std::optional<std::tuple<float, float>> solve_quadratic_equation(float constant_coeff, float linear_coeff, float quadratic_coeff);
+
 }

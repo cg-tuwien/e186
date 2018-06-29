@@ -11,7 +11,7 @@ namespace e186
 		m_time_since_start(0.0), 
 		m_delta_time(0.0)
 	{
-		m_last_time = m_abs_time = m_start_time = glfwGetTime();
+		m_abs_time = m_start_time = glfwGetTime();
 	}
 
 

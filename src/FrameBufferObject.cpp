@@ -31,25 +31,40 @@ namespace e186
 	FboAttachmentConfig& FboAttachmentConfig::modify_num_samples(uint32_t value) { set_num_samples(value); return *this; }
 
 	FboAttachmentConfig FboAttachmentConfig::kPresetNone			(0, 0, 0);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGB				(GL_RGB,				GL_RGB,				GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA			(GL_RGBA,				GL_RGBA,			GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA8			(GL_RGBA8,				GL_RGBA,			GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGB16F			(GL_RGB16F,				GL_RGB,				GL_HALF_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA16F			(GL_RGBA16F,			GL_RGBA,			GL_HALF_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGB32F			(GL_RGB32F,				GL_RGB,				GL_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA32F			(GL_RGBA32F,			GL_RGBA,			GL_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf		(GL_RGBA,				GL_RGBA,			GL_HALF_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetSRGB			(GL_SRGB,				GL_RGB,				GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetSRGBA			(GL_SRGB_ALPHA,			GL_RGBA,			GL_UNSIGNED_BYTE);
-	FboAttachmentConfig FboAttachmentConfig::kPresetDepthStencil24_8(GL_DEPTH_STENCIL,		GL_DEPTH_STENCIL,	GL_UNSIGNED_INT_24_8);
-	FboAttachmentConfig FboAttachmentConfig::kPresetDepth32F		(GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetDepth24			(GL_DEPTH_COMPONENT24,	GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
-	FboAttachmentConfig FboAttachmentConfig::kPresetDepth16			(GL_DEPTH_COMPONENT16,	GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetCompressedRGB	(GL_COMPRESSED_RGB,			GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGB				(GL_RGB,					GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA			(GL_RGBA,					GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetCompressedRGBA	(GL_COMPRESSED_RGBA,		GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA8			(GL_RGBA8,					GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGB16F			(GL_RGB16F,					GL_RGB,				GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA16F			(GL_RGBA16F,				GL_RGBA,			GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGB32F			(GL_RGB32F,					GL_RGB,				GL_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBA32F			(GL_RGBA32F,				GL_RGBA,			GL_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetRGBAhalf		(GL_RGBA,					GL_RGBA,			GL_HALF_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGB			(GL_SRGB,					GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGB8			(GL_SRGB8,					GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetCompressedSRGB	(GL_COMPRESSED_SRGB,		GL_RGB,				GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGBA			(GL_SRGB_ALPHA,				GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetSRGBA8			(GL_SRGB8_ALPHA8,			GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetCompressedSRGBA	(GL_COMPRESSED_SRGB_ALPHA,	GL_RGBA,			GL_UNSIGNED_BYTE);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepthStencil24_8(GL_DEPTH24_STENCIL8,		GL_DEPTH_STENCIL,	GL_UNSIGNED_INT_24_8);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepth32F		(GL_DEPTH_COMPONENT32F,		GL_DEPTH_COMPONENT, GL_FLOAT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepth24			(GL_DEPTH_COMPONENT24,		GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
+	FboAttachmentConfig FboAttachmentConfig::kPresetDepth16			(GL_DEPTH_COMPONENT16,		GL_DEPTH_COMPONENT, GL_UNSIGNED_INT);
 #pragma endregion
 
-#pragma region RenderTexture
+	FrameBufferObject* FrameBufferObject::g_default_framebuffer(nullptr);
+	FrameBufferObject& FrameBufferObject::default_framebuffer() { return *g_default_framebuffer; }
 
-	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height) :
+	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height) : FrameBufferObject(width, height, true)
+	{
+	}
+
+	FrameBufferObject::FrameBufferObject(glm::tvec2<GLsizei> size) : FrameBufferObject(size.x, size.y)
+	{
+	}
+
+	FrameBufferObject::FrameBufferObject(GLsizei width, GLsizei height, bool do_generate) :
 		m_viewport_x(0),
 		m_viewport_y(0),
 		m_width(width),
@@ -59,7 +74,10 @@ namespace e186
 		m_depth_buffer_handle(0),
 		m_clear_color(.153f, .275f, .349f, 1.0f)
 	{
-		GenerateFbo();
+		if (do_generate)
+		{
+			GenerateFbo();
+		}
 	}
 
 	FrameBufferObject::FrameBufferObject(FrameBufferObject&& other) noexcept :
@@ -137,18 +155,6 @@ namespace e186
 		{
 			return nullptr;
 		}
-	}
-
-	FrameBufferObject& FrameBufferObject::BindForReading()
-	{
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fbo_id);
-		return *this;
-	}
-
-	FrameBufferObject& FrameBufferObject::BindForWriting()
-	{
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_fbo_id);
-		return *this;
 	}
 
 	FrameBufferObject& FrameBufferObject::Bind()
@@ -239,15 +245,7 @@ namespace e186
 		{
 			ti->BindAndSetTextureParameters(params);
 
-			glTexImage2D(
-				GL_TEXTURE_2D, 
-				0, 
-				config.internal_format(), 
-				m_width, m_height, 
-				config.border(), 
-				config.format(), 
-				config.data_type(), 
-				nullptr);
+			glTexStorage2D(GL_TEXTURE_2D, 1, config.internal_format(), m_width, m_height);
 
 			if ((params & TexParams::GenerateMipMaps) != TexParams::None)
 			{
@@ -347,7 +345,7 @@ namespace e186
 		glDrawBuffers(static_cast<GLsizei>(m_color_attachments.size()), &m_color_attachments[0]);
 	}
 
-	bool FrameBufferObject::status()
+	bool FrameBufferObject::ready_for_action()
 	{
 		auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		bool isGood = GL_FRAMEBUFFER_COMPLETE == status;
@@ -379,5 +377,89 @@ namespace e186
 		m_fbo_id = 0;
 	}
 
-#pragma endregion
+	void Blit(GLuint source, GLuint target, Rect source_rect, Rect target_rect, GLbitfield mask, GLenum filter, GLenum color_buffer_source)
+	{
+#ifdef OPENGL_V4_5
+		if (0 != color_buffer_source)
+		{
+			glNamedFramebufferReadBuffer(source, color_buffer_source);
+		}
+		glBlitNamedFramebuffer(source, target,
+			source_rect.x(), source_rect.y(), source_rect.width(), source_rect.height(),
+			target_rect.x(), target_rect.y(), target_rect.width(), target_rect.height(),
+			mask, filter);
+#else 
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, source);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
+		if (0 != color_buffer_source)
+		{
+			glReadBuffer(color_buffer_source);
+		}
+		glBlitFramebuffer(
+			source_rect.x(), source_rect.y(), source_rect.width(), source_rect.height(),
+			target_rect.x(), target_rect.y(), target_rect.width(), target_rect.height(),
+			mask, filter);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+#endif
+	}
+
+	void BlitColor(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect, Rect target_rect, GLenum filter, GLenum color_buffer_source)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		Blit(source.handle(), target.handle(), source_rect, target_rect, GL_COLOR_BUFFER_BIT, filter, color_buffer_source);
+	}
+
+	void BlitDepth(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect, Rect target_rect, GLenum filter)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		Blit(source.handle(), target.handle(), source_rect, target_rect, GL_DEPTH_BUFFER_BIT, filter);
+	}
+
+	void BlitStencil(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect, Rect target_rect, GLenum filter)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		Blit(source.handle(), target.handle(), source_rect, target_rect, GL_STENCIL_BUFFER_BIT, filter);
+	}
+
+	void BlitMultiple(const FrameBufferObject& source, const FrameBufferObject& target, bool blit_color, bool blit_depth, bool blit_stencil, Rect source_rect, Rect target_rect, GLenum filter, GLenum color_buffer_source)
+	{
+		if (source_rect.width() == 0 && source_rect.height() == 0)
+		{
+			source_rect = Rect(source.width(), source.height());
+		}
+		if (target_rect.width() == 0 && target_rect.height() == 0)
+		{
+			target_rect = Rect(target.width(), target.height());
+		}
+		GLbitfield mask = 0
+			| (blit_color ? GL_COLOR_BUFFER_BIT : 0)
+			| (blit_depth ? GL_DEPTH_BUFFER_BIT : 0)
+			| (blit_stencil ? GL_STENCIL_BUFFER_BIT : 0);
+		Blit(source.handle(), target.handle(), source_rect, target_rect, mask, filter, color_buffer_source);
+	}
+
+
+
 }

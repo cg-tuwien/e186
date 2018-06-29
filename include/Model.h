@@ -43,22 +43,6 @@ namespace e186
 		MOLF_default = MOLF_triangulate | MOLF_smoothNormals | MOLF_limitBoneWeights,
 	};
 
-	struct MeshUniformSettersForShader
-	{
-		GLuint m_shader_handle;
-		std::vector<std::tuple<MeshRef, UniformSetter>> m_mesh_uniform_setters;
-		MeshUniformSettersForShader() : m_shader_handle{0}, m_mesh_uniform_setters{} {}
-		auto num_meshes() const { return m_mesh_uniform_setters.size(); }
-	};
-	
-	struct MeshRenderData
-	{
-		VertexAttribData m_vertex_attrib_config;
-		std::vector<std::tuple<MeshRef, RenderConfig>> m_mesh_render_configs;
-		MeshRenderData() : m_vertex_attrib_config{VertexAttribData::Nothing}, m_mesh_render_configs{} {}
-		auto num_meshes() const { return m_mesh_render_configs.size(); }
-	};
-
 	void Append(MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append);
 	void Append(MeshRenderData& vaos, const MeshRenderData& vaos_to_append);
 	MeshUniformSettersForShader Concatenate(const MeshUniformSettersForShader& unisetters, const MeshUniformSettersForShader& unisetters_to_append);
@@ -68,6 +52,7 @@ namespace e186
 	class Mesh
 	{
 		friend class Model;
+		friend void RenderMesh(Shader& shader, Mesh& mesh);
 
 		MeshIdx m_index;
 		std::string m_name;
@@ -214,10 +199,9 @@ namespace e186
 		void set_topology(const GLenum value) { m_topology = value; }
 		void set_patch_size(const int value) { m_patch_size = value; }
 
-		static VAOType GetOrCreateVAOForShader(Mesh& mesh, const Shader& shader);
+		static VAOType GetOrCreateVAOForShader(Mesh& mesh, Shader& shader);
 		static VAOType GetOrCreateVAOForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);
-		static RenderConfig GetOrCreateRenderConfigForShader(Mesh& mesh, const Shader& shader);
-		static RenderConfig GetOrCreateRenderConfigForVertexAttribConfig(Mesh& mesh, VertexAttribData vertexDataConfig);
+		static MeshRenderConfig GetOrCreateRenderConfigForShader(Mesh& mesh, Shader& shader);
 	};
 	
 	class Model
@@ -298,11 +282,10 @@ namespace e186
 		void CreateAndUploadGpuData(GLenum vertex_data_usage = GL_STATIC_DRAW, GLenum indices_usage = GL_STATIC_DRAW);
 
 		bool GenerateVAOsWithVertexAttribConfig(VertexAttribData vertexDataConfig);
-		bool GenerateVAOsForShader(MeshIdx mesh_index, const Shader& shader);
+		bool GenerateVAOsForShader(MeshIdx mesh_index, Shader& shader);
 		VAOType GetOrCreateVAOForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig);
-		VAOType GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, const Shader& shader);
-		RenderConfig GetOrCreateRenderConfigForMeshForVertexAttribConfig(MeshIdx mesh_index, VertexAttribData vertexDataConfig);
-		RenderConfig GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, const Shader& shader);
+		VAOType GetOrCreateVAOForMeshForShader(MeshIdx mesh_index, Shader& shader);
+		MeshRenderConfig GetOrCreateRenderConfigForMeshForShader(MeshIdx mesh_index, Shader& shader);
 
 		const glm::mat4& transformation_matrix() const;
 		const glm::mat4 transformation_matrix(unsigned int meshIndex) const;
@@ -354,9 +337,9 @@ namespace e186
 			return SelectMeshes([](const Mesh& mesh) { return true; });
 		}
 
-		static MeshUniformSettersForShader CompileUniformSetters(const Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshUniformSettersForShader CompileUniformSetters(Shader& shader, const std::vector<MeshRef>& meshes, UniformSetterUsageMode usage_mode = UniformSetterUsageMode::Static);
 
-		static MeshRenderData GetOrCreateRenderData(const Shader& shader, const std::vector<MeshRef>& meshes);
+		static MeshRenderData GetOrCreateRenderData(Shader& shader, const std::vector<MeshRef>& meshes);
 
 		Mesh& mesh_at(unsigned int meshIndex);
 

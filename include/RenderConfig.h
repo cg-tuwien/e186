@@ -2,30 +2,60 @@
 
 namespace e186
 {
-	struct RenderConfig
+	/*! Holds render configuration for a, e.g., glDrawElements call */
+	class RenderConfig
 	{
-		/*! VAO-ID of the data to be rendered */
-		VAOType m_vao_handle;
+	public:
+		RenderConfig() noexcept;
+		RenderConfig(const VAOType vao, const GLenum mode, const int patch_size = 3) noexcept;
+		RenderConfig(RenderConfig&&) noexcept;
+		RenderConfig(const RenderConfig&) noexcept;
+		RenderConfig& operator=(RenderConfig&&) noexcept;
+		RenderConfig& operator=(const RenderConfig&) noexcept;
 
-		/*! Render mode or topology of the data 
-		 *  e.g. GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.
-		 *  Please refer to https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawElements.xhtml */
-		GLenum m_render_mode;
+		/*! VAO-ID of the data to be rendered */
+		VAOType vao_handle() const { return m_vao_handle; }
+
+		/*! Render mode or topology of the data
+		*  e.g. GL_TRIANGLES, GL_TRIANGLE_STRIP, etc.
+		*  Please refer to https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawElements.xhtml */
+		GLenum render_mode() const { return m_render_mode; }
 
 		/*! If render mode is GL_PATCHES, this is the patch size. */
-		int m_patch_size;
+		int patch_size() const { return m_patch_size; }
 
-		RenderConfig() 
-			: m_vao_handle(0),
-			m_render_mode(GL_TRIANGLES),
-			m_patch_size(3) {}
-		RenderConfig(const VAOType vao, const GLenum mode, const int patch_size = 3) 
-			: m_vao_handle(vao),
-			m_render_mode(mode),
-			m_patch_size(patch_size) {}
-		RenderConfig(RenderConfig&&) noexcept = default;
-		RenderConfig(const RenderConfig&) noexcept = default;
-		RenderConfig& operator=(RenderConfig&&) noexcept = default;
-		RenderConfig& operator=(const RenderConfig&) noexcept = default;
+		bool is_valid() const { return 0 != m_vao_handle; }
+
+	protected:
+		VAOType m_vao_handle;
+		GLenum m_render_mode;
+		int m_patch_size;
+	};
+
+	/*! Same render config data as RenderConfig, and a reference to the Mesh in addition. */
+	class MeshRenderConfig : public RenderConfig
+	{
+	public:
+		MeshRenderConfig(MeshRef, Shader&) noexcept;
+		MeshRenderConfig(MeshRef, Shader&, const VAOType, const GLenum, const int patch_size = 3) noexcept;
+		MeshRenderConfig(MeshRef, Shader&, RenderConfig) noexcept;
+		MeshRenderConfig(MeshRenderConfig&&) noexcept;
+		MeshRenderConfig(const MeshRenderConfig&) noexcept;
+		MeshRenderConfig& operator=(MeshRenderConfig&&) noexcept;
+		MeshRenderConfig& operator=(const MeshRenderConfig&) noexcept;
+		~MeshRenderConfig();
+
+		void ShaderUpdated(Shader& new_shader);
+
+		Mesh& mesh() const { return m_mesh; }
+		Shader* shader() const { return m_shader; }
+
+	private:
+		void NotifyShaderAboutCreation();
+		void NotifyShaderAboutDeletion();
+
+	private:
+		MeshRef m_mesh;
+		Shader* m_shader;
 	};
 }

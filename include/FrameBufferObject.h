@@ -29,7 +29,9 @@ namespace e186
 
 		static FboAttachmentConfig kPresetNone;
 		static FboAttachmentConfig kPresetRGB;
+		static FboAttachmentConfig kPresetCompressedRGB;
 		static FboAttachmentConfig kPresetRGBA;
+		static FboAttachmentConfig kPresetCompressedRGBA;
 		static FboAttachmentConfig kPresetRGBA8;
 		static FboAttachmentConfig kPresetRGB16F;
 		static FboAttachmentConfig kPresetRGBA16F;
@@ -37,7 +39,11 @@ namespace e186
 		static FboAttachmentConfig kPresetRGBA32F;
 		static FboAttachmentConfig kPresetRGBAhalf;
 		static FboAttachmentConfig kPresetSRGB;
+		static FboAttachmentConfig kPresetSRGB8;
+		static FboAttachmentConfig kPresetCompressedSRGB;
 		static FboAttachmentConfig kPresetSRGBA;
+		static FboAttachmentConfig kPresetSRGBA8;
+		static FboAttachmentConfig kPresetCompressedSRGBA;
 		static FboAttachmentConfig kPresetDepthStencil24_8;
 		static FboAttachmentConfig kPresetDepth32F;
 		static FboAttachmentConfig kPresetDepth24;
@@ -46,23 +52,13 @@ namespace e186
 
 	class FrameBufferObject
 	{
-		GLint m_viewport_x, m_viewport_y;
-		GLsizei m_width, m_height;
-		GLuint m_fbo_id;
-
-		std::vector<GLenum> m_color_attachments;
-		std::unordered_map<GLenum, std::shared_ptr<TexInfo>> m_tex_attachments;
-			
-		GLenum m_depth_buffer_format;
-		GLuint m_depth_buffer_handle;
-			
-		glm::vec4 m_clear_color;
-
-		void GenerateFbo();
-		void AttachTexture(const FboAttachmentConfig& config, std::vector<GLenum> attachments, TexParams params);
-
+		friend class Engine;
+		static FrameBufferObject* g_default_framebuffer;
 	public:
+		static FrameBufferObject& default_framebuffer();
+
 		FrameBufferObject(GLsizei width, GLsizei height);
+		FrameBufferObject(glm::tvec2<GLsizei> size);
 		FrameBufferObject(const FrameBufferObject& other) = delete;
 		FrameBufferObject& operator=(const FrameBufferObject& other) = delete;
 		FrameBufferObject(FrameBufferObject&& other) noexcept;
@@ -83,8 +79,6 @@ namespace e186
 
 		const TexInfo* FindAttachedTexture(GLenum attachment) const;
 
-		FrameBufferObject& BindForReading();
-		FrameBufferObject& BindForWriting();
 		FrameBufferObject& Bind();
 		FrameBufferObject& Unbind();
 		FrameBufferObject& Clear(GLbitfield clearFlags = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
@@ -113,8 +107,32 @@ namespace e186
 			*	If the fbo's status is GL_FRAMEBUFFER_COMPLETE, this method returns true; false otherwise.
 			*	Make sure that the fbo is bound before calling this method.
 			*/
-		static bool status();
+		static bool ready_for_action();
 
 		void Destroy();
+
+	private:
+		FrameBufferObject(GLsizei width, GLsizei height, bool do_generate);
+
+		GLint m_viewport_x, m_viewport_y;
+		GLsizei m_width, m_height;
+		GLuint m_fbo_id;
+
+		std::vector<GLenum> m_color_attachments;
+		std::unordered_map<GLenum, std::shared_ptr<TexInfo>> m_tex_attachments;
+
+		GLenum m_depth_buffer_format;
+		GLuint m_depth_buffer_handle;
+
+		glm::vec4 m_clear_color;
+
+		void GenerateFbo();
+		void AttachTexture(const FboAttachmentConfig& config, std::vector<GLenum> attachments, TexParams params);
 	};
+
+	void Blit(GLuint source, GLuint target, Rect source_rect, Rect target_rect, GLbitfield mask, GLenum filter = GL_NEAREST, GLenum color_buffer_source = 0);
+	void BlitColor(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST, GLenum color_buffer_source = GL_COLOR_ATTACHMENT0);
+	void BlitDepth(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST);
+	void BlitStencil(const FrameBufferObject& source, const FrameBufferObject& target, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST);
+	void BlitMultiple(const FrameBufferObject& source, const FrameBufferObject& target, bool blit_color, bool blit_depth, bool blit_stencil, Rect source_rect = Rect{}, Rect target_rect = Rect{}, GLenum filter = GL_NEAREST, GLenum color_buffer_source = 0);
 }

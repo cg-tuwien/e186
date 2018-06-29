@@ -94,4 +94,36 @@ namespace e186
 			0.0f, 0.0f, 0.0f, 1.0f);
 		return glm::transpose(R);
 	}
+
+	std::optional<float> solve_linear_equation(float constant_coeff, float linear_coeff)
+	{
+		if (linear_coeff == 0.0f)
+			return std::nullopt;
+
+		float solution = -constant_coeff / linear_coeff;
+		return solution;
+	}
+
+	std::optional<std::tuple<float, float>> solve_quadratic_equation(float constant_coeff, float linear_coeff, float quadratic_coeff)
+	{
+		if (quadratic_coeff == 0.0f)
+		{
+			if (auto lin_result = solve_linear_equation(constant_coeff, linear_coeff))
+				return std::make_tuple(*lin_result, *lin_result);
+			else
+				return std::nullopt;
+		}
+
+		float beta = linear_coeff / 2.0f;
+		float discriminant = beta * beta - quadratic_coeff * constant_coeff;
+		if (discriminant < 0.0f)
+			return std::nullopt;
+
+		float root = glm::sqrt(discriminant);
+		float s = glm::sign(quadratic_coeff);
+		return std::make_tuple(
+			(-beta + root * s) / quadratic_coeff,
+			(-beta - root * s) / quadratic_coeff
+		);
+	}
 }
