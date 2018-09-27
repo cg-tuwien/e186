@@ -57,6 +57,7 @@
     <ClInclude Include="..\include\string_utils.h" />
     <ClInclude Include="..\include\Tex2D.h" />
     <ClInclude Include="..\include\Tex3D.h" />
+    <ClInclude Include="..\include\Tex3dDisplayer.h" />
     <ClInclude Include="..\include\TexData.h" />
     <ClInclude Include="..\include\TexInfo.h" />
     <ClInclude Include="..\include\TexLoadingHelper.h" />
@@ -107,6 +108,7 @@
     <ClCompile Include="..\src\string_utils.cpp" />
     <ClCompile Include="..\src\Tex2D.cpp" />
     <ClCompile Include="..\src\Tex3D.cpp" />
+    <ClCompile Include="..\src\Tex3dDisplayer.cpp" />
     <ClCompile Include="..\src\TexData.cpp" />
     <ClCompile Include="..\src\TexInfo.cpp" />
     <ClCompile Include="..\src\TexLoadingHelper.cpp" />
@@ -124,6 +126,8 @@
     <None Include="..\assets\shaders\geodesic.vert" />
     <None Include="..\assets\shaders\terrain.frag" />
     <None Include="..\assets\shaders\terrain.vert" />
+    <None Include="..\assets\shaders\tex3d_element.frag" />
+    <None Include="..\assets\shaders\tex3d_element.vert" />
     <None Include="..\assets\shaders\texture.frag" />
     <None Include="..\assets\shaders\texture.vert" />
     <None Include="..\assets\shaders\translucent_gizmo.frag" />
