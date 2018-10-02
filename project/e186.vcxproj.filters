@@ -133,6 +133,9 @@
     <Filter Include="Source Files\data">
       <UniqueIdentifier>{712956f2-92e6-4418-ab3b-f7191066ab9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\shaders\tex3d_displayer">
+      <UniqueIdentifier>{0999f952-2827-4cd8-af8a-70d9bd43c989}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\e186stdafx.h">
@@ -297,6 +300,9 @@
     <ClInclude Include="..\include\RenderData.h">
       <Filter>Header Files\shader</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\Tex3dDisplayer.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\e186stdafx.cpp">
@@ -428,6 +434,9 @@
     <ClCompile Include="..\src\UniformSetter.cpp">
       <Filter>Source Files\shader</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Tex3dDisplayer.cpp">
+      <Filter>Source Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\assets\shaders\geodesic.tesc">
@@ -468,6 +477,12 @@
     </None>
     <None Include="..\assets\shaders\translucent_gizmo.vert">
       <Filter>Resource Files\shaders\gizmo</Filter>
+    </None>
+    <None Include="..\assets\shaders\tex3d_element.vert">
+      <Filter>Resource Files\shaders\tex3d_displayer</Filter>
+    </None>
+    <None Include="..\assets\shaders\tex3d_element.frag">
+      <Filter>Resource Files\shaders\tex3d_displayer</Filter>
     </None>
   </ItemGroup>
 </Project>
