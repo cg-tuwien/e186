@@ -126,11 +126,6 @@ namespace e186
 			glUniform1f(location, value);
 		}
 
-		void SetUniform(GLint location, GLint value) const
-		{
-			glUniform1i(location, value);
-		}
-
 		void SetUniform(GLint location, const glm::vec2& value) const
 		{
 			glUniform2fv(location, 1, static_cast<const GLfloat*>(glm::value_ptr(value)));
@@ -140,6 +135,43 @@ namespace e186
 		{
 			glUniform2f(location, x, y);
 		}
+
+
+		void SetUniform(GLint location, const glm::ivec4& value) const
+		{
+			glUniform4iv(location, 1, static_cast<const GLint*>(glm::value_ptr(value)));
+		}
+
+		void SetUniform(GLint location, GLint x, GLint y, GLint z, GLint w) const
+		{
+			glUniform4i(location, x, y, z, w);
+		}
+
+		void SetUniform(GLint location, const glm::ivec3& value) const
+		{
+			glUniform3iv(location, 1, static_cast<const GLint*>(glm::value_ptr(value)));
+		}
+
+		void SetUniform(GLint location, GLint x, GLint y, GLint z) const
+		{
+			glUniform3i(location, x, y, z);
+		}
+
+		void SetUniform(GLint location, GLint value) const
+		{
+			glUniform1i(location, value);
+		}
+
+		void SetUniform(GLint location, const glm::ivec2& value) const
+		{
+			glUniform2iv(location, 1, static_cast<const GLint*>(glm::value_ptr(value)));
+		}
+
+		void SetUniform(GLint location, GLint x, GLint y) const
+		{
+			glUniform2i(location, x, y);
+		}
+
 
 		void SetUniform(GLint location, const glm::mat3& value) const
 		{

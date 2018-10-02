@@ -126,15 +126,29 @@ namespace e186
 		auto dd = static_cast<size_t>(depth);
 		size_t size = ww * hh * dd * cc;
 		unsigned char* data = new unsigned char[size];
+		glm::ivec3 sphere_center(width / 2, height / 2, depth / 2);
+		int sphere_radius = glm::min(width, height, depth) / 2;
 		for (auto k = 0; k < dd; ++k)
 		{
 			for (auto j = 0; j < hh; ++j)
 			{
 				for (auto i = 0; i < ww; ++i)
 				{
-					data[0 + i * cc + j * ww * cc + k * hh * ww * cc] = static_cast<unsigned char>((255 * i) / ww);
-					data[1 + i * cc + j * ww * cc + k * hh * ww * cc] = static_cast<unsigned char>((255 * j) / hh);
-					data[2 + i * cc + j * ww * cc + k * hh * ww * cc] = static_cast<unsigned char>((255 * k) / dd);
+					auto dist = glm::sqrt(
+						glm::pow2(i - sphere_center.x) + glm::pow2(j - sphere_center.y) + glm::pow2(k - sphere_center.z)
+					);
+
+					glm::tvec3<unsigned char> tx_color(0, 0, 0);
+					if (dist < sphere_radius)
+					{
+						// is inside sphere
+						tx_color.r = static_cast<unsigned char>((255 * i) / ww);
+						tx_color.g = static_cast<unsigned char>((255 * j) / hh);
+						tx_color.b = static_cast<unsigned char>((255 * k) / dd);
+					}
+					data[0 + i * cc + j * ww * cc + k * hh * ww * cc] = tx_color.r;
+					data[1 + i * cc + j * ww * cc + k * hh * ww * cc] = tx_color.g;
+					data[2 + i * cc + j * ww * cc + k * hh * ww * cc] = tx_color.b;
 				}
 			}
 		}
@@ -160,15 +174,30 @@ namespace e186
 		float heightf = static_cast<float>(height);
 		float depthf = static_cast<float>(depth);
 		float* data = new float[size];
+		glm::ivec3 sphere_center(width / 2, height / 2, depth / 2);
+		int sphere_radius = glm::min(width, height, depth) / 2;
 		for (auto k = 0; k < dd; ++k)
 		{
 			for (auto j = 0; j < hh; ++j)
 			{
 				for (auto i = 0; i < ww; ++i)
 				{
-					data[0 + i * cc + j * ww * cc + k * hh * ww * cc] = i / widthf;
-					data[1 + i * cc + j * ww * cc + k * hh * ww * cc] = j / heightf;
-					data[2 + i * cc + j * ww * cc + k * hh * ww * cc] = k / depthf;
+					auto dist = glm::sqrt(
+						glm::pow2(i - sphere_center.x) + glm::pow2(j - sphere_center.y) + glm::pow2(k - sphere_center.z)
+					);
+
+					glm::vec3 tx_color(0.f, 0.f, 0.f);
+					if (dist < sphere_radius)
+					{
+						// is inside sphere
+						tx_color.r = static_cast<unsigned char>(i / ww);
+						tx_color.g = static_cast<unsigned char>(j / hh);
+						tx_color.b = static_cast<unsigned char>(k / dd);
+					}
+
+					data[0 + i * cc + j * ww * cc + k * hh * ww * cc] = tx_color.r;
+					data[1 + i * cc + j * ww * cc + k * hh * ww * cc] = tx_color.g;
+					data[2 + i * cc + j * ww * cc + k * hh * ww * cc] = tx_color.b;
 				}
 			}
 		}

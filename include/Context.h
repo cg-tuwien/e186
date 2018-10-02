@@ -8,7 +8,7 @@ namespace e186
 		static void glfw_error_callback(int error, const char* description);
 
 	public:
-		Context(int glMajorVersion = 4, int glMinorVersion = 3);
+		Context(int glMajorVersion = 4, int glMinorVersion = 6);
 		~Context();
 		
 		static Context* current() { return Context::g_current; }

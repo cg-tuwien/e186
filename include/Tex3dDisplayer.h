@@ -10,9 +10,20 @@ namespace e186
 	public:
 		Tex3dDisplayer(Tex3D& tex3d);
 
+		void Render(const glm::mat4& mM, const glm::mat4& vM, const glm::mat4& pM);
+
 	private:
 		Tex3D& m_tex3d;
-		GLuint m_b1, m_b2, m_b3, m_vao;
+		Shader m_shader;
+		GLuint m_instPosBuffer;
+		GLuint m_posBuffer;
+		GLuint m_nrmBuffer;
+		GLuint m_elBuffer;
+		GLuint m_vao;
+		GLsizei m_indices_len;
+
+		glm::vec3 m_element_pos;
+		AntTweakBarHandle m_twbar;
 	};
 
 }
