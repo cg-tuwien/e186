@@ -137,6 +137,11 @@ namespace e186
 		{
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		} 
+		else if ((TexParams::ClampToBorder & parameters) != TexParams::None)
+		{
+			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(m_texture_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		}
 
 		if ((TexParams::NearestFiltering & parameters) != TexParams::None)
@@ -146,6 +151,12 @@ namespace e186
 		else
 		{	
 			glTexParameteri(m_texture_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+
+		if ((TexParams::EnableTextureCompareMode & parameters) != TexParams::None)
+		{
+			glTexParameteri(m_texture_target, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+			glTexParameteri(m_texture_target, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 		}
 
 		if ((TexParams::GenerateMipMaps & parameters) != TexParams::None)

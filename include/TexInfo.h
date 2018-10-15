@@ -17,8 +17,10 @@ namespace e186
 		AnisotropicFiltering16x	= 0x00000100,
 		AnisotropicFilteringMax = 0x00000200,
 		ClampToEdge				= 0x00001000,
-		Repeat					= 0x00002000,
-		MirroredRepeat			= 0x00004000,
+		ClampToBorder			= 0x00002000,
+		Repeat					= 0x00004000,
+		MirroredRepeat			= 0x00008000,
+		EnableTextureCompareMode= 0x00010000,
 	};
 
 	inline TexParams operator| (TexParams a, TexParams b)

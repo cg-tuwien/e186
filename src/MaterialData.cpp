@@ -248,7 +248,7 @@ namespace e186
 		GLint size_of_the_uniform_variable = 0;
 		GLenum type_of_the_uniform_variable = 0;
 
-		int32_t current_tex_unit = 0;
+		int32_t current_tex_unit = 2;
 
 		GLint count;
 		glGetProgramiv(shader.handle(), GL_ACTIVE_UNIFORMS, &count);
