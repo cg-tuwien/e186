@@ -10,6 +10,7 @@ namespace e186
 	{
 		m_texture_configs.reserve(kVecSize);
 		m_texture_configs_multisample.reserve(kVecSize);
+		m_texture_configs_shadow.reserve(kVecSize);
 
 		m_quad = Model::LoadFromFile("assets/models/quad01.obj", glm::mat4(1.0f), MOLF_default);
 		assert(m_quad);
@@ -39,6 +40,18 @@ namespace e186
 		m_transform_add_loc_multisample = m_shader_multisample.GetUniformLocation("transform_add");
 		m_pvmt_matrix_loc_multisample = m_shader_multisample.GetUniformLocation("pvmtMatrix");
 
+		m_shader_shadow
+			.AddToMultipleShaderSources(Shader::version_string(), ShaderType::Vertex | ShaderType::Fragment)
+			.AddVertexShaderSourceFromFile("assets/shaders/texture.vert")
+			.AddFragmentShaderSource("#define SHADOW")
+			.AddFragmentShaderSourceFromFile("assets/shaders/texture.frag")
+			.Build();
+
+		m_sampler_loc_shadow = m_shader_shadow.GetUniformLocation("sampler");
+		m_transform_mul_loc_shadow = m_shader_shadow.GetUniformLocation("transform_mul");
+		m_transform_add_loc_shadow = m_shader_shadow.GetUniformLocation("transform_add");
+		m_pvmt_matrix_loc_shadow = m_shader_shadow.GetUniformLocation("pvmtMatrix");
+
 		TwDefine(" 'Debug Textures' color='26 27 61' text=light position='232 400' ");
 	}
 
@@ -46,7 +59,7 @@ namespace e186
 	{
 	}
 
-	DebugTexDisplayer::DbgTexConfig* DebugTexDisplayer::Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name)
+	DebugTexDisplayer::DbgTexConfig* DebugTexDisplayer::Add(GLsizei width, GLsizei height, GLenum texTarget, GLuint glHandle, std::string name, bool isShadowSampler)
 	{
 		size_t n;
 		std::vector<DbgTexConfig>* vectr;
@@ -54,6 +67,11 @@ namespace e186
 		{
 			n = m_texture_configs_multisample.size();
 			vectr = &m_texture_configs_multisample;
+		}
+		else if(isShadowSampler)
+		{
+			n = m_texture_configs_shadow.size();
+			vectr = &m_texture_configs_shadow;
 		}
 		else
 		{
@@ -105,7 +123,7 @@ namespace e186
 		return Add(data.width(), data.height(), data.target(), data.handle(), std::move(name));
 	}
 
-	DebugTexDisplayer::DbgTexConfig* DebugTexDisplayer::Add(const FrameBufferObject& data, GLenum attachment, std::string name)
+	DebugTexDisplayer::DbgTexConfig* DebugTexDisplayer::Add(const FrameBufferObject& data, GLenum attachment, std::string name, bool isShadowSampler)
 	{
 		auto* texInfo = data.FindAttachedTexture(attachment);
 		if (nullptr == texInfo)
@@ -113,7 +131,7 @@ namespace e186
 			log_error("Couldn't find attached texture at attachment %u, with name[%s]", attachment, name.c_str());
 			return nullptr;
 		}
-		return Add(data.width(), data.height(), texInfo->target(), texInfo->handle(), std::move(name));
+		return Add(data.width(), data.height(), texInfo->target(), texInfo->handle(), std::move(name), isShadowSampler);
 	}
 
 	void DebugTexDisplayer::RenderConfigs(Shader& shader, std::vector<DbgTexConfig>& configs, const int wnd_height, const glm::mat4& pM, Mesh& quad_mesh, GLuint sampler_loc, GLuint transform_mul_loc, GLuint transform_add_loc, GLuint pvmt_matrix_loc)
@@ -208,6 +226,19 @@ namespace e186
 				m_transform_mul_loc_multisample,
 				m_transform_add_loc_multisample,
 				m_pvmt_matrix_loc_multisample);
+		}
+		if (m_texture_configs_shadow.size() > 0)
+		{
+			RenderConfigs(
+				m_shader_shadow,
+				m_texture_configs_shadow,
+				wnd_height,
+				pM,
+				quad_mesh,
+				m_sampler_loc_shadow,
+				m_transform_mul_loc_shadow,
+				m_transform_add_loc_shadow,
+				m_pvmt_matrix_loc_shadow);
 		}
 
 		glDepthMask(GL_TRUE);

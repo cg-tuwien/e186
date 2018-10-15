@@ -1,5 +1,10 @@
 #include "Tex2D.h"
 
+#ifdef __linux__
+    #define STB_IMAGE_IMPLEMENTATION
+    #include "stb_image.h"
+#endif
+
 namespace e186
 {
 	GLsizei Tex2D::CalculateMipMapLevelCount(GLsizei width, GLsizei height)

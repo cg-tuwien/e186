@@ -1,4 +1,6 @@
-#include "e186stdafx.h"
+#if defined(_WIN32)
+    #include "e186stdafx.h"
+#endif
 #include "SampleSceneTessIco.h"
 #include "MaxFpsTimer.h"
 #include "Shader.h"
