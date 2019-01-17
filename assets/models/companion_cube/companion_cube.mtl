@@ -1,0 +1,14 @@
+# Blender MTL File: 'companion_cube.obj'
+# Material Count: 1
+
+newmtl cube_heart
+	Ns 19.607843
+	Ni 1.000000
+	d 1.000000
+	illum 2
+	Ka 1.000000 1.000000 1.000000
+	Kd 0.560000 0.560000 0.560000
+	Ks 0.200000 0.200000 0.200000
+	Ke 0.000000 0.000000 0.000000
+	map_Kd cube_heart.jpg
+

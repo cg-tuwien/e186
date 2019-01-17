@@ -1,0 +1,20 @@
+layout(binding = 0, rgba16f) uniform restrict image3D uTex3D;
+uniform vec3 uFillColor;
+
+bool isEmpty(vec4 value)
+{
+    return (length(value.rgb) == 0);
+}
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in; // layout declaration
+void main()
+{
+    vec4 value = vec4(imageLoad(uTex3D, ivec3(gl_GlobalInvocationID.xyz)));
+
+    if (isEmpty(value))
+    {
+        imageStore(uTex3D, ivec3(gl_GlobalInvocationID.xyz), vec4(uFillColor, 1));
+    }
+}
+
+
