@@ -9,6 +9,9 @@ namespace e186
 	Tex3dDisplayer::Tex3dDisplayer(Tex3D& tex3d) 
 		: m_tex3d(tex3d)
 		, m_element_pos(0.0f, 0.0f, 0.0f)
+	    , m_element_scale(0.05f)
+	    , m_element_rotation_axis(1.0f, 1.0f, 1.0f)
+	    , m_element_rotation_angle(0.0f)
 		, m_twbar(Engine::current()->tweak_bar_manager().create_new_tweak_bar("3D-Texture Displayer"))
 	{
 		m_shader
@@ -17,6 +20,8 @@ namespace e186
 			.Build();
 
 		GLfloat side2 = 1.0 / 2.0f;
+
+		// cube
 
 		std::vector<GLfloat> p = {
 			// Front
@@ -135,8 +140,14 @@ namespace e186
 #endif
 		glBindVertexArray(0);
 
-		// ============= set up this tweak bar ====================
-		TwAddVarRW(m_twbar, "Position", TW_TYPE_DIR3F, glm::value_ptr(m_element_pos), nullptr);
+		// ============= set up tweak bar ====================
+
+		TwAddVarRW(m_twbar, "Pos", TW_TYPE_DIR3F, glm::value_ptr(m_element_pos), nullptr);
+		TwAddVarRW(m_twbar, "Scale", TW_TYPE_FLOAT, &m_element_scale, "min=0 step=0.01");
+		TwAddVarRW(m_twbar, "Rot Axis", TW_TYPE_DIR3F, glm::value_ptr(m_element_rotation_axis), nullptr);
+		TwAddVarRW(m_twbar, "Rot Angle", TW_TYPE_FLOAT, &m_element_rotation_angle, "step=0.01");
+
+
 	}
 
 	void Tex3dDisplayer::Render(const glm::mat4& mM, const glm::mat4& vM, const glm::mat4& pM)
@@ -153,7 +164,20 @@ namespace e186
 		glEnableVertexArrayAttrib(m_vao, 2);
 		glVertexArrayElementBuffer(m_vao, m_elBuffer);
 		//glDrawElements(GL_TRIANGLES, m_indices_len, GL_UNSIGNED_INT, nullptr);
+
+		// draw a cube for each voxel, instance positions are determined in shader using gl_InstanceID and 3D texture
 		glDrawElementsInstanced(GL_TRIANGLES, m_indices_len, GL_UNSIGNED_INT, nullptr, 
-			m_tex3d.width() * m_tex3d.height() * m_tex3d.depth());
+		                        m_tex3d.width() * m_tex3d.height() * m_tex3d.depth());
+	}
+
+	void Tex3dDisplayer::Render(const glm::mat4 &vM, const glm::mat4 &pM)
+	{
+		glm::mat4 centerTranslationMat = glm::translate(glm::vec3(-m_tex3d.width()/2, -m_tex3d.height()/2, -m_tex3d.depth()/2));
+		glm::mat4 scaleMat = glm::scale(glm::vec3(m_element_scale));
+		glm::mat4 rotationMat = glm::rotate(m_element_rotation_angle, m_element_rotation_axis);
+		glm::mat4 translationMat = glm::translate(m_element_pos);
+		glm::mat4 mMTweaked = translationMat * rotationMat * scaleMat * centerTranslationMat;
+
+		Render(mMTweaked, vM, pM);
 	}
 }
