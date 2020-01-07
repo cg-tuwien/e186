@@ -1,9 +1,13 @@
-# Engine186
+# e186
 
-Developed at Vienna University of Technology, institute 193.
+A real-time rendering framework for
+* OpenGL 4 and above
+* C++17
+* Visual Studio: All dependencies pre-configured, ready to go.
 
-**E**ngine**186**: Rocket jump into C++/OpenGL graphics programming in Visual Studio!
+Developed at TU Wien's Rendering and Modeling Group, Institute of Visual Computing & Human-Centered Technology.
 
+e186 is the basis framework for the assignments in the lecture Algorithms for Real-Time Rending, summer term 2018, and summer term 2020.
 
 # Credits and Copyright Notices
 
