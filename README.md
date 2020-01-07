@@ -1,9 +1,16 @@
-# e186
+# e186[Library]
 
-A real-time rendering framework for
-* OpenGL 4 and above
+A real-time rendering framework for:
+* OpenGL 4
 * C++17
-* Visual Studio: All dependencies pre-configured, ready to go.
+* Visual Studio 2019: All dependencies pre-configured and pre-built. It's ready to go as is.
+
+Setup:
+* Clone the repository 
+* Create a solution, e.g. by copying [templates/solution-template](https://github.com/cg-tuwien/e186/tree/master/templates/solution-template) or using [create-solution-from-template.bat](https://github.com/cg-tuwien/e186/tree/master/templates/create-solution-from-template.bat)
+* Create a project, e.g. by copying [templates/project-template](https://github.com/cg-tuwien/e186/tree/master/templates/project-template) or using [create-project-from-template.bat](https://github.com/cg-tuwien/e186/tree/master/templates/create-project-from-template.bat)
+* Add both, the e186 library's project file [project/e186.vcxproj](https://github.com/cg-tuwien/e186/tree/master/project/e186.vcxproj) and the project file of the previous step to the solution.
+* Build the solution and run the project.
 
 Developed at TU Wien's Rendering and Modeling Group, Institute of Visual Computing & Human-Centered Technology.
 
