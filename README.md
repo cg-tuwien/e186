@@ -9,12 +9,12 @@ Setup:
 * Clone the repository 
 * Create a solution, e.g. by copying [templates/solution-template](https://github.com/cg-tuwien/e186/tree/master/templates/solution-template) or using [create-solution-from-template.bat](https://github.com/cg-tuwien/e186/tree/master/templates/create-solution-from-template.bat)
 * Create a project, e.g. by copying [templates/project-template](https://github.com/cg-tuwien/e186/tree/master/templates/project-template) or using [create-project-from-template.bat](https://github.com/cg-tuwien/e186/tree/master/templates/create-project-from-template.bat)
-* Add both, the e186 library's project file [project/e186.vcxproj](https://github.com/cg-tuwien/e186/tree/master/project/e186.vcxproj) and the project file of the previous step to the solution.
+* Add both, the *e186* library's project file [project/e186.vcxproj](https://github.com/cg-tuwien/e186/tree/master/project/e186.vcxproj) and the project file of the previous step to the solution.
 * Build the solution and run the project.
 
 Developed at TU Wien's Rendering and Modeling Group, Institute of Visual Computing & Human-Centered Technology.
 
-e186 is the basis framework for the assignments in the lecture Algorithms for Real-Time Rending, summer term 2018, and summer term 2020.
+*e186* is the basis framework for the assignments in the course _Algorithms for Real-Time Rending_, summer term 2018, and summer term 2020.
 
 # Credits and Copyright Notices
 
