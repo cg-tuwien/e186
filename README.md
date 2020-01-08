@@ -3,20 +3,27 @@
 A real-time rendering framework for:
 * OpenGL 4
 * C++17
-* Visual Studio 2019: All dependencies pre-configured and pre-built. It's ready to go as is.
+
+Environment for which the project is preconfigured:
+* Windows 10, 64bit (make sure to have an SDK installed)
+* Visual Studio 2019 (Community Edition is fine)
+* There's a Linux port at [github.com/lemurni/Engine186-Linux](https://github.com/lemurni/Engine186-Linux) (It's a bit out of date, though)
 
 Setup:
 * Clone the repository 
-* Create a solution, e.g. by copying [templates/solution-template](https://github.com/cg-tuwien/e186/tree/master/templates/solution-template) or using [create-solution-from-template.bat](https://github.com/cg-tuwien/e186/tree/master/templates/create-solution-from-template.bat)
-* Create a project, e.g. by copying [templates/project-template](https://github.com/cg-tuwien/e186/tree/master/templates/project-template) or using [create-project-from-template.bat](https://github.com/cg-tuwien/e186/tree/master/templates/create-project-from-template.bat)
-* Add both, the *e186* library's project file [project/e186.vcxproj](https://github.com/cg-tuwien/e186/tree/master/project/e186.vcxproj) and the project file of the previous step to the solution.
-* Build the solution and run the project.
+* Open the solution file [visual_studio/e186_framework_and_example.sln](https://github.com/cg-tuwien/e186/tree/master/visual_studio/e186_framework_and_example.sln) with Visual Studio 2019
+* Build and run (Make sure that _"example"_ is selected as the start-up project; _"e186"_ is the library project which contains the framework)
 
-Developed at TU Wien's Rendering and Modeling Group, Institute of Visual Computing & Human-Centered Technology.
+# Example Code
 
-*e186* is the basis framework for the assignments in the course _Algorithms for Real-Time Rending_, summer term 2018, and summer term 2020.
+The example project located at [visual_studio/example](https://github.com/cg-tuwien/e186/tree/master/visual_studio/example) and it's single implementation file [visual_studio/example/main.cpp](https://github.com/cg-tuwien/e186/blob/master/visual_studio/example/main.cpp) may serve as a starting point. Implementation-wise, _e186_ is organized into scenes, two of which can be found at:
+* [src/ModelExplorerScene.cpp](https://github.com/cg-tuwien/e186/blob/master/src/ModelExplorerScene.cpp) ... a scene which loads a model and renders it.
+* [src/SampleSceneTessIco.cpp](https://github.com/cg-tuwien/e186/blob/master/src/SampleSceneTessIco.cpp) ... a scene wich loads a icosahedron model and renders it using tessellation shaders.      
+Please refer to these scene implementation files in order to learn how to use _e186_.
 
 # Credits and Copyright Notices
+
+Developed at TU Wien's Rendering and Modeling Group, Institute of Visual Computing & Human-Centered Technology.
 
 **ASSIMP**
 
