@@ -29,6 +29,8 @@
 #include <glm/ext.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtx/transform2.hpp>
+#include <glm/gtx/optimum_pow.hpp>
+#include <glm/gtx/extended_min_max.hpp>
 
 #include <assimp/Importer.hpp>  // C++ importer interface
 #include <assimp/scene.h>       // Output data structure

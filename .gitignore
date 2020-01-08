@@ -3,8 +3,6 @@
 # User-specific files
 *.suo
 *.user
-# ...but not inside the "templates" directory
-!/templates/**/*.user
 
 # Ignore build results
 [Dd]ebug/

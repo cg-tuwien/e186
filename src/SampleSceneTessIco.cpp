@@ -35,8 +35,9 @@ namespace e186
 		      .Build();
 
 		// load the model:
-		auto ico = Model::LoadFromFile("assets/models/icosahedron.obj", glm::mat4(1.0f));
-		ico->GenerateVAOsWithVertexAttribConfig(VertexAttribData::Position);
+		auto icoModel = Model::LoadFromFile("assets/models/icosahedron.obj", glm::mat4(1.0f));
+		icoModel->CreateAndUploadGpuData();
+		icoModel->GenerateVAOsWithVertexAttribConfig(VertexAttribData::Position);
 
 		// create a camera for view and projection matrices:
 		QuakeCamera cam;
@@ -87,7 +88,7 @@ namespace e186
 			shader.SetUniform("uDiffuseMaterial", glm::vec3(1.0f, 0.0f, 0.0f));
 			shader.SetUniform("uLightPosition", glm::vec3(0.0f, 100.0f, -50.0f));
 
-			RenderMesh(shader, ico->mesh_at(0));
+			RenderMesh(shader, icoModel->mesh_at(0));
 
 			Engine::current()->EndFrame();
 		}
