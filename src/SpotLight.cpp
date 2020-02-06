@@ -17,12 +17,12 @@ namespace e186
 	}
 
 	SpotLight::SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction,
-		float const_atten, float lin_atten, float quad_atten, float cub_atten,
+		float const_atten, float lin_atten, float quad_atten,
 		float outer_angle, float inner_angle, float falloff)
 		: m_position(position),
 		m_direction(glm::normalize(direction)),
 		m_light_color(color),
-		m_attenuation(const_atten, lin_atten, quad_atten, cub_atten),
+		m_attenuation(const_atten, lin_atten, quad_atten, 0.0f),
 		m_outer_angle(outer_angle),
 		m_inner_angle(inner_angle),
 		m_falloff(falloff),
@@ -44,12 +44,12 @@ namespace e186
 	}
 
 	SpotLight::SpotLight(const glm::vec3& color, Transform transform,
-		float const_atten, float lin_atten, float quad_atten, float cub_atten,
+		float const_atten, float lin_atten, float quad_atten,
 		float outer_angle, float inner_angle, float falloff)
 		: m_position(transform.GetPosition()),
 		m_direction(transform.GetFrontVector()),
 		m_light_color(color),
-		m_attenuation(const_atten, lin_atten, quad_atten, cub_atten),
+		m_attenuation(const_atten, lin_atten, quad_atten, 0.0f),
 		m_outer_angle(outer_angle),
 		m_inner_angle(inner_angle),
 		m_falloff(falloff),
@@ -94,11 +94,6 @@ namespace e186
 	void SpotLight::set_quadratic_attenuation(float attenuation)
 	{
 		m_attenuation = glm::vec4(m_attenuation[0], m_attenuation[1], attenuation, m_attenuation[3]);
-	}
-
-	void SpotLight::set_cubic_attenuation(float attenuation)
-	{
-		m_attenuation = glm::vec4(m_attenuation[0], m_attenuation[1], m_attenuation[2], attenuation);
 	}
 
 	void SpotLight::set_outer_angle(float outer_angle)

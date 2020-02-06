@@ -45,8 +45,6 @@ namespace e186
 		static void TW_CALL GetAllAtt1PlCB(void *value, void *clientData);
 		static void TW_CALL SetAllAtt2PlCB(const void *value, void *clientData);
 		static void TW_CALL GetAllAtt2PlCB(void *value, void *clientData);
-		static void TW_CALL SetAllAtt3PlCB(const void *value, void *clientData);
-		static void TW_CALL GetAllAtt3PlCB(void *value, void *clientData);
 
 		static void TW_CALL EnableAllSpotLightsCallback(void *clientData);
 		static void TW_CALL DisableAllSpotLightsCallback(void *clientData);
@@ -62,8 +60,6 @@ namespace e186
 		static void TW_CALL GetAllAtt1SlCB(void *value, void *clientData);
 		static void TW_CALL SetAllAtt2SlCB(const void *value, void *clientData);
 		static void TW_CALL GetAllAtt2SlCB(void *value, void *clientData);
-		static void TW_CALL SetAllAtt3SlCB(const void *value, void *clientData);
-		static void TW_CALL GetAllAtt3SlCB(void *value, void *clientData);
 
 		static void TW_CALL SetDLDirectionCallback(const void *value, void *clientData);
 		static void TW_CALL GetDLDirectionCallback(void *value, void *clientData);
@@ -89,8 +85,6 @@ namespace e186
 		static void TW_CALL GetAtt1PlCB(void *value, void *clientData);
 		static void TW_CALL SetAtt2PlCB(const void *value, void *clientData);
 		static void TW_CALL GetAtt2PlCB(void *value, void *clientData);
-		static void TW_CALL SetAtt3PlCB(const void *value, void *clientData);
-		static void TW_CALL GetAtt3PlCB(void *value, void *clientData);
 
 		static void TW_CALL SetEnabledSlCB(const void *value, void *clientData);
 		static void TW_CALL GetEnabledSlCB(void *value, void *clientData);
@@ -106,8 +100,6 @@ namespace e186
 		static void TW_CALL GetAtt1SlCB(void *value, void *clientData);
 		static void TW_CALL SetAtt2SlCB(const void *value, void *clientData);
 		static void TW_CALL GetAtt2SlCB(void *value, void *clientData);
-		static void TW_CALL SetAtt3SlCB(const void *value, void *clientData);
-		static void TW_CALL GetAtt3SlCB(void *value, void *clientData);
 		static void TW_CALL SetInnerAngleSlCB(const void *value, void *clientData);
 		static void TW_CALL GetInnerAngleSlCB(void *value, void *clientData);
 		static void TW_CALL SetOuterAngleSlCB(const void *value, void *clientData);
