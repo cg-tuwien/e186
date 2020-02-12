@@ -56,19 +56,6 @@ namespace e186
 		}
 	}
 
-	void TW_CALL LightsourceEditor::GetAllAtt3PlCB(void *value, void *clientData)
-	{
-		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
-		if (thiz->m_point_lights.size() > 0)
-		{
-			*reinterpret_cast<float*>(value) = thiz->m_point_lights[0].cubic_attenuation();
-		}
-		else
-		{
-			*reinterpret_cast<float*>(value) = 0.0f;
-		}
-	}
-
 	void TW_CALL LightsourceEditor::GetPosOffsetPlCB(void *value, void *clientData)
 	{
 		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
@@ -120,15 +107,6 @@ namespace e186
 		for (auto& ptlt : thiz->m_point_lights)
 		{
 			ptlt.set_quadratic_attenuation(*reinterpret_cast<const float*>(value));
-		}
-	}
-
-	void TW_CALL LightsourceEditor::SetAllAtt3PlCB(const void *value, void *clientData)
-	{
-		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
-		for (auto& ptlt : thiz->m_point_lights)
-		{
-			ptlt.set_cubic_attenuation(*reinterpret_cast<const float*>(value));
 		}
 	}
 
@@ -295,28 +273,6 @@ namespace e186
 		}
 	}
 
-	void TW_CALL LightsourceEditor::SetAllAtt3SlCB(const void *value, void *clientData)
-	{
-		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
-		for (auto& sptl : thiz->m_spot_lights)
-		{
-			sptl.set_cubic_attenuation(*reinterpret_cast<const float*>(value));
-		}
-	}
-
-	void TW_CALL LightsourceEditor::GetAllAtt3SlCB(void *value, void *clientData)
-	{
-		auto* thiz = reinterpret_cast<LightsourceEditor*>(clientData);
-		if (thiz->m_spot_lights.size() > 0)
-		{
-			*reinterpret_cast<float*>(value) = thiz->m_spot_lights[0].cubic_attenuation();
-		}
-		else
-		{
-			*reinterpret_cast<float*>(value) = 0.0f;
-		}
-	}
-
 
 	void TW_CALL LightsourceEditor::SetDLDirectionCallback(const void * value, void * clientData)
 	{
@@ -446,18 +402,6 @@ namespace e186
 		*reinterpret_cast<float*>(value) = ptlt->quadratic_attenuation();
 	}
 
-	void TW_CALL LightsourceEditor::SetAtt3PlCB(const void *value, void *clientData)
-	{
-		auto* ptlt = reinterpret_cast<PointLightWrapper*>(clientData);
-		ptlt->set_cubic_attenuation(*reinterpret_cast<const float*>(value));
-	}
-
-	void TW_CALL LightsourceEditor::GetAtt3PlCB(void *value, void *clientData)
-	{
-		auto* ptlt = reinterpret_cast<PointLightWrapper*>(clientData);
-		*reinterpret_cast<float*>(value) = ptlt->cubic_attenuation();
-	}
-
 	void TW_CALL LightsourceEditor::SetEnabledPlCB(const void *value, void *clientData)
 	{
 		auto* ptlt = reinterpret_cast<PointLightWrapper*>(clientData);
@@ -564,18 +508,6 @@ namespace e186
 		*reinterpret_cast<float*>(value) = sptl->quadratic_attenuation();
 	}
 
-	void TW_CALL LightsourceEditor::SetAtt3SlCB(const void *value, void *clientData)
-	{
-		auto* sptl = reinterpret_cast<SpotLightWrapper*>(clientData);
-		sptl->set_cubic_attenuation(*reinterpret_cast<const float*>(value));
-	}
-
-	void TW_CALL LightsourceEditor::GetAtt3SlCB(void *value, void *clientData)
-	{
-		auto* sptl = reinterpret_cast<SpotLightWrapper*>(clientData);
-		*reinterpret_cast<float*>(value) = sptl->cubic_attenuation();
-	}
-
 	void TW_CALL LightsourceEditor::SetInnerAngleSlCB(const void *value, void *clientData)
 	{
 		auto* sptl = reinterpret_cast<SpotLightWrapper*>(clientData);
@@ -661,7 +593,6 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, "All point lights: const-atten", TW_TYPE_FLOAT, SetAllAtt0PlCB, GetAllAtt0PlCB, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "All point lights: lin-atten", TW_TYPE_FLOAT, SetAllAtt1PlCB, GetAllAtt1PlCB, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "All point lights: quad-atten", TW_TYPE_FLOAT, SetAllAtt2PlCB, GetAllAtt2PlCB, this, " min=0.0 step=0.01 ");
-		TwAddVarCB(m_tweak_bar, "All point lights: cub-atten", TW_TYPE_FLOAT, SetAllAtt3PlCB, GetAllAtt3PlCB, this, " min=0.0 step=0.01 ");
 		TwAddSeparator(m_tweak_bar, nullptr, nullptr);
 		TwAddButton(m_tweak_bar, "Enable all spot lights", EnableAllSpotLightsCallback, this, nullptr);
 		TwAddButton(m_tweak_bar, "Disable all spot lights", DisableAllSpotLightsCallback, this, nullptr);
@@ -671,7 +602,6 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, "All spot lights: const-atten", TW_TYPE_FLOAT, SetAllAtt0SlCB, GetAllAtt0SlCB, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "All spot lights: lin-atten", TW_TYPE_FLOAT, SetAllAtt1SlCB, GetAllAtt1SlCB, this, " min=0.0 step=0.01 ");
 		TwAddVarCB(m_tweak_bar, "All spot lights: quad-atten", TW_TYPE_FLOAT, SetAllAtt2SlCB, GetAllAtt2SlCB, this, " min=0.0 step=0.01 ");
-		TwAddVarCB(m_tweak_bar, "All spot lights: cub-atten", TW_TYPE_FLOAT, SetAllAtt3SlCB, GetAllAtt3SlCB, this, " min=0.0 step=0.01 ");
 		TwAddSeparator(m_tweak_bar, nullptr, nullptr);
 		TwAddVarRW(m_tweak_bar, "Gizmo Transparency", TW_TYPE_FLOAT, &m_transparency, " min=0.01 max=1.0 step=0.01 ");
 		TwAddVarRW(m_tweak_bar, "PL Gizmo Scale", TW_TYPE_FLOAT, &m_gizmo_scale_ptl, " min=0.0 max=100.0 step=0.1 ");
@@ -740,7 +670,6 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, (name + " const-att").c_str(), TW_TYPE_FLOAT, SetAtt0PlCB, GetAtt0PlCB, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " linear-att").c_str(), TW_TYPE_FLOAT, SetAtt1PlCB, GetAtt1PlCB, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " quadr-att").c_str(), TW_TYPE_FLOAT, SetAtt2PlCB, GetAtt2PlCB, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarCB(m_tweak_bar, (name + " cubic-att").c_str(), TW_TYPE_FLOAT, SetAtt3PlCB, GetAtt3PlCB, point_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		int opened = 0;
 		auto plGroup = "Point Lights";
 		TwSetParam(m_tweak_bar, name.c_str(), "opened", TW_PARAM_INT32,   1, &opened);
@@ -783,7 +712,6 @@ namespace e186
 		TwAddVarCB(m_tweak_bar, (name + " const-att").c_str(), TW_TYPE_FLOAT,  SetAtt0SlCB, GetAtt0SlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " linear-att").c_str(), TW_TYPE_FLOAT, SetAtt1SlCB, GetAtt1SlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " quadr-att").c_str(), TW_TYPE_FLOAT,  SetAtt2SlCB, GetAtt2SlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
-		TwAddVarCB(m_tweak_bar, (name + " cubic-att").c_str(), TW_TYPE_FLOAT, SetAtt3SlCB, GetAtt3SlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " inner angle").c_str(), TW_TYPE_FLOAT, SetInnerAngleSlCB, GetInnerAngleSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " outer angle").c_str(), TW_TYPE_FLOAT, SetOuterAngleSlCB, GetOuterAngleSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());
 		TwAddVarCB(m_tweak_bar, (name + " falloff").c_str(), TW_TYPE_FLOAT, SetFalloffSlCB, GetFalloffSlCB, spot_light_ptr, (" min=0.0 step=0.01 " + groupAssignment).c_str());

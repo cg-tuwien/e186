@@ -19,10 +19,10 @@ namespace e186
 		SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction,
 			const glm::vec4& attenuation, float outer_angle, float inner_angle, float falloff);
 		SpotLight(const glm::vec3& color, const glm::vec3& position, const glm::vec3& direction,
-			float const_atten, float lin_atten, float quad_atten, float cub_atten,
+			float const_atten, float lin_atten, float quad_atten,
 			float outer_angle, float inner_angle, float falloff);
 		SpotLight(const glm::vec3& color, Transform transform,
-			float const_atten, float lin_atten, float quad_atten, float cub_atten,
+			float const_atten, float lin_atten, float quad_atten,
 			float outer_angle, float inner_angle, float falloff);
 		SpotLight(const SpotLight& other) noexcept = default;
 		SpotLight(SpotLight&& other) noexcept = default;
@@ -37,7 +37,6 @@ namespace e186
 		float const_attenuation() const { return m_attenuation.x; }
 		float linear_attenuation() const { return m_attenuation.y; }
 		float quadratic_attenuation() const { return m_attenuation.z; }
-		float cubic_attenuation() const { return m_attenuation.w; }
 		float outer_angle() const { return m_outer_angle; }
 		float inner_angle() const { return m_inner_angle; }
 		float falloff() const { return m_falloff; }
@@ -50,7 +49,6 @@ namespace e186
 		void set_const_attenuation(float attenuation);
 		void set_linear_attenuation(float attenuation);
 		void set_quadratic_attenuation(float attenuation);
-		void set_cubic_attenuation(float attenuation);
 		void set_outer_angle(float outer_angle);
 		void set_inner_angle(float inner_angle);
 		void set_falloff(float falloff);
@@ -92,7 +90,6 @@ namespace e186
 		float const_attenuation() const { return m_light.attenuation().x; }
 		float linear_attenuation() const { return m_light.attenuation().y; }
 		float quadratic_attenuation() const { return m_light.attenuation().z; }
-		float cubic_attenuation() const { return m_light.attenuation().w; }
 		float outer_angle() const { return m_light.outer_angle(); }
 		float inner_angle() const { return m_light.inner_angle(); }
 		float falloff() const { return m_light.falloff(); }
@@ -130,11 +127,6 @@ namespace e186
 			m_light.set_quadratic_attenuation(attenuation); 
 			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
 		}
-		void set_cubic_attenuation(float attenuation)
-		{
-			m_light.set_cubic_attenuation(attenuation); 
-			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
-		}
 		void set_enabled(bool is_enabled)
 		{
 			m_light.set_enabled(is_enabled); 
@@ -168,4 +160,3 @@ inline e186::SpotLightWrapper e186::LightCollection<e186::SpotLight, e186::SpotL
 {
 	return SpotLightWrapper{ m_lights[i], this, i };
 }
-

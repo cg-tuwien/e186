@@ -510,7 +510,7 @@ namespace e186
 									shader.SetSampler(static_cast<GLuint>(MaterialUniformLocation::NormalsTexture), *mat.normals_tex(), tex_unit);
 								}
 								else {
-									shader.SetSampler(static_cast<GLuint>(MaterialUniformLocation::NormalsTexture), *MaterialData::GetOrCreateWhiteTex(), tex_unit);
+									shader.SetSampler(static_cast<GLuint>(MaterialUniformLocation::NormalsTexture), *MaterialData::GetOrCreateStraightUpNormalTex(), tex_unit);
 								}
 							} );
 						}
@@ -526,8 +526,8 @@ namespace e186
 									});
 								}
 								else {
-									setter.set_func([tex_unit, white_tex = MaterialData::GetOrCreateWhiteTex()](const Shader& shader, const MaterialData& mat, UniformSubSetter& setter) {
-										shader.SetSampler(static_cast<GLuint>(MaterialUniformLocation::NormalsTexture), *white_tex, tex_unit);
+									setter.set_func([tex_unit, straight_up_normals_tex = MaterialData::GetOrCreateStraightUpNormalTex()](const Shader& shader, const MaterialData& mat, UniformSubSetter& setter) {
+										shader.SetSampler(static_cast<GLuint>(MaterialUniformLocation::NormalsTexture), *straight_up_normals_tex, tex_unit);
 									});
 								}
 							} );

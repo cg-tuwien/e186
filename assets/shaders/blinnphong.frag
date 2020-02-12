@@ -54,10 +54,9 @@ out vec4 oFragColor;
 // @param atten attenuation data
 // @param dist  distance
 // @param dist2 squared distance
-// @param dist3 cubed distance
-float CalcAttenuation(vec4 atten, float dist, float dist2, float dist3)
+float CalcAttenuation(vec4 atten, float dist, float dist2)
 {
-	return atten[0] + atten[1] * dist + atten[2] * dist2 + atten[3] * dist3;
+	return atten[0] + atten[1] * dist + atten[2] * dist2;
 }
 
 // Calculates the diffuse and specular illumination contribution for the given
@@ -101,7 +100,7 @@ void main()
 	float dist_sq = dot(to_light, to_light);
 	float dist = sqrt(dist_sq);
 	vec3 to_light_nrm = to_light / dist;
-	float atten = CalcAttenuation(uPointLight.attenuation, dist, dist_sq, dist * dist_sq);
+	float atten = CalcAttenuation(uPointLight.attenuation, dist, dist_sq);
 	vec3 pl_intensity = uPointLight.color.rgb / atten;
 	diffuse_and_specular += pl_intensity * CalcBlinnPhongDiffAndSpecContribution(to_light_nrm, to_eye_nrm_vs, normal_vs, diff_tex_color);
 

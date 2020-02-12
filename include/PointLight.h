@@ -14,8 +14,8 @@ namespace e186
 	public:
 		PointLight(const glm::vec3& color, const glm::vec3& position);
 		PointLight(const glm::vec3& color, const glm::vec3& position, const glm::vec4& attenuation);
-		PointLight(const glm::vec3& color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten, float cub_atten);
-		PointLight(const glm::vec3& color, Transform transform, float const_atten, float lin_atten, float quad_atten, float cub_atten);
+		PointLight(const glm::vec3& color, const glm::vec3& position, float const_atten, float lin_atten, float quad_atten);
+		PointLight(const glm::vec3& color, Transform transform, float const_atten, float lin_atten, float quad_atten);
 		PointLight(const PointLight& other) noexcept = default;
 		PointLight(PointLight&& other) noexcept = default;
 		PointLight& operator=(const PointLight& other) noexcept = default;
@@ -28,7 +28,6 @@ namespace e186
 		float const_attenuation() const { return m_attenuation.x; }
 		float linear_attenuation() const { return m_attenuation.y; }
 		float quadratic_attenuation() const { return m_attenuation.z; }
-		float cubic_attenuation() const { return m_attenuation.w; }
 		//Transform& transform() { return m_transform; }
 		bool enabled() const { return m_enabled; }
 
@@ -38,7 +37,6 @@ namespace e186
 		void set_const_attenuation(float attenuation);
 		void set_linear_attenuation(float attenuation);
 		void set_quadratic_attenuation(float attenuation);
-		void set_cubic_attenuation(float attenuation);
 		void set_enabled(bool is_enabled);
 
 		PointLightGpuData GetGpuData() const;
@@ -73,7 +71,6 @@ namespace e186
 		float const_attenuation() const { return m_light.attenuation().x; }
 		float linear_attenuation() const { return m_light.attenuation().y; }
 		float quadratic_attenuation() const { return m_light.attenuation().z; }
-		float cubic_attenuation() const { return m_light.attenuation().w; }
 		bool enabled() const { return m_light.enabled(); }
 		void set_position(glm::vec3 position)
 		{
@@ -101,11 +98,6 @@ namespace e186
 		void set_quadratic_attenuation(float attenuation)
 		{
 			m_light.set_quadratic_attenuation(attenuation); 
-			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
-		}
-		void set_cubic_attenuation(float attenuation)
-		{
-			m_light.set_cubic_attenuation(attenuation); 
 			if (nullptr != m_collection) m_collection->UpdateGpuData(m_light_index);
 		}
 		void set_enabled(bool is_enabled)
