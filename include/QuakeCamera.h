@@ -21,6 +21,16 @@ namespace e186
 		void set_fast_multiplier(float value) { m_fast_multiplier = value; }
 		void set_slow_multiplier(float value) { m_slow_multiplier = value; }
 
+		void AlignWithRotationMatrix();
+
+		void LookAt(Transform* target);
+		void LookAt(const glm::vec3& target);
+		void LookAlong(const glm::vec3& direction);
+
+		void AlignUpVectorTowards(Transform* target);
+		void AlignUpVectorTowards(const glm::vec3& target);
+		void AlignUpVectorAlong(const glm::vec3& direction);
+		
 	private:
 		float m_rotation_speed;
 		float m_move_speed;

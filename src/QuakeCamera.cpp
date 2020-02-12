@@ -37,6 +37,63 @@ namespace e186
 		glfwSetInputMode(Engine::current()->main_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
+	void QuakeCamera::AlignWithRotationMatrix()
+	{
+		const auto front = glm::vec3{0.f, 0.f, -1.f};
+		const auto off = glm::mat3{m_rotation} * front;
+		const auto nrmOff = glm::normalize(off);
+		
+		const auto horiz = glm::normalize(glm::vec3{off.x, 0.f, off.z});
+		const auto dotHoriz = glm::dot(front, horiz);
+		const auto crossHoriz = glm::cross(front, horiz);
+		const auto horizSign = glm::sign(crossHoriz.y);
+		const auto angleHoriz = horizSign * glm::acos( dotHoriz );
+
+		const auto dotVerti = glm::clamp(glm::dot(horiz, nrmOff), -1.0f, 1.0f);
+		const auto rotAxis = glm::cross(horiz, nrmOff);
+		const auto crossVerti = glm::cross(rotAxis, horiz); // still on xz-plane
+		const auto vertSign = glm::sign(crossVerti.y);
+		const auto angleVerti = vertSign * glm::acos( dotVerti );
+		
+		m_accumulated_mouse_movement = glm::vec2{angleHoriz, angleVerti};
+	}
+
+	void QuakeCamera::LookAt(Transform* target)
+	{
+		Transform::LookAt(target);
+		AlignWithRotationMatrix();
+	}
+	
+	void QuakeCamera::LookAt(const glm::vec3& target)
+	{
+		Transform::LookAt(target);
+		AlignWithRotationMatrix();
+	}
+	
+	void QuakeCamera::LookAlong(const glm::vec3& direction)
+	{
+		Transform::LookAlong(direction);
+		AlignWithRotationMatrix();
+	}
+
+	void QuakeCamera::AlignUpVectorTowards(Transform* target)
+	{
+		Transform::AlignUpVectorTowards(target);
+		AlignWithRotationMatrix();
+	}
+	
+	void QuakeCamera::AlignUpVectorTowards(const glm::vec3& target)
+	{
+		Transform::AlignUpVectorTowards(target);
+		AlignWithRotationMatrix();
+	}
+	
+	void QuakeCamera::AlignUpVectorAlong(const glm::vec3& direction)
+	{
+		Transform::AlignUpVectorAlong(direction);
+		AlignWithRotationMatrix();
+	}
+
 	void QuakeCamera::AddToCameraPositionRelative(const glm::vec4& homoVectorToAdd, double deltaTime)
 	{
 		glm::vec3 rotatedVector = glm::vec3(m_rotation * homoVectorToAdd);
