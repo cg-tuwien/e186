@@ -38,22 +38,22 @@ namespace e186
 		static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void glfw_char_callback(GLFWwindow* window, unsigned int codepoint);
 
-		std::vector<std::function<void(GLFWwindow*, int, int)>> m_stored_windowsize_callbacks;
+		std::deque<std::function<void(GLFWwindow*, int, int)>> m_stored_windowsize_callbacks;
 		std::vector<std::function<void(GLFWwindow*, int, int)>*> m_windowsize_callbacks;
 
-		std::vector<std::function<void(GLFWwindow*, int, int, int)>> m_stored_mouse_button_callbacks;
+		std::deque<std::function<void(GLFWwindow*, int, int, int)>> m_stored_mouse_button_callbacks;
 		std::vector<std::function<void(GLFWwindow*, int, int, int)>*> m_mouse_button_callbacks;
 		
-		std::vector<std::function<void(GLFWwindow*, double, double)>> m_stored_cursor_pos_callbacks;
+		std::deque<std::function<void(GLFWwindow*, double, double)>> m_stored_cursor_pos_callbacks;
 		std::vector<std::function<void(GLFWwindow*, double, double)>*> m_cursor_pos_callbacks;
 		
-		std::vector<std::function<void(GLFWwindow*, double, double)>> m_stored_scroll_callbacks;
+		std::deque<std::function<void(GLFWwindow*, double, double)>> m_stored_scroll_callbacks;
 		std::vector<std::function<void(GLFWwindow*, double, double)>*> m_scroll_callbacks;
 		
-		std::vector<std::function<void(GLFWwindow*, int, int, int, int)>> m_stored_key_callbacks;
+		std::deque<std::function<void(GLFWwindow*, int, int, int, int)>> m_stored_key_callbacks;
 		std::vector<std::function<void(GLFWwindow*, int, int, int, int)>*> m_key_callbacks;
 		
-		std::vector<std::function<void(GLFWwindow*, unsigned int)>> m_stored_char_callbacks;
+		std::deque<std::function<void(GLFWwindow*, unsigned int)>> m_stored_char_callbacks;
 		std::vector<std::function<void(GLFWwindow*, unsigned int)>*> m_char_callbacks;
 
 #if defined(_DEBUG)
