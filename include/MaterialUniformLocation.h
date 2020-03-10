@@ -5,97 +5,97 @@ namespace e186
 	*/
 	enum class MaterialUniformLocation : unsigned int
 	{
-		/*! Diffuse color at layout (location = 110) */
+		/*! Diffuse color at layout (location = 110) -- type: vec3 */
 		DiffuseColor = 110,
 
-		/*! Specular color at layout (location = 111) */
+		/*! Specular color at layout (location = 111) -- type: vec3 */
 		SpecularColor,
 
-		/*! Ambient color value at layout (location = 112) */
+		/*! Ambient color value at layout (location = 112) -- type: vec3 */
 		AmbientColor,
 
-		/*! Emissive color value at layout (location = 113) */
+		/*! Emissive color value at layout (location = 113) -- type: vec3 */
 		EmissiveColor,
 
-		/*! Transparent color value at layout (location = 114) */
+		/*! Transparent color value at layout (location = 114) -- type: vec3 */
 		TransparentColor,
 
-		/*! Opacity value at layout (location = 115) */
+		/*! Opacity value at layout (location = 115) -- type: float */
 		Opacity,
 
-		/*! Transparent color value at layout (location = 116) */
+		/*! Shininess factor at layout (location = 116) -- type: float */
 		Shininess,
 
-		/*! Transparent color value at layout (location = 117) */
+		/*! Shininess strength at layout (location = 117) -- type: float */
 		ShininessStrength,
 
-		/*! Transparent color value at layout (location = 118) */
+		/*! Refraction Index at layout (location = 118) -- type: float */
 		RefractionIndex,
 
-		/*! Transparent color value at layout (location = 119) */
+		/*! Reflectivity value at layout (location = 119) -- type: float */
 		Reflectivity,
 
-		/*! Diffuse texture sampler at layout (location = 120) */
+		/*! Diffuse texture sampler at layout (location = 120) -- type: sampler2D */
 		DiffuseTexture,
 
-		/*! Specular texture sampler at layout (location = 121) */
+		/*! Specular texture sampler at layout (location = 121) -- type: sampler2D */
 		SpecularTexture,
 
-		/*! Ambient texture sampler at layout (location = 122) */
+		/*! Ambient texture sampler at layout (location = 122) -- type: sampler2D */
 		AmbientTexture,
 
-		/*! Emissive texture sampler at layout (location = 123) */
+		/*! Emissive texture sampler at layout (location = 123) -- type: sampler2D */
 		EmissiveTexture,
 
-		/*! Height texture sampler at layout (location = 124) */
+		/*! Height texture sampler at layout (location = 124) -- type: sampler2D */
 		HeightTexture,
 
-		/*! Normals texture sampler at layout (location = 125) */
+		/*! Normals texture sampler at layout (location = 125) -- type: sampler2D */
 		NormalsTexture,
 
-		/*! Shininess texture sampler at layout (location = 126) */
+		/*! Shininess texture sampler at layout (location = 126) -- type: sampler2D */
 		ShininessTexture,
 
-		/*! Opacity texture sampler at layout (location = 127) */
+		/*! Opacity texture sampler at layout (location = 127) -- type: sampler2D */
 		OpacityTexture,
 
-		/*! Displacement texture sampler at layout (location = 128) */
+		/*! Displacement texture sampler at layout (location = 128) -- type: sampler2D */
 		DisplacementTexture,
 
-		/*! Reflection texture sampler at layout (location = 129) */
+		/*! Reflection texture sampler at layout (location = 129) -- type: sampler2D */
 		ReflectionTexture,
 
-		/*! Lightmap texture sampler at layout (location = 130) */
+		/*! Lightmap texture sampler at layout (location = 130) -- type: sampler2D */
 		LightmapTexture,
 
-		/*! Albedo color at layout (location = 131) */
+		/*! Albedo color at layout (location = 131) -- type: vec3 */
 		Albedo,
 
-		/*! Metallic factor at layout (location = 132) */
+		/*! Metallic factor at layout (location = 132) -- type: float */
 		Metallic,
 
-		/*! Smoothness factor at layout (location = 133) */
+		/*! Smoothness factor at layout (location = 133) -- type: float */
 		Smoothness,
 		
-		/*! Sheen factor at layout (location = 134) */
+		/*! Sheen factor at layout (location = 134) -- type: float */
 		Sheen,
 
-		/*! Thickness factor at layout (location = 135) */
+		/*! Thickness factor at layout (location = 135) -- type: float */
 		Thickness,
 
-		/*! Roughness factor at layout (location = 136) */
+		/*! Roughness factor at layout (location = 136) -- type: float */
 		Roughness,
 
-		/*! Anisotropy at layout (location = 137) */
+		/*! Anisotropy at layout (location = 137) -- type: float */
 		Anisotropy,
 
-		/*! Anisotropy Rotation at layout (location = 138) */
+		/*! Anisotropy Rotation at layout (location = 138) -- type: vec3 */
 		AnisotropyRotation,
 
-		/*! (Texturecoordinate-)Offset at layout (location = 139) */
+		/*! (Texturecoordinate-)Offset at layout (location = 139) -- type: vec2 */
 		Offset,
 
-		/*! (Texture-)Tiling or Texture Scale at layout (location = 140) */
+		/*! (Texture-)Tiling or Texture Scale at layout (location = 140) -- type: vec2 */
 		Tiling,
 	};
 
